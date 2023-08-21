@@ -11,9 +11,9 @@ from java_to_python_transpiler.token_classes import TokenType, Token
 ERROR_MESSAGE = "Invalid character: {0}"
 
 
-def start_lexing(java_source: str) -> List[Token]:
+def tokenize_code(java_source: str) -> List[Token]:
     """
-    This function begins the lexing process
+    This functions tokenizes java source code
 
     This function has a singular parameter: java_source of type string
 
