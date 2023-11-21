@@ -13,7 +13,7 @@ ERROR_MESSAGE = "Invalid character: {0}"
 
 def tokenize_input_string(input: str) -> List[Token]:
     """
-    This functions tokenizes java source code
+    This function tokenizes java source code
 
     This function has a singular parameter: input of type string
 
@@ -22,30 +22,35 @@ def tokenize_input_string(input: str) -> List[Token]:
     :return a list of tokens
     """
 
-    token_list = []
+    token_list: List[Token] = []
     current_index = 0
+    length_of_input = len(input)
 
-    while current_index < len(input):
-        regex_match = None
+    while current_index < length_of_input:
+        match = None
 
         # TokenType is an Enum and they are iterable
         for token_type in TokenType:
-            regex_pattern = re.compile(token_type.value)
-            regex_match = regex_pattern.match(input, current_index)
+            
+            # TokenType.value stores the regex pattern.
+            pattern = re.compile(token_type.value)
+            match = pattern.match(input, current_index)
 
-            if regex_match is not None:
-                token_value = regex_match.group(0)
+            if match is not None:
+                token_value = match.group(0)
 
                 # Whitespace is ignored in Java
                 if token_type is not TokenType.WHITESPACE:
                     token = Token(token_type, token_value)
                     token_list.append(token)
 
-                current_index = regex_match.end()
+                current_index = match.end()
                 break
 
-        if regex_match is None:
-            raise ValueError(ERROR_MESSAGE.format(input[current_index]))
+        if match is None:
+            input_at_current_index = input[current_index]
+            error_message = ERROR_MESSAGE.format(input_at_current_index)
+            raise ValueError(error_message)
 
     return token_list
 
