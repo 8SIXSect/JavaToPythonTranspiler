@@ -2,7 +2,7 @@
 This module contains methods for transpiling source to source
 """
 
-from java_to_python_transpiler.java_lexer import tokenize_code
+from java_to_python_transpiler.scan_and_lex_input import tokenize_input_string
 
 
 PROMPT = ">>> "
@@ -18,6 +18,6 @@ def lexer_shell() -> None:
 
     while True:
         user_input = input(PROMPT)
-        lexer_result = tokenize_code(user_input)
+        lexer_result = tokenize_input_string(user_input)
         print(lexer_result)
 

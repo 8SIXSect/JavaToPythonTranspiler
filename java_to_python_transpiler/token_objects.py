@@ -78,3 +78,4 @@ class Token:
 
     token_type: TokenType
     value: str
+
