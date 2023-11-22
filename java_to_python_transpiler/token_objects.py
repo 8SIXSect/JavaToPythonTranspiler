@@ -34,7 +34,6 @@ class TokenType(Enum):
     DIVIDE = r"\/"
     MODULO = r"%"
 
-    IDENTIFIER = r"[a-zA-Z_$][\da-zA-Z_]*"
     FLOAT_LITERAL = \
         r"(\d[_\d]*\d|\d)\.(\d[_\d]*\d|\d)?([eE][+-]?(\d[_\d]*\d|\d))?[fFdD]?"
     DECIMAL_LITERAL = r"([1-9]([_\d]*\d+)?|0)[lL]?"
@@ -66,6 +65,28 @@ class TokenType(Enum):
     IF = r"if"
     ELSE = r"else"
     WHILE = r"while"
+    a = "(?!if\b|else\b)"
+
+    def setup_identifier_and_regex_string(self) -> None:
+        """
+        This function's purpose is to set the IDENTIFIER TokenType regex.
+        Identifier needs to ignore every single keyword and so this method 
+        is able to make things easier.
+        """
+
+        IDENTIFIER_REGEX_PREFIX = "(?!{0})"
+        IDENTIFIER_REGEX_SUFFIX =  `r"[a-zA-Z_$][\da-zA-Z_]*"
+        
+        KEYWORDS = (
+            TRUE, FALSE, NULL, PUBLIC, PRIVATE, VOID, STATIC, BYTE, SHORT,
+            CHAR, INT, LONG, FLOAT, DOUBLE, BOOLEAN, CLASS, RETURN, NEW,
+            PACKAGE, IMPORT, EXTENDS, IF, ELSE, WHILE,
+        )
+
+
+        identifier_regex = ""
+        for keyword in KEYWORDS:
+            identifier_regex += IDENTIFIER_REGEX_PREFIX.format()
 
 
 @dataclass
