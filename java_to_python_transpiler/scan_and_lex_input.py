@@ -226,4 +226,3 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     was_successful = True
     return LexerResult(was_successful, tokens_with_keywords_as_list)
 
-
