@@ -33,6 +33,30 @@ STRING_LITERAL_TOKEN_TYPE: str = "STRING_LITERAL"
 WHITESPACE_TOKEN_TYPE: str = "WHITESPACE"
 IDENTIFIER_TOKEN_TYPE: str = "IDENTIFIER"
 
+TRUE_TOKEN_TYPE: str = r"TRUE"
+FALSE_TOKEN_TYPE: str = r"FALSE"
+NULL_TOKEN_TYPE: str = r"NULL"
+PUBLIC_TOKEN_TYPE: str = r"PUBLIC"
+PRIVATE_TOKEN_TYPE: str = r"PRIVATE"
+VOID_TOKEN_TYPE: str = r"VOID"
+STATIC_TOKEN_TYPE: str = r"STATIC"
+BYTE_TOKEN_TYPE: str = r"BYTE"
+SHORT_TOKEN_TYPE: str = r"SHORT"
+CHAR_TOKEN_TYPE: str = r"CHAR"
+INT_TOKEN_TYPE: str = r"INT"
+LONG_TOKEN_TYPE: str = r"LONG"
+FLOAT_TOKEN_TYPE: str = r"FLOAT"
+DOUBLE_TOKEN_TYPE: str = r"DOUBLE"
+BOOLEAN_TOKEN_TYPE: str = r"BOOLEAN"
+CLASS_TOKEN_TYPE: str = r"CLASS"
+RETURN_TOKEN_TYPE: str = r"RETURN"
+NEW_TOKEN_TYPE: str = r"NEW"
+PACKAGE_TOKEN_TYPE: str = r"PACKAGE"
+IMPORT_TOKEN_TYPE: str = r"IMPORT"
+IF_TOKEN_TYPE: str = r"IF"
+ELSE_TOKEN_TYPE: str = r"ELSE"
+WHILE_TOKEN_TYPE: str = r"WHILE"
+
 
 TOKEN_PATTERNS = {
     r"//.*": SINGLE_LINE_COMMENT_TOKEN_TYPE,
@@ -56,34 +80,6 @@ TOKEN_PATTERNS = {
     r"\"([^\"\\],|\\[btnfr\"\'\\])*\"": STRING_LITERAL_TOKEN_TYPE,
     r"\s+": WHITESPACE_TOKEN_TYPE,
     r"[a-zA-Z_$][\da-zA-Z_]*": IDENTIFIER_TOKEN_TYPE,
-}
-
-
-_ = {
-    "TRUE": r"true",
-    "FALSE": r"false",
-    "NULL": r"null",
-    "PUBLIC": r"public",
-    "PRIVATE": r"private",
-    "VOID": r"void",
-    "STATIC": r"static",
-    "BYTE": r"byte",
-    "SHORT": r"short",
-    "CHAR": r"char",
-    "INT": r"int",
-    "LONG": r"long",
-    "FLOAT": r"float",
-    "DOUBLE": r"double",
-    "BOOLEAN": r"boolean",
-    "CLASS": r"class",
-    "RETURN": r"return",
-    "NEW": r"new",
-    "PACKAGE": r"package",
-    "IMPORT": r"import",
-    "EXTENDS": r"extends",
-    "IF": r"if",
-    "ELSE": r"else",
-    "WHILE": r"while"
 }
 
 
@@ -171,6 +167,63 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
 
         position += match.end()
 
+
+    def change_identifier_to_keyword(token: Token) -> Token:
+        """
+        The purpose of this function is to take in a Token.
+
+        If the Token is not an identifier then the Token is returned as it
+
+        If the Token is of type identifier, it will check if that identifier is
+        a keyword. If it is a keyword, then it will create a new keyword Token
+        """
+        
+        KEYWORDS = {
+            r"true": TRUE_TOKEN_TYPE,
+            r"false": FALSE_TOKEN_TYPE,
+            r"null": NULL_TOKEN_TYPE,
+            r"public": PUBLIC_TOKEN_TYPE,
+            r"private": PRIVATE_TOKEN_TYPE,
+            r"void": VOID_TOKEN_TYPE,
+            r"static": STATIC_TOKEN_TYPE,
+            r"byte": BYTE_TOKEN_TYPE,
+            r"short": SHORT_TOKEN_TYPE,
+            r"char": CHAR_TOKEN_TYPE,
+            r"int": INT_TOKEN_TYPE,
+            r"long": LONG_TOKEN_TYPE,
+            r"float": FLOAT_TOKEN_TYPE,
+            r"double": DOUBLE_TOKEN_TYPE,
+            r"boolean": BOOLEAN_TOKEN_TYPE,
+            r"class": CLASS_TOKEN_TYPE,
+            r"return": RETURN_TOKEN_TYPE,
+            r"new": NEW_TOKEN_TYPE,
+            r"package": PACKAGE_TOKEN_TYPE,
+            r"import": IMPORT_TOKEN_TYPE,
+            r"if": IF_TOKEN_TYPE,
+            r"else": ELSE_TOKEN_TYPE,
+            r"while": WHILE_TOKEN_TYPE,
+        }
+        
+        if token.token_type != IDENTIFIER_TOKEN_TYPE:
+            return token
+
+        if token.value not in KEYWORDS.keys():
+            return token
+
+        keyword_token_type: str = KEYWORDS[token.value]
+
+        # The value is kind of redundant
+        keyword_value: str = token.value
+        keyword_token: Token = Token(keyword_token_type, keyword_value)
+
+        return keyword_token
+
+
+    tokens_with_keywords: map[Token] = map(change_identifier_to_keyword, tokens)
+    tokens_with_keywords_as_list: List[Token] = list(tokens_with_keywords)
+
+
     was_successful = True
-    return LexerResult(was_successful, tokens)
+    return LexerResult(was_successful, tokens_with_keywords_as_list)
+
 
