@@ -2,13 +2,10 @@
 This module's purpose is to tokenize user input (some Java source code string)
 """
 
+from dataclasses import dataclass
 import re
-from typing import List
+from typing import List, Optional
 from java_to_python_transpiler.token_objects import TokenType, Token
-
-
-# This string is used in formatting
-ERROR_MESSAGE = "Invalid character: {0}"
 
 
 def tokenize_input_string(input: str) -> List[Token]:
@@ -22,35 +19,21 @@ def tokenize_input_string(input: str) -> List[Token]:
     :return a list of tokens
     """
 
-    token_list: List[Token] = []
-    current_index = 0
-    length_of_input = len(input)
+    @dataclass
+    class LexerResult:
+        """ This dataclass provides information from the Lexer """
+        
+        was_successful: bool
+        match_object: Optional[re.Match[str]]
+        token: Optional[Token]
 
-    while current_index < length_of_input:
-        match = None
+    tokens: List[Token] = []
+    position = 0
 
-        # TokenType is an Enum and they are iterable
-        for token_type in TokenType:
-            
-            # TokenType.value stores the regex pattern.
-            pattern = re.compile(token_type.value)
-            match = pattern.match(input, current_index)
+    while position < len(input):
 
-            if match is not None:
-                token_value = match.group(0)
+        for token_type_key in TokenType.keys():
+            print(token_type_key)
+        break
 
-                # Whitespace is ignored in Java
-                if token_type is not TokenType.WHITESPACE:
-                    token = Token(token_type, token_value)
-                    token_list.append(token)
-
-                current_index = match.end()
-                break
-
-        if match is None:
-            input_at_current_index = input[current_index]
-            error_message = ERROR_MESSAGE.format(input_at_current_index)
-            raise ValueError(error_message)
-
-    return token_list
 
