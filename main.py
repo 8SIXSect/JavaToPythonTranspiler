@@ -1,6 +1,6 @@
-from java_to_python_transpiler import lexer_shell
+from java_to_python_transpiler import test_parser 
 
 
 if __name__ == "__main__":
-    lexer_shell()
+    test_parser()
 
