@@ -9,7 +9,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "5+5"
+    user_input = "x+5"
 
     lexer_result: java_to_python.LexerResult = \
             java_to_python.scan_and_tokenize_input(user_input)

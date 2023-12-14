@@ -601,9 +601,14 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
         term node; otherwise, it contains an error message.
         """
 
+        FACTOR_TOKEN_TYPES: List[str] = [
+            DECIMAL_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, FALSE_TOKEN_TYPE,
+            IDENTIFIER_TOKEN_TYPE,
+        ]
+
         current_token = tokens.pop(0)
 
-        if current_token.token_type != DECIMAL_LITERAL_TOKEN_TYPE:
+        if current_token.token_type not in FACTOR_TOKEN_TYPES:
             return report_error(current_token.token_type)
 
         factor_node = FactorNode(current_token.value)
