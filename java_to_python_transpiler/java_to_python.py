@@ -35,6 +35,7 @@ DECIMAL_LITERAL_TOKEN_TYPE: str = "DECIMAL_LITERAL"
 STRING_LITERAL_TOKEN_TYPE: str = "STRING_LITERAL"
 WHITESPACE_TOKEN_TYPE: str = "WHITESPACE"
 IDENTIFIER_TOKEN_TYPE: str = "IDENTIFIER"
+END_OF_FILE_TOKEN_TYPE: str = "EOF"
 
 TRUE_TOKEN_TYPE: str = r"TRUE"
 FALSE_TOKEN_TYPE: str = r"FALSE"
@@ -144,7 +145,6 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
         sliced_input = user_input[position:]
         
         pattern: str
-
         for pattern in TOKEN_PATTERNS.keys():
 
             match = re.match(pattern,sliced_input)
@@ -224,6 +224,9 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     tokens_with_keywords: map[Token] = map(change_identifier_to_keyword, tokens)
     tokens_with_keywords_as_list: List[Token] = list(tokens_with_keywords)
 
+    # Reminder, let's stop using mutable data and switch to immutable data
+    end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
+    tokens_with_keywords_as_list.append(end_of_file_token)
 
     was_successful = True
     return LexerResult(was_successful, tokens_with_keywords_as_list)
@@ -323,17 +326,6 @@ class TermNode:
     second_factor_node: Optional[FactorNode] = None
 
 
-@dataclass
-class FactorNode:
-    """
-    Represents a node in the abstract syntax tree (AST) for a numerical factor.
-
-    Attributes:
-    - number (str): The numerical value associated with this factor.
-    """
-    number: str
-
-
 class ArithmeticOperator(Enum):
     """
     Enumeration class representing arithmetic operators in a mathematical
@@ -351,6 +343,56 @@ class ArithmeticOperator(Enum):
     MINUS = "-"
     MULTIPLY = "*"
     DIVIDE = "/"
+
+
+@dataclass
+class FactorNode:
+    """
+    Represents a node for a numerical factor.
+
+    number_or_identifier represents number or identifier that is the factor.
+    It is not necessary to differentiate between the two because the emitter sees
+    them the same way. This field defaults to an empty string.
+
+    method_call represents a call to a method. This field defaults to None.
+
+    FactorNode cannot have both its fields using their default values. If
+    method_call is None, then number_or_identifier has a value, and vice-versa.
+    """
+
+    number_or_identifier: str = ""
+    method_call: Optional[MethodCall] = None
+
+
+@dataclass
+class MethodCall:
+    """
+    Represents a call to a method.
+
+    identifier represents the name of the method being called.
+
+    argument_list represents the list of arguments supplied to the method. It
+    defaults to None; None represents called a method with no arguments. 
+    """
+    
+    identifier: str
+    argument_list: Optional[ArgumentList] = None
+
+
+@dataclass
+class ArgumentList:
+    """
+    Represents a list of arguments.
+
+    argument is represented by an expression node.
+
+    additonal_argument_list represents additional arguments. This
+    field defaults to None; when it is None, it represents a method being called
+    with a singular argument.
+    """
+
+    argument: ExpressionNode
+    additional_argument_list: Optional[ArgumentList] = None
 
 
 def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
@@ -443,13 +485,11 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
             unsuccessful_result: NodeResult = report_error(unexpected_null=FOUND_NULL_VALUE)
             return unsuccessful_result
 
-        length_of_tokens = len(node_result_for_simple_expression.tokens)
-
-        if length_of_tokens == 0:
-            return node_result_for_simple_expression 
-
         # We don't pop the token off b/c there's a chance it's not a + or -
-        current_token = tokens[0]
+        current_token: Token = tokens[0]
+
+        if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
+            return node_result_for_simple_expression 
 
         if current_token.token_type not in EXPRESSION_TOKEN_TYPES:
             return node_result_for_simple_expression 
@@ -540,13 +580,11 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
             unsuccessful_result: NodeResult = report_error(unexpected_null=FOUND_NULL_VALUE)
             return unsuccessful_result
 
-        length_of_tokens: int = len(node_result_for_simple_term.tokens)
-
-        if length_of_tokens == 0:
-            return node_result_for_simple_term 
-
         # We don't pop the token off b/c there's a chance it's not a * or /
         current_token = tokens[0]
+
+        if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
+            return node_result_for_simple_term
 
         if current_token.token_type not in TERM_TOKEN_TYPES:
             return node_result_for_simple_term 
@@ -606,12 +644,13 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
             IDENTIFIER_TOKEN_TYPE,
         ]
 
-        current_token = tokens.pop(0)
+        current_token: Token = tokens.pop(0)
 
         if current_token.token_type not in FACTOR_TOKEN_TYPES:
             return report_error(current_token.token_type)
 
-        factor_node = FactorNode(current_token.value)
+        factor_node: FactorNode = FactorNode(
+                number_or_identifier=current_token.value)
 
         return NodeResult(True, tokens, factor_node)
 
