@@ -497,10 +497,6 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
         else:
             term_node_operator = ArithmeticOperator.DIVIDE
 
-        # this might break something but idk
-#        if factor_node_result.tokens is not None:
-#            tokens = factor_node_result.tokens
-
         second_factor_node_result: NodeResult = parse_tokens_for_factor(tokens)
        
         if isinstance(second_factor_node_result, NodeFailure):
