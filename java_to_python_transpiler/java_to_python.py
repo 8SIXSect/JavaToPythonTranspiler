@@ -111,14 +111,16 @@ class LexerFailure:
     error_message: str
 
 
+ERROR_MESSAGE_FOR_LEXER: str = "Found an unknown character, '{0}'"
+
+
 def report_error_for_lexer(unknown_character: str) -> LexerFailure:
     """
     This function's purpose is to report an error that occurred in the
     lexer.
     """
 
-    ERROR_MESSAGE: str = "Found an unknown character, '{0}'"
-    error_message: str = ERROR_MESSAGE.format(unknown_character)
+    error_message: str = ERROR_MESSAGE_FOR_LEXER.format(unknown_character)
 
     return LexerFailure(error_message)
 
@@ -161,6 +163,8 @@ def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]
         position += match.end()
 
 
+    # I don't think this closure needs to be tested. It used as a map a couple
+    # lines after it is declared.
     def change_identifier_to_keyword(token: Token) -> Token:
         """
         The purpose of this function is to take in a Token.
@@ -425,7 +429,7 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
     current_token: Token = tokens[0]
 
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
-        return node_success_for_simple_expression 
+        return node_success_for_simple_expression
 
     if current_token.token_type not in EXPRESSION_TOKEN_TYPES:
         return node_success_for_simple_expression 
