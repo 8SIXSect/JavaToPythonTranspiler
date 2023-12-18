@@ -100,18 +100,13 @@ class Token:
 
 
 @dataclass
-class LexerResult:
+class LexerFailure:
     """
-    This class represents the output of the lexer.
-    'tokens' and 'error_message' cannot both have no value.
-    By this, I mean that 'tokens' is an empty list, then an error occurred, and
-    'error_message' is not an empty string.
-    The opposite is also true: if 'tokens' is not an empty list then
-    'error_message' is an empty string.
+    Represents an error occurring in the Lexer.
+
+    error_message is the message to be printed to the user
     """
 
-    was_successful: bool
-    tokens: List[Token] = field(default_factory=list) 
     error_message: str = ""
 
 
