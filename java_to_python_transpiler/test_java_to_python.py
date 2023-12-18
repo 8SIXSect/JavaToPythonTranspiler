@@ -1,5 +1,5 @@
 from typing import List
-from java_to_python_transpiler.java_to_python import (COMMA_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE,
+from java_to_python_transpiler.java_to_python import (COMMA_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, GREATER_THAN_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE,
                                                       SINGLE_LINE_COMMENT_TOKEN_TYPE,
                                                       LexerFailure, Token,
                                                       report_error_for_lexer, scan_and_tokenize_input)
@@ -83,6 +83,29 @@ def test_lexer_can_generate_token_for_punctuation_characters():
 
     expected_output: List[Token] = [
         semi_colon_token, comma_token, comma_token, semi_colon_token,
+        end_of_file_token
+    ]
+
+    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output 
+
+
+def test_lexer_can_generate_token_for_comparison_operators():
+    """
+    This test checks if the lexer can successfully generate Token objects for
+    less than, greater than, and the equals sign
+    """
+
+    LEXER_INPUT: str = "=>=<="
+
+    less_than_token: Token = Token(LESS_THAN_TOKEN_TYPE, "<")
+    greater_than_token: Token = Token(GREATER_THAN_TOKEN_TYPE, ">")
+    equals_token: Token = Token(EQUALS_TOKEN_TYPE, "=")
+
+    expected_output: List[Token] = [
+        equals_token, greater_than_token, equals_token, less_than_token,
+        equals_token,
         end_of_file_token
     ]
 
