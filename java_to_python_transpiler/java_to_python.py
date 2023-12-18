@@ -110,26 +110,24 @@ class LexerFailure:
     error_message: str = ""
 
 
-def scan_and_tokenize_input(user_input: str) -> LexerResult:
+def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]:
     """ This function's purpose is to be the entrypoint for the lexer. """
 
 
-    def report_error(unknown_character: str) -> LexerResult:
+    def report_error(unknown_character: str) -> LexerFailure:
         """
         This function's purpose is to report an error that occurred in the
         lexer.
         """
 
-        ERROR_MESSAGE = "Found an unknown character, '{0}'"
-
+        ERROR_MESSAGE: str = "Found an unknown character, '{0}'"
         error_message: str = ERROR_MESSAGE.format(unknown_character)
 
-        lexer_result = LexerResult(False, error_message=error_message)
-        return lexer_result 
-    
+        return LexerFailure(error_message)
+
 
     tokens: List[Token] = []
-    position = 0
+    position: int = 0
     length_of_input: int = len(user_input)
     
     while position < length_of_input:
@@ -151,17 +149,14 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
                     break
 
                 token_value: str = match.group(0)
-                token = Token(token_type, token_value)
-                
+                token: Token = Token(token_type, token_value) 
                 tokens.append(token)
+
                 break
         
         if match is None:
-
-            unknown_character = user_input[position]
-            unsuccessful_result: LexerResult = report_error(unknown_character)
-            
-            return unsuccessful_result
+            unknown_character: str = user_input[position]
+            return report_error(unknown_character)
 
         position += match.end()
 
@@ -223,8 +218,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
     tokens_with_keywords_as_list.append(end_of_file_token)
 
-    was_successful = True
-    return LexerResult(was_successful, tokens_with_keywords_as_list)
+    return tokens_with_keywords_as_list
 
 
 @dataclass
