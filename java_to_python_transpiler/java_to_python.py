@@ -382,7 +382,7 @@ class ArgumentList:
     additional_argument_list: Optional[ArgumentList] = None
 
 
-NodeResult = Union[NodeSuccess, NodeFailure]
+ERROR_MESSAGE_FOR_PARSER: str = "Unexpected token type, {0}"
 
 
 def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
@@ -390,8 +390,7 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     This function's purpose is to report an error found in the parser
     """
 
-    ERROR_MESSAGE: str = "Unexpected token type, {0}"
-    error_message: str = ERROR_MESSAGE.format(unexpected_token_type)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(unexpected_token_type)
 
     return NodeFailure(error_message)
 
@@ -407,6 +406,9 @@ def parse_list_of_tokens(tokens: List[Token]) -> Union[ExpressionNode, ParserFai
     assert isinstance(root_node_result.node, ExpressionNode)
 
     return root_node_result.node
+
+
+NodeResult = Union[NodeSuccess, NodeFailure]
 
 
 def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
