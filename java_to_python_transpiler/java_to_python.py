@@ -7,7 +7,7 @@ This module's purpose is to tokenize user input (some Java source code string)
 from dataclasses import dataclass
 import re
 from enum import Enum
-from typing import List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Union, Tuple
 
 
 TokenType = str
@@ -62,7 +62,7 @@ ELSE_TOKEN_TYPE: str = r"ELSE"
 WHILE_TOKEN_TYPE: str = r"WHILE"
 
 
-TOKEN_PATTERNS = {
+TOKEN_PATTERNS: Dict[str, str] = {
     r"//.*": SINGLE_LINE_COMMENT_TOKEN_TYPE,
     r"\(": LEFT_PARENTHESIS_TOKEN_TYPE,
     r"\)": RIGHT_PARENTHESIS_TOKEN_TYPE,
