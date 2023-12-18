@@ -82,7 +82,8 @@ TOKEN_PATTERNS: Dict[str, str] = {
     r"\/": DIVIDE_TOKEN_TYPE,
     r"\d+\.\d+": FLOAT_LITERAL_TOKEN_TYPE,
     r"\d+": DECIMAL_LITERAL_TOKEN_TYPE,
-    r"\"([^\"\\],|\\[btnfr\"\'\\])*\"": STRING_LITERAL_TOKEN_TYPE,
+    r"\".*\"": STRING_LITERAL_TOKEN_TYPE,
+    #    r'"([^\"\\],|\\[btnfr\"\'\\])*"': STRING_LITERAL_TOKEN_TYPE,
     r"\s+": WHITESPACE_TOKEN_TYPE,
     r"[a-zA-Z_$][\da-zA-Z_]*": IDENTIFIER_TOKEN_TYPE,
 }
