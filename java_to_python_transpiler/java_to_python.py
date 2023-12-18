@@ -511,8 +511,6 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     return NodeSuccess(second_factor_node_result.tokens, complex_term_node)
 
 
-
-
 def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
@@ -531,6 +529,4 @@ def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
 
     factor_node: FactorNode = FactorNode(number_or_identifier=current_token.value)
     return NodeSuccess(tokens, factor_node)
-
-
 
