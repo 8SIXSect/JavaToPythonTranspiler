@@ -377,150 +377,19 @@ class ArgumentList:
 NodeResult = Union[NodeSuccess, NodeFailure]
 
 
+def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
+    """
+    This function's purpose is to report an error found in the parser
+    """
+
+    ERROR_MESSAGE: str = "Unexpected token type, {0}"
+    error_message: str = ERROR_MESSAGE.format(unexpected_token_type)
+
+    return NodeFailure(error_message)
+
+
 def parse_list_of_tokens(tokens: List[Token]) -> Union[ExpressionNode, ParserFailure]:
     """ This functions purpose is to be the entrypoint for the parser """
-
-
-    def report_error(unexpected_token_type: TokenType) -> NodeFailure:
-        """
-        This function's purpose is to report an error found in the parser
-        """
-
-        ERROR_MESSAGE: str = "Unexpected token type, {0}"
-        error_message: str = ERROR_MESSAGE.format(unexpected_token_type)
-
-        return NodeFailure(error_message)
-
-
-    def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
-        """
-        Parses a list of tokens to construct an abstract syntax tree (AST) for
-        a mathematical expression.
-        """
-
-        EXPRESSION_TOKEN_TYPES: Tuple[TokenType, TokenType] = (PLUS_TOKEN_TYPE,
-                                                               MINUS_TOKEN_TYPE)
- 
-        term_node_result: NodeResult = parse_tokens_for_term(tokens)
-
-        if isinstance(term_node_result, NodeFailure):
-            return term_node_result
-
-        assert isinstance(term_node_result.node, TermNode)
-        expression_node = ExpressionNode(term_node_result.node)
-
-        node_success_for_simple_expression: NodeSuccess = \
-                NodeSuccess(term_node_result.tokens, expression_node)
-
-        # We don't pop the token off b/c there's a chance it's not a + or -
-        current_token: Token = tokens[0]
-
-        if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
-            return node_success_for_simple_expression 
-
-        if current_token.token_type not in EXPRESSION_TOKEN_TYPES:
-            return node_success_for_simple_expression 
-
-        del tokens[0]
-
-        expression_node_operator: ArithmeticOperator 
-
-        if current_token.token_type == PLUS_TOKEN_TYPE:
-            expression_node_operator = ArithmeticOperator.PLUS
-        else:
-            expression_node_operator = ArithmeticOperator.MINUS
-
-        additional_expression_node_result: NodeResult = \
-                parse_tokens_for_expression(term_node_result.tokens)
-        
-        if isinstance(additional_expression_node_result, NodeFailure):
-            return additional_expression_node_result
-
-        assert isinstance(additional_expression_node_result.node, ExpressionNode)
-
-        complex_expression_node = ExpressionNode(
-            expression_node.single_term_node,
-            expression_node_operator,
-            additional_expression_node_result.node
-        )
-
-        return NodeSuccess(additional_expression_node_result.tokens,
-                           complex_expression_node)
- 
-
-    def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
-        """
-        Parses a list of tokens to construct an abstract syntax tree (AST) for
-        a mathematical term.
-        """
-
-
-        TERM_TOKEN_TYPES: Tuple[TokenType, TokenType] = (MULTIPLY_TOKEN_TYPE,
-                                                         DIVIDE_TOKEN_TYPE)
-
-        factor_node_result: NodeResult = parse_tokens_for_factor(tokens)
-
-        if isinstance(factor_node_result, NodeFailure):
-            return factor_node_result
-
-        assert isinstance(factor_node_result.node, FactorNode)
-
-        term_node = TermNode(factor_node_result.node)
-
-        node_success_for_simple_term: NodeSuccess = \
-                NodeSuccess(factor_node_result.tokens, term_node)
-
-        # We don't pop the token off b/c there's a chance it's not a * or /
-        current_token = tokens[0]
-
-        if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
-            return node_success_for_simple_term 
-
-        if current_token.token_type not in TERM_TOKEN_TYPES:
-            return node_success_for_simple_term 
-
-        del tokens[0]
-
-        term_node_operator: ArithmeticOperator 
-
-        if current_token.token_type == MULTIPLY_TOKEN_TYPE:
-            term_node_operator = ArithmeticOperator.MULTIPLY
-        else:
-            term_node_operator = ArithmeticOperator.DIVIDE
-
-        second_factor_node_result: NodeResult = parse_tokens_for_factor(tokens)
-       
-        if isinstance(second_factor_node_result, NodeFailure):
-            return second_factor_node_result
-
-        assert isinstance(second_factor_node_result.node, FactorNode)
- 
-        complex_term_node: TermNode = TermNode(term_node.first_factor_node,
-                                               term_node_operator,
-                                               second_factor_node_result.node)
-
-        return NodeSuccess(second_factor_node_result.tokens, complex_term_node)
- 
-
-    def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
-        """
-        Parses a list of tokens to construct an abstract syntax tree (AST) for
-        a mathematical term.
-        """
-
-        FACTOR_TOKEN_TYPES: List[str] = [
-            DECIMAL_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, FALSE_TOKEN_TYPE,
-            IDENTIFIER_TOKEN_TYPE,
-        ]
-
-        current_token: Token = tokens.pop(0)
-
-        if current_token.token_type not in FACTOR_TOKEN_TYPES:
-            return report_error(current_token.token_type)
-
-        factor_node: FactorNode = FactorNode(number_or_identifier=current_token.value)
-        return NodeSuccess(tokens, factor_node)
-
 
     root_node_result: NodeResult = parse_tokens_for_expression(tokens)
 
@@ -530,4 +399,138 @@ def parse_list_of_tokens(tokens: List[Token]) -> Union[ExpressionNode, ParserFai
     assert isinstance(root_node_result.node, ExpressionNode)
 
     return root_node_result.node
+
+
+def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
+    """
+    Parses a list of tokens to construct an abstract syntax tree (AST) for
+    a mathematical expression.
+    """
+
+    EXPRESSION_TOKEN_TYPES: Tuple[TokenType, TokenType] = (PLUS_TOKEN_TYPE,
+                                                           MINUS_TOKEN_TYPE)
+
+    term_node_result: NodeResult = parse_tokens_for_term(tokens)
+
+    if isinstance(term_node_result, NodeFailure):
+        return term_node_result
+
+    assert isinstance(term_node_result.node, TermNode)
+    expression_node = ExpressionNode(term_node_result.node)
+
+    node_success_for_simple_expression: NodeSuccess = \
+            NodeSuccess(term_node_result.tokens, expression_node)
+
+    # We don't pop the token off b/c there's a chance it's not a + or -
+    current_token: Token = tokens[0]
+
+    if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
+        return node_success_for_simple_expression 
+
+    if current_token.token_type not in EXPRESSION_TOKEN_TYPES:
+        return node_success_for_simple_expression 
+
+    del tokens[0]
+
+    expression_node_operator: ArithmeticOperator 
+
+    if current_token.token_type == PLUS_TOKEN_TYPE:
+        expression_node_operator = ArithmeticOperator.PLUS
+    else:
+        expression_node_operator = ArithmeticOperator.MINUS
+
+    additional_expression_node_result: NodeResult = \
+            parse_tokens_for_expression(term_node_result.tokens)
+    
+    if isinstance(additional_expression_node_result, NodeFailure):
+        return additional_expression_node_result
+
+    assert isinstance(additional_expression_node_result.node, ExpressionNode)
+
+    complex_expression_node = ExpressionNode(
+        expression_node.single_term_node,
+        expression_node_operator,
+        additional_expression_node_result.node
+    )
+
+    return NodeSuccess(additional_expression_node_result.tokens,
+                       complex_expression_node)
+
+
+def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
+    """
+    Parses a list of tokens to construct an abstract syntax tree (AST) for
+    a mathematical term.
+    """
+
+
+    TERM_TOKEN_TYPES: Tuple[TokenType, TokenType] = (MULTIPLY_TOKEN_TYPE,
+                                                     DIVIDE_TOKEN_TYPE)
+
+    factor_node_result: NodeResult = parse_tokens_for_factor(tokens)
+
+    if isinstance(factor_node_result, NodeFailure):
+        return factor_node_result
+
+    assert isinstance(factor_node_result.node, FactorNode)
+
+    term_node = TermNode(factor_node_result.node)
+
+    node_success_for_simple_term: NodeSuccess = \
+            NodeSuccess(factor_node_result.tokens, term_node)
+
+    # We don't pop the token off b/c there's a chance it's not a * or /
+    current_token = tokens[0]
+
+    if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
+        return node_success_for_simple_term 
+
+    if current_token.token_type not in TERM_TOKEN_TYPES:
+        return node_success_for_simple_term 
+
+    del tokens[0]
+
+    term_node_operator: ArithmeticOperator 
+
+    if current_token.token_type == MULTIPLY_TOKEN_TYPE:
+        term_node_operator = ArithmeticOperator.MULTIPLY
+    else:
+        term_node_operator = ArithmeticOperator.DIVIDE
+
+    second_factor_node_result: NodeResult = parse_tokens_for_factor(tokens)
+   
+    if isinstance(second_factor_node_result, NodeFailure):
+        return second_factor_node_result
+
+    assert isinstance(second_factor_node_result.node, FactorNode)
+
+    complex_term_node: TermNode = TermNode(term_node.first_factor_node,
+                                           term_node_operator,
+                                           second_factor_node_result.node)
+
+    return NodeSuccess(second_factor_node_result.tokens, complex_term_node)
+
+
+
+
+def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
+    """
+    Parses a list of tokens to construct an abstract syntax tree (AST) for
+    a mathematical term.
+    """
+
+    FACTOR_TOKEN_TYPES: List[str] = [
+        DECIMAL_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, FALSE_TOKEN_TYPE,
+        IDENTIFIER_TOKEN_TYPE,
+    ]
+
+    current_token: Token = tokens.pop(0)
+
+    if current_token.token_type not in FACTOR_TOKEN_TYPES:
+        return report_error_in_parser(current_token.token_type)
+
+    factor_node: FactorNode = FactorNode(number_or_identifier=current_token.value)
+    return NodeSuccess(tokens, factor_node)
+
+
 
