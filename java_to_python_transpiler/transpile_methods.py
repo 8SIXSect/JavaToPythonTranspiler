@@ -3,9 +3,10 @@ This module contains methods for transpiling source to source
 """
 
 from typing import List, Union
-from java_to_python_transpiler.java_to_python import (Token,
+from java_to_python_transpiler.java_to_python import (ExpressionNode,
+                                                      ParserFailure,
+                                                      Token,
                                                       LexerFailure,
-                                                      ParserResult,
                                                       scan_and_tokenize_input,
                                                       parse_list_of_tokens
                                                       )
@@ -26,11 +27,12 @@ def test_parser():
 
     assert isinstance(lexer_result, list)
 
-    parser_result: ParserResult = parse_list_of_tokens(lexer_result)
+    parser_result: Union[ExpressionNode, ParserFailure] = \
+            parse_list_of_tokens(lexer_result)
 
-    if (not parser_result.was_successful) or (parser_result.syntax_tree is None):
-        print(parser_result.error_message)
+    if isinstance(parser_result, ParserFailure):
+        print(parser_result.error_messasge)
         return
 
-    print(parser_result.syntax_tree)
+    print(parser_result)
 

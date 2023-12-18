@@ -222,23 +222,14 @@ def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]
 
 
 @dataclass
-class ParserResult:
+class ParserFailure:
     """
-    This class defines the parser output.
+    Represents an error occurring while parsing.
 
-    Either 'syntax_tree' or 'error_message' must have a value; they cannot both be
-    empty.
-    
-    Specifically, if 'syntax_tree' is None, it indicates an error, and
-    'error_message' must be a non-empty string.
-    
-    Conversely, if 'tokens' is not None, 'error_message' must be an
-    empty string.
+    `error_message` is the the message to be printed for the user
     """
 
-    was_successful: bool
-    syntax_tree: Optional[ExpressionNode] = None
-    error_message: str = ""
+    error_messasge: str
 
 
 @dataclass
@@ -386,7 +377,7 @@ class ArgumentList:
 NodeResult = Union[NodeSuccess, NodeFailure]
 
 
-def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
+def parse_list_of_tokens(tokens: List[Token]) -> Union[ExpressionNode, ParserFailure]:
     """ This functions purpose is to be the entrypoint for the parser """
 
 
@@ -534,14 +525,9 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
     root_node_result: NodeResult = parse_tokens_for_expression(tokens)
 
     if isinstance(root_node_result, NodeFailure):
-        return ParserResult(False, error_message=root_node_result.error_message)
+        return ParserFailure(root_node_result.error_message)
 
-    if not isinstance(root_node_result.node, ExpressionNode):
+    assert isinstance(root_node_result.node, ExpressionNode)
 
-        root_node_as_str: str = str(root_node_result.node)
-        node_failure: NodeFailure = report_error(root_node_as_str)
-        
-        return ParserResult(False, error_message=node_failure.error_message)
-
-    return ParserResult(True, root_node_result.node)
+    return root_node_result.node
 
