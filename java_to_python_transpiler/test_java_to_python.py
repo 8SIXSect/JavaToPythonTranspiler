@@ -30,7 +30,7 @@ def test_report_error_for_lexer_returns_proper_error_object():
     assert expected_output == report_error_output
 
 
-def test_lexer_can_generate_token_for_single_line_comment():
+def test_lexer_can_generate_tokens_for_single_line_comment():
     """
     This test checks if the lexer can successfully generate a Token object
     with a token type of SINGLE LINE COMMMENT.
@@ -75,7 +75,7 @@ def test_lexer_can_generate_token_for_grouping_characters():
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
 
-def test_lexer_can_generate_token_for_punctuation_characters():
+def test_lexer_can_generate_tokens_for_punctuation_characters():
     """
     This test checks if the lexer can successfully generate Token objects for
     semicolons and commas.
@@ -96,7 +96,7 @@ def test_lexer_can_generate_token_for_punctuation_characters():
     assert isinstance(lexer_output, list) and expected_output == lexer_output 
 
 
-def test_lexer_can_generate_token_for_comparison_operators():
+def test_lexer_can_generate_tokens_for_comparison_operators():
     """
     This test checks if the lexer can successfully generate Token objects for
     less than, greater than, and the equals sign
@@ -119,7 +119,7 @@ def test_lexer_can_generate_token_for_comparison_operators():
     assert isinstance(lexer_output, list) and expected_output == lexer_output 
 
 
-def test_lexer_can_generate_token_for_arithmetic_operators():
+def test_lexer_can_generate_tokens_for_arithmetic_operators():
     """
     This test checks if the lexer can successfully generate Token objects for
     plus, minus, multiply, and divide
@@ -143,7 +143,7 @@ def test_lexer_can_generate_token_for_arithmetic_operators():
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
 
-def test_lexer_can_generate_token_for_float_literals():
+def test_lexer_can_generate_tokens_for_float_literals():
     """
     This test checks if the lexer can successfully generate Token objects for
     float literals.
@@ -159,7 +159,7 @@ def test_lexer_can_generate_token_for_float_literals():
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
 
-def test_lexer_can_generate_token_for_decimal_literals():
+def test_lexer_can_generate_tokens_for_decimal_literals():
     """
     This test checks if the lexer can successfully generate Token objects for
     decimal literals.
@@ -175,8 +175,7 @@ def test_lexer_can_generate_token_for_decimal_literals():
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
 
-# TODO: rename tests. every single test generates a token list. not a singular token
-def test_lexer_can_generate_token_for_string_literals():
+def test_lexer_can_generate_tokens_for_string_literals():
     """
     This test checks if the lexer can successfully generate Tokeno objects for
     string literals.
