@@ -110,21 +110,20 @@ class LexerFailure:
     error_message: str
 
 
+def report_error_for_lexer(unknown_character: str) -> LexerFailure:
+    """
+    This function's purpose is to report an error that occurred in the
+    lexer.
+    """
+
+    ERROR_MESSAGE: str = "Found an unknown character, '{0}'"
+    error_message: str = ERROR_MESSAGE.format(unknown_character)
+
+    return LexerFailure(error_message)
+
+
 def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]:
     """ This function's purpose is to be the entrypoint for the lexer. """
-
-
-    def report_error(unknown_character: str) -> LexerFailure:
-        """
-        This function's purpose is to report an error that occurred in the
-        lexer.
-        """
-
-        ERROR_MESSAGE: str = "Found an unknown character, '{0}'"
-        error_message: str = ERROR_MESSAGE.format(unknown_character)
-
-        return LexerFailure(error_message)
-
 
     tokens: List[Token] = []
     position: int = 0
@@ -156,7 +155,7 @@ def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]
         
         if match is None:
             unknown_character: str = user_input[position]
-            return report_error(unknown_character)
+            return report_error_for_lexer(unknown_character)
 
         position += match.end()
 
