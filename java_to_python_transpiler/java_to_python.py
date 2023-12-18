@@ -134,7 +134,7 @@ def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]
 
         # Incase you don't remember hunter, this gives you everything after
         # position
-        sliced_input = user_input[position:]
+        sliced_input: str = user_input[position:]
         
         pattern: str
         for pattern in TOKEN_PATTERNS.keys():
@@ -170,7 +170,7 @@ def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]
         a keyword. If it is a keyword, then it will create a new keyword Token
         """
         
-        KEYWORDS = {
+        KEYWORDS: Dict[str, str] = {
             r"true": TRUE_TOKEN_TYPE,
             r"false": FALSE_TOKEN_TYPE,
             r"null": NULL_TOKEN_TYPE,
