@@ -1,7 +1,7 @@
 from typing import List
 from java_to_python_transpiler.java_to_python import (
     COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE,
-    ERROR_MESSAGE_FOR_LEXER, FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE,
+    ERROR_MESSAGE_FOR_LEXER, FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE,
     LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE, MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE,
     RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE,
@@ -177,7 +177,7 @@ def test_lexer_can_generate_tokens_for_decimal_literals():
 
 def test_lexer_can_generate_tokens_for_string_literals():
     """
-    This test checks if the lexer can successfully generate Tokeno objects for
+    This test checks if the lexer can successfully generate Tokens objects for
     string literals.
     """
 
@@ -187,6 +187,28 @@ def test_lexer_can_generate_tokens_for_string_literals():
 
     expected_output: List[Token] = [
         first_string_literal_token,
+        end_of_file_token
+    ]
+
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_lexer_can_generate_tokens_for_identifiers():
+    """
+    This test checks if the lexer can successfully generate Token objects for
+    identifiers.
+    """
+
+    LEXER_INPUT: str = "eighty sixth sector"
+
+    first_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "eighty")
+    second_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "sixth")
+    third_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "sector")
+
+    expected_output: List[Token] = [
+        first_identifier_token, second_identifier_token, third_identifier_token,
         end_of_file_token
     ]
 
