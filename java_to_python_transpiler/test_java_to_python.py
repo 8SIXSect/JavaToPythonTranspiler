@@ -1,6 +1,12 @@
-from java_to_python_transpiler.java_to_python import (ERROR_MESSAGE_FOR_LEXER,
-                                                      LexerFailure,
-                                                      report_error_for_lexer)
+from typing import List
+from java_to_python_transpiler.java_to_python import (COMMA_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE,
+                                                      SINGLE_LINE_COMMENT_TOKEN_TYPE,
+                                                      LexerFailure, Token,
+                                                      report_error_for_lexer, scan_and_tokenize_input)
+
+
+# This token may be reused throughout the tests in this file
+end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -11,10 +17,76 @@ def test_report_error_for_lexer_returns_proper_error_object():
 
     UNKNOWN_CHARACTER: str = "~"
 
-    error_message: str= ERROR_MESSAGE_FOR_LEXER.format(UNKNOWN_CHARACTER)
+    error_message: str = ERROR_MESSAGE_FOR_LEXER.format(UNKNOWN_CHARACTER)
     expected_output: LexerFailure = LexerFailure(error_message)
 
     report_error_output: LexerFailure = report_error_for_lexer(UNKNOWN_CHARACTER)
 
     assert expected_output == report_error_output
+
+
+def test_lexer_can_generate_token_for_single_line_comment():
+    """
+    This test checks if the lexer can successfully generate a Token object
+    with a token type of SINGLE LINE COMMMENT.
+    """
+
+    LEXER_INPUT: str = "// this is in a `comment`"
+
+    expected_output_token: Token = Token(SINGLE_LINE_COMMENT_TOKEN_TYPE, LEXER_INPUT)
+    expected_output: List[Token] = [expected_output_token, end_of_file_token] 
+ 
+    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_lexer_can_generate_token_for_grouping_characters():
+    """
+    This test checks if the lexer can successfully generate a Token objects
+    for parenthesis, curly braces, and brackets
+    """
+
+    LEXER_INPUT: str = "(){}[]"
+
+    left_parenthesis_token: Token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
+    right_parenthesis_token: Token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
+
+    left_curly_braces_token: Token = Token(LEFT_CURLY_BRACE_TOKEN_TYPE, "{")
+    right_curly_braces_token: Token = Token(RIGHT_CURLY_BRACE_TOKEN_TYPE, "}")
+
+    left_bracket_token: Token = Token(LEFT_BRACKET_TOKEN_TYPE, "[")
+    right_bracket_token: Token = Token(RIGHT_BRACKET_TOKEN_TYPE, "]")
+
+    expected_output: List[Token] = [
+        left_parenthesis_token, right_parenthesis_token,
+        left_curly_braces_token, right_curly_braces_token,
+        left_bracket_token, right_bracket_token,
+        end_of_file_token
+    ]
+
+    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_lexer_can_generate_token_for_punctuation_characters():
+    """
+    This test checks if the lexer can successfully generate Token objects for
+    semicolons and commas.
+    """
+
+    LEXER_INPUT: str = ";,,;"
+
+    semi_colon_token: Token = Token(SEMI_COLON_TOKEN_TYPE, ";")
+    comma_token: Token = Token(COMMA_TOKEN_TYPE, ",")
+
+    expected_output: List[Token] = [
+        semi_colon_token, comma_token, comma_token, semi_colon_token,
+        end_of_file_token
+    ]
+
+    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output 
 
