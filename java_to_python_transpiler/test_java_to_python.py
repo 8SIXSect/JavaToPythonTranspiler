@@ -1,6 +1,6 @@
 from typing import List
 from java_to_python_transpiler.java_to_python import (
-    COMMA_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE,
+    COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE,
     ERROR_MESSAGE_FOR_LEXER, FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE,
     LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE, MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE,
     RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
@@ -153,6 +153,22 @@ def test_lexer_can_generate_token_for_float_literals():
 
     float_literal_token: Token = Token(FLOAT_LITERAL_TOKEN_TYPE, LEXER_INPUT)
     expected_output: List[Token] = [float_literal_token, end_of_file_token]
+
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_lexer_can_generate_token_for_decimal_literals():
+    """
+    This test checks if the lexer can successfully generate Token objects for
+    decimal literals.
+    """
+
+    LEXER_INPUT: str = "86868686"
+
+    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, LEXER_INPUT)
+    expected_output: List[Token] = [decimal_literal_token, end_of_file_token]
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
