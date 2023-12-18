@@ -4,7 +4,7 @@ from java_to_python_transpiler.java_to_python import (
     ERROR_MESSAGE_FOR_LEXER, FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE,
     LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE, MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE,
     RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
-    SEMI_COLON_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE,
+    SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE,
     LexerFailure, Token, LexerResult,
     report_error_for_lexer, scan_and_tokenize_input
 )
@@ -241,6 +241,30 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
     LEXER_INPUT: str = "               \t     \n \n   "
 
     expected_output: List[Token] = [end_of_file_token]
+
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_lexer_can_generate_proper_keyword_tokens():
+    """
+    This test checks if the lexer can successfully generate a list of Tokens
+    with keywords when given keywords. Pretty much, if given the input: "true",
+    it will return a Token(true, "true") object and not a
+    Token(identifier, "true")
+    """
+
+    LEXER_INPUT: str = "true short while"
+
+    true_token: Token = Token(TRUE_TOKEN_TYPE, "true")
+    short_token: Token = Token(SHORT_TOKEN_TYPE, "short")
+    while_token: Token = Token(WHILE_TOKEN_TYPE, "while")
+
+    expected_output: List[Token] = [
+        true_token, short_token, while_token,
+        end_of_file_token
+    ]
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
