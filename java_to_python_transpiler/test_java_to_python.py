@@ -1,8 +1,13 @@
 from typing import List
-from java_to_python_transpiler.java_to_python import (COMMA_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, GREATER_THAN_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE,
-                                                      SINGLE_LINE_COMMENT_TOKEN_TYPE,
-                                                      LexerFailure, Token,
-                                                      report_error_for_lexer, scan_and_tokenize_input)
+from java_to_python_transpiler.java_to_python import (
+    COMMA_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE,
+    ERROR_MESSAGE_FOR_LEXER, GREATER_THAN_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE,
+    LEFT_CURLY_BRACE_TOKEN_TYPE, LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE,
+    RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
+    SEMI_COLON_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
+    LexerFailure, Token, LexerResult,
+    report_error_for_lexer, scan_and_tokenize_input
+)
 
 
 # This token may be reused throughout the tests in this file
@@ -36,7 +41,7 @@ def test_lexer_can_generate_token_for_single_line_comment():
     expected_output_token: Token = Token(SINGLE_LINE_COMMENT_TOKEN_TYPE, LEXER_INPUT)
     expected_output: List[Token] = [expected_output_token, end_of_file_token] 
  
-    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
@@ -65,7 +70,7 @@ def test_lexer_can_generate_token_for_grouping_characters():
         end_of_file_token
     ]
 
-    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
@@ -86,7 +91,7 @@ def test_lexer_can_generate_token_for_punctuation_characters():
         end_of_file_token
     ]
 
-    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
     assert isinstance(lexer_output, list) and expected_output == lexer_output 
 
@@ -109,7 +114,7 @@ def test_lexer_can_generate_token_for_comparison_operators():
         end_of_file_token
     ]
 
-    lexer_output: List[Token] | LexerFailure = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
     assert isinstance(lexer_output, list) and expected_output == lexer_output 
 

@@ -125,7 +125,10 @@ def report_error_for_lexer(unknown_character: str) -> LexerFailure:
     return LexerFailure(error_message)
 
 
-def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]:
+LexerResult = List[Token] | LexerFailure
+
+
+def scan_and_tokenize_input(user_input: str) -> LexerResult:
     """ This function's purpose is to be the entrypoint for the lexer. """
 
     tokens: List[Token] = []
