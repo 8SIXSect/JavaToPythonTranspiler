@@ -216,3 +216,33 @@ def test_lexer_can_generate_tokens_for_identifiers():
 
     assert isinstance(lexer_output, list) and expected_output == lexer_output
 
+
+def test_lexer_can_generate_only_end_of_file_token_when_given_no_input():
+    """
+    This test checks if the lexer can successfully generate a list of one
+    Token (an end of file token) when given no input
+    """
+
+    LEXER_INPUT: str = ""
+
+    expected_output: List[Token] = [end_of_file_token]
+
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
+    """
+    This test checks if the lexer can successfully generate a list of one
+    Token (an end of file token) when given only whitespace in the input
+    """
+
+    LEXER_INPUT: str = "               \t     \n \n   "
+
+    expected_output: List[Token] = [end_of_file_token]
+
+    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+
+    assert isinstance(lexer_output, list) and expected_output == lexer_output
+
