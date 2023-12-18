@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import KeysView
 
 """
 This module's purpose is to tokenize user input (some Java source code string)
@@ -195,10 +196,10 @@ def scan_and_tokenize_input(user_input: str) -> Union[List[Token], LexerFailure]
             r"while": WHILE_TOKEN_TYPE,
         }
         
-        if token.token_type != IDENTIFIER_TOKEN_TYPE:
-            return token
+        token_type_not_identifier: bool = token.token_type != IDENTIFIER_TOKEN_TYPE
+        keywords_keys: KeysView = KEYWORDS.keys()
 
-        if token.value not in KEYWORDS.keys():
+        if token_type_not_identifier or (token.value not in keywords_keys):
             return token
 
         keyword_token_type: str = KEYWORDS[token.value]
