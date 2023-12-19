@@ -472,3 +472,40 @@ def test_parser_can_generate_correct_ast_for_simple_expression():
 
     assert expected_output == node_result 
 
+
+def test_parser_can_generate_correct_ast_for_expression_with_one_term():
+    """
+    This test checks if the parser can properly generate an AST for a simple
+    expression with a singular term but multiple factors
+    """
+
+    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
+
+    tokens: List[Token] = [
+        decimal_literal_token, multiply_token, decimal_literal_token,
+        end_of_file_token
+    ]
+
+    first_factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+    multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
+    second_factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+
+    term_node: TermNode = TermNode(first_factor_node, multiply_operator,
+                                   second_factor_node)
+
+    expression_node: ExpressionNode = ExpressionNode(term_node)
+    
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+# TODO: you need to add multiple term capabilities. It's going to break tests.
+# That's okay. Ask a question on stackoverflow if it is okay. Ask the best way to do it
+# you can put in hella work tmrw but call it all for today :)
+
