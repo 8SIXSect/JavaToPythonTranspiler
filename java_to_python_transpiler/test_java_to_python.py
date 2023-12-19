@@ -9,7 +9,7 @@ from java_to_python_transpiler.java_to_python import (
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, FactorNode,
-    LexerFailure, NodeResult, NodeSuccess, ParserFailure, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_factor,
+    LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_factor,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -319,4 +319,23 @@ def test_parser_can_generate_correct_ast_for_single_factor():
     assert isinstance(parser_output, NodeSuccess)
     assert expected_output == parser_output 
 
+
+def test_parser_can_generate_correct_error_for_factor():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct NodeFailure object.
+    """
+
+    INPUT: str = "+"
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
+
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
+    assert isinstance(lexer_result, list) 
+
+    node_result: NodeResult = parse_tokens_for_factor(lexer_result)
+
+    assert isinstance(node_result, NodeFailure) 
+    assert expected_output == node_result
 
