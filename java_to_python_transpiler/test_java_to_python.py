@@ -8,7 +8,7 @@ from java_to_python_transpiler.java_to_python import (
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
-    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, FactorNode,
+    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArithmeticOperator, FactorNode,
     LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_factor, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
@@ -342,7 +342,7 @@ def test_parser_can_generate_correct_error_for_factor():
 
 def test_parser_can_generate_correct_ast_for_single_term():
     """
-    This test checks if the parse can successfully generate an ast when given
+    This test checks if the parser can successfully generate an ast when given
     a single term. This test specifically checks the `parse_tokens_for_term`
     function.
     """
@@ -359,11 +359,74 @@ def test_parser_can_generate_correct_ast_for_single_term():
     term_node: TermNode = TermNode(factor_node)
 
     expected_output_tokens: List[Token] = [end_of_file_token]
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               term_node)
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
     assert isinstance(node_output, NodeSuccess)
     assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_multiply_term():
+    """
+    This test checks if the parser can successfully generate an ast when given
+    a term like "86*2" or "12*9"; this test specifically checks the
+    `parse_tokens_for_term` function, 
+    """
+
+    first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
+    second_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "3")
+
+    tokens: List[Token] = [
+        first_decimal_literal_token, multiply_token, second_decimal_literal_token,
+        end_of_file_token
+    ]
+
+    first_factor_node: FactorNode = FactorNode(first_decimal_literal_token.value)
+    multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
+    second_factor_node: FactorNode = FactorNode(second_decimal_literal_token.value)
+
+    term_node: TermNode = TermNode(first_factor_node, multiply_operator,
+                                   second_factor_node)
+
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert isinstance(node_output, NodeSuccess)
+    assert expected_output == node_output
+
+
+def test_parser_can_generate_correct_ast_for_divide_term():
+    """
+    This test checks if the parser can successfully generate an ast when given
+    a term like "86/2" or "12/9"; this test specifically checks the
+    `parse_tokens_for_term` function, 
+    """
+
+    first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "*")
+    second_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "3")
+
+    tokens: List[Token] = [
+        first_decimal_literal_token, divide_token, second_decimal_literal_token,
+        end_of_file_token
+    ]
+
+    first_factor_node: FactorNode = FactorNode(first_decimal_literal_token.value)
+    divide_operator: ArithmeticOperator = ArithmeticOperator.DIVIDE
+    second_factor_node: FactorNode = FactorNode(second_decimal_literal_token.value)
+
+    term_node: TermNode = TermNode(first_factor_node, divide_operator,
+                                   second_factor_node)
+
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert isinstance(node_output, NodeSuccess)
+    assert expected_output == node_output
 
