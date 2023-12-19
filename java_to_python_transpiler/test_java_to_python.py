@@ -430,3 +430,27 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     assert isinstance(node_output, NodeSuccess)
     assert expected_output == node_output
 
+
+def test_parser_can_generate_correct_error_for_complex_term():
+    """
+    This test checks if the parser can successfully generate an error when given
+    a syntax error kind of term like "5//" or "5*"
+    """
+
+    first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
+
+    tokens: List[Token] = [
+        first_decimal_literal_token, divide_token, divide_token,
+        end_of_file_token
+    ]
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert isinstance(node_output, NodeFailure)
+
+    assert expected_output == node_output 
+
