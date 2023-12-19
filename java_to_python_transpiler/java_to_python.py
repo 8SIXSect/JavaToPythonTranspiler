@@ -395,7 +395,10 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     return NodeFailure(error_message)
 
 
-def parse_list_of_tokens(tokens: List[Token]) -> Union[ExpressionNode, ParserFailure]:
+ParserResult = ExpressionNode | ParserFailure
+
+
+def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
     """ This functions purpose is to be the entrypoint for the parser """
 
     root_node_result: NodeResult = parse_tokens_for_expression(tokens)

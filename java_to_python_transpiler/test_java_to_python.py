@@ -1,7 +1,7 @@
 from typing import List
 from java_to_python_transpiler.java_to_python import (
     COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE,
-    END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER,
+    END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
     FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE,
     LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
     LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE,
@@ -9,8 +9,8 @@ from java_to_python_transpiler.java_to_python import (
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE,
-    LexerFailure, Token, LexerResult,
-    report_error_for_lexer, scan_and_tokenize_input
+    LexerFailure, ParserFailure, Token, LexerResult, parse_list_of_tokens,
+    report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
 
@@ -273,4 +273,24 @@ def test_lexer_can_generate_proper_keyword_tokens():
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
     assert isinstance(lexer_output, list) and expected_output == lexer_output
+
+
+def test_report_error_for_parser_returns_proper_error_object():
+    """
+    This test checks if the function `report_error_for_parser` returns
+    the correct ParserFailure object.
+    """
+
+    INPUT: str = "5 +"
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output: ParserFailure = ParserFailure(error_message)
+
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
+    assert isinstance(lexer_result, list) 
+
+    parser_result: ParserResult = parse_list_of_tokens(lexer_result)
+
+    assert isinstance(parser_result, ParserFailure) 
+    assert expected_output == parser_result
 
