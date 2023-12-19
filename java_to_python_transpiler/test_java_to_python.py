@@ -8,8 +8,8 @@ from java_to_python_transpiler.java_to_python import (
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
-    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArithmeticOperator, FactorNode,
-    LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_factor, parse_tokens_for_term,
+    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArithmeticOperator, ExpressionNode, FactorNode,
+    LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -337,7 +337,7 @@ def test_parser_can_generate_correct_error_for_factor():
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_single_term():
+def test_parser_can_generate_correct_ast_for_simple_term():
     """
     This test checks if the parser can successfully generate an ast when given
     a single term. This test specifically checks the `parse_tokens_for_term`
@@ -445,4 +445,30 @@ def test_parser_can_generate_correct_error_for_complex_term():
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
     assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_simple_expression():
+    """
+    This test checks if the parser can properly generate an AST for a simple
+    expression with a singular term and that term has a singular factor.
+    """
+
+    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    
+    tokens: List[Token] = [
+        decimal_literal_token,
+        end_of_file_token
+    ]
+
+    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+    term_node: TermNode = TermNode(factor_node)
+    expression_node: ExpressionNode = ExpressionNode(term_node)
+
+    expected_output_tokens = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result 
 

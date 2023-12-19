@@ -16,7 +16,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "86"
+    user_input = ""
 
     lexer_result: Union[List[Token], LexerFailure] = \
             scan_and_tokenize_input(user_input)
