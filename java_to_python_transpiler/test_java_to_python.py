@@ -9,7 +9,7 @@ from java_to_python_transpiler.java_to_python import (
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, FactorNode,
-    LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_factor,
+    LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_factor, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -314,10 +314,10 @@ def test_parser_can_generate_correct_ast_for_single_factor():
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                factor_node)
 
-    parser_output: NodeResult = parse_tokens_for_factor(tokens)
+    node_output: NodeResult = parse_tokens_for_factor(tokens)
 
-    assert isinstance(parser_output, NodeSuccess)
-    assert expected_output == parser_output 
+    assert isinstance(node_output, NodeSuccess)
+    assert expected_output == node_output 
 
 
 def test_parser_can_generate_correct_error_for_factor():
@@ -338,4 +338,32 @@ def test_parser_can_generate_correct_error_for_factor():
 
     assert isinstance(node_result, NodeFailure) 
     assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_term():
+    """
+    This test checks if the parse can successfully generate an ast when given
+    a single term. This test specifically checks the `parse_tokens_for_term`
+    function.
+    """
+
+    INPUT: str = "86"
+
+    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, INPUT)
+    tokens: List[Token] = [
+        decimal_literal_token,
+        end_of_file_token
+    ]
+
+    factor_node: FactorNode = FactorNode(INPUT)
+    term_node: TermNode = TermNode(factor_node)
+
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               term_node)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert isinstance(node_output, NodeSuccess)
+    assert expected_output == node_output 
 
