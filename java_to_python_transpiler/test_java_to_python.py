@@ -47,7 +47,7 @@ def test_lexer_can_generate_tokens_for_single_line_comment():
  
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_token_for_grouping_characters():
@@ -76,7 +76,7 @@ def test_lexer_can_generate_token_for_grouping_characters():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_tokens_for_punctuation_characters():
@@ -97,7 +97,7 @@ def test_lexer_can_generate_tokens_for_punctuation_characters():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output 
+    assert expected_output == lexer_output 
 
 
 def test_lexer_can_generate_tokens_for_comparison_operators():
@@ -120,7 +120,7 @@ def test_lexer_can_generate_tokens_for_comparison_operators():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output 
+    assert expected_output == lexer_output 
 
 
 def test_lexer_can_generate_tokens_for_arithmetic_operators():
@@ -144,7 +144,7 @@ def test_lexer_can_generate_tokens_for_arithmetic_operators():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_tokens_for_float_literals():
@@ -160,7 +160,7 @@ def test_lexer_can_generate_tokens_for_float_literals():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_tokens_for_decimal_literals():
@@ -176,7 +176,7 @@ def test_lexer_can_generate_tokens_for_decimal_literals():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_tokens_for_string_literals():
@@ -196,7 +196,7 @@ def test_lexer_can_generate_tokens_for_string_literals():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_tokens_for_identifiers():
@@ -218,7 +218,7 @@ def test_lexer_can_generate_tokens_for_identifiers():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_only_end_of_file_token_when_given_no_input():
@@ -233,7 +233,7 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_no_input():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
     
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
@@ -248,7 +248,7 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_lexer_can_generate_proper_keyword_tokens():
@@ -272,7 +272,7 @@ def test_lexer_can_generate_proper_keyword_tokens():
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert isinstance(lexer_output, list) and expected_output == lexer_output
+    assert expected_output == lexer_output
 
 
 def test_report_error_for_parser_returns_proper_error_object():
@@ -291,7 +291,6 @@ def test_report_error_for_parser_returns_proper_error_object():
 
     parser_result: ParserResult = parse_list_of_tokens(lexer_result)
 
-    assert isinstance(parser_result, ParserFailure) 
     assert expected_output == parser_result
 
 
@@ -316,7 +315,6 @@ def test_parser_can_generate_correct_ast_for_single_factor():
 
     node_output: NodeResult = parse_tokens_for_factor(tokens)
 
-    assert isinstance(node_output, NodeSuccess)
     assert expected_output == node_output 
 
 
@@ -336,7 +334,6 @@ def test_parser_can_generate_correct_error_for_factor():
 
     node_result: NodeResult = parse_tokens_for_factor(lexer_result)
 
-    assert isinstance(node_result, NodeFailure) 
     assert expected_output == node_result
 
 
@@ -363,7 +360,6 @@ def test_parser_can_generate_correct_ast_for_single_term():
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
-    assert isinstance(node_output, NodeSuccess)
     assert expected_output == node_output 
 
 
@@ -395,7 +391,6 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
-    assert isinstance(node_output, NodeSuccess)
     assert expected_output == node_output
 
 
@@ -427,7 +422,6 @@ def test_parser_can_generate_correct_ast_for_divide_term():
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
-    assert isinstance(node_output, NodeSuccess)
     assert expected_output == node_output
 
 
@@ -449,8 +443,6 @@ def test_parser_can_generate_correct_error_for_complex_term():
     expected_output: NodeFailure = NodeFailure(error_message)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
-
-    assert isinstance(node_output, NodeFailure)
 
     assert expected_output == node_output 
 
