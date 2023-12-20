@@ -510,3 +510,40 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
 
     assert expected_output == node_result
 
+
+def test_parser_can_generate_correct_ast_for_multiple_terms():
+    """
+    This test checks that the parser can properly generate an AST for multiple
+    terms at once
+    """
+ 
+    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
+    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
+
+    tokens: List[Token] = [
+        decimal_literal_token, multiply_token, decimal_literal_token,
+        divide_token, decimal_literal_token,
+        end_of_file_token
+    ]
+
+    first_factor: FactorNode = FactorNode(decimal_literal_token.value)
+    second_factor: FactorNode = FactorNode(decimal_literal_token.value)
+    third_factor: FactorNode = FactorNode(decimal_literal_token.value)
+    
+    additional_term_of_additional_term: TermNode = TermNode(third_factor)
+    additional_term: TermNode = TermNode(second_factor, ArithmeticOperator.DIVIDE,
+                                         additional_term_of_additional_term)
+    
+    term: TermNode = TermNode(first_factor, ArithmeticOperator.MULTIPLY,
+                              additional_term)
+
+
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               term)
+
+    node_result: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_result
+
