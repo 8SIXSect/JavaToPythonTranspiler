@@ -379,12 +379,14 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
         end_of_file_token
     ]
 
-    first_factor_node: FactorNode = FactorNode(first_decimal_literal_token.value)
+    single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
     multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
-    second_factor_node: FactorNode = FactorNode(second_decimal_literal_token.value)
+    
+    factor_for_additional_term: FactorNode = FactorNode(second_decimal_literal_token.value)
+    additional_term: TermNode = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(first_factor_node, multiply_operator,
-                                   second_factor_node)
+    term_node: TermNode = TermNode(single_factor, multiply_operator,
+                                   additional_term)
 
     expected_output_tokens: List[Token] = [end_of_file_token]
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
@@ -410,12 +412,14 @@ def test_parser_can_generate_correct_ast_for_divide_term():
         end_of_file_token
     ]
 
-    first_factor_node: FactorNode = FactorNode(first_decimal_literal_token.value)
+    single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
     divide_operator: ArithmeticOperator = ArithmeticOperator.DIVIDE
-    second_factor_node: FactorNode = FactorNode(second_decimal_literal_token.value)
+    
+    factor_for_additional_term: FactorNode = FactorNode(second_decimal_literal_token.value)
+    additional_term: TermNode = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(first_factor_node, divide_operator,
-                                   second_factor_node)
+    term_node: TermNode = TermNode(single_factor, divide_operator,
+                                   additional_term)
 
     expected_output_tokens: List[Token] = [end_of_file_token]
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
@@ -487,12 +491,14 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
         end_of_file_token
     ]
 
-    first_factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+    single_factor: FactorNode = FactorNode(decimal_literal_token.value)
     multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
-    second_factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+    
+    factor_for_additional_term: FactorNode = FactorNode(decimal_literal_token.value)
+    additional_term: TermNode = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(first_factor_node, multiply_operator,
-                                   second_factor_node)
+    term_node: TermNode = TermNode(single_factor, multiply_operator,
+                                   additional_term)
 
     expression_node: ExpressionNode = ExpressionNode(term_node)
     
@@ -503,9 +509,4 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
     assert expected_output == node_result
-
-
-# TODO: you need to add multiple term capabilities. It's going to break tests.
-# That's okay. Ask a question on stackoverflow if it is okay. Ask the best way to do it
-# you can put in hella work tmrw but call it all for today :)
 
