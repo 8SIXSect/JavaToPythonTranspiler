@@ -308,9 +308,9 @@ class TermNode:
     operator. Defaults to None if no second factor is present.
     """    
 
-    first_factor_node: FactorNode
+    single_factor_node: FactorNode
     operator: Optional[ArithmeticOperator] = None
-    second_factor_node: Optional[FactorNode] = None
+    additional_term_node: Optional[TermNode] = None
 
 
 class ArithmeticOperator(Enum):
@@ -476,7 +476,6 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     a mathematical term.
     """
 
-
     TERM_TOKEN_TYPES: Tuple[TokenType, TokenType] = (MULTIPLY_TOKEN_TYPE,
                                                      DIVIDE_TOKEN_TYPE)
 
@@ -486,17 +485,16 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
         return factor_node_result
 
     assert isinstance(factor_node_result.node, FactorNode)
-
-    term_node = TermNode(factor_node_result.node)
+    term_node: TermNode = TermNode(factor_node_result.node)
 
     node_success_for_simple_term: NodeSuccess = \
             NodeSuccess(factor_node_result.tokens, term_node)
 
-    # We don't pop the token off b/c there's a chance it's not a * or /
-    current_token = tokens[0]
+    # We don't pop the token off b/c there's a chance it's not a + or -
+    current_token: Token = tokens[0]
 
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
-        return node_success_for_simple_term 
+        return node_success_for_simple_term
 
     if current_token.token_type not in TERM_TOKEN_TYPES:
         return node_success_for_simple_term 
@@ -510,18 +508,21 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     else:
         term_node_operator = ArithmeticOperator.DIVIDE
 
-    second_factor_node_result: NodeResult = parse_tokens_for_factor(tokens)
-   
-    if isinstance(second_factor_node_result, NodeFailure):
-        return second_factor_node_result
+    additional_term_node_result: NodeResult = \
+            parse_tokens_for_term(factor_node_result.tokens)
+    
+    if isinstance(additional_term_node_result, NodeFailure):
+        return additional_term_node_result
 
-    assert isinstance(second_factor_node_result.node, FactorNode)
+    assert isinstance(additional_term_node_result.node, TermNode)
 
-    complex_term_node: TermNode = TermNode(term_node.first_factor_node,
-                                           term_node_operator,
-                                           second_factor_node_result.node)
+    complex_term_node: TermNode = TermNode(
+        term_node.single_factor_node,
+        term_node_operator,
+        additional_term_node_result.node
+    )
 
-    return NodeSuccess(second_factor_node_result.tokens, complex_term_node)
+    return NodeSuccess(additional_term_node_result.tokens, complex_term_node)
 
 
 def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
