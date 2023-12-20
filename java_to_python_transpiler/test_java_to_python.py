@@ -14,8 +14,12 @@ from java_to_python_transpiler.java_to_python import (
 )
 
 
-# This token may be reused throughout the tests in this file
+# These tokens may be reused throughout the tests in this file
 end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
+plus_token: Token = Token(PLUS_TOKEN_TYPE, "+")
+minus_token: Token = Token(MINUS_TOKEN_TYPE, "-")
+multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
+divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -371,7 +375,6 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
     """
 
     first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
     second_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "3")
 
     tokens: List[Token] = [
@@ -380,12 +383,11 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
     ]
 
     single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
-    multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
     
     factor_for_additional_term: FactorNode = FactorNode(second_decimal_literal_token.value)
     additional_term: TermNode = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(single_factor, multiply_operator,
+    term_node: TermNode = TermNode(single_factor, ArithmeticOperator.MULTIPLY,
                                    additional_term)
 
     expected_output_tokens: List[Token] = [end_of_file_token]
@@ -404,7 +406,6 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     """
 
     first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "*")
     second_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "3")
 
     tokens: List[Token] = [
@@ -413,12 +414,11 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     ]
 
     single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
-    divide_operator: ArithmeticOperator = ArithmeticOperator.DIVIDE
     
     factor_for_additional_term: FactorNode = FactorNode(second_decimal_literal_token.value)
     additional_term: TermNode = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(single_factor, divide_operator,
+    term_node: TermNode = TermNode(single_factor, ArithmeticOperator.DIVIDE,
                                    additional_term)
 
     expected_output_tokens: List[Token] = [end_of_file_token]
@@ -436,7 +436,6 @@ def test_parser_can_generate_correct_error_for_complex_term():
     """
 
     first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
 
     tokens: List[Token] = [
         first_decimal_literal_token, divide_token, divide_token,
@@ -477,40 +476,6 @@ def test_parser_can_generate_correct_ast_for_simple_expression():
     assert expected_output == node_result 
 
 
-def test_parser_can_generate_correct_ast_for_expression_with_one_term():
-    """
-    This test checks if the parser can properly generate an AST for a simple
-    expression with a singular term but multiple factors
-    """
-
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
-
-    tokens: List[Token] = [
-        decimal_literal_token, multiply_token, decimal_literal_token,
-        end_of_file_token
-    ]
-
-    single_factor: FactorNode = FactorNode(decimal_literal_token.value)
-    multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
-    
-    factor_for_additional_term: FactorNode = FactorNode(decimal_literal_token.value)
-    additional_term: TermNode = TermNode(factor_for_additional_term)
-
-    term_node: TermNode = TermNode(single_factor, multiply_operator,
-                                   additional_term)
-
-    expression_node: ExpressionNode = ExpressionNode(term_node)
-    
-    expected_output_tokens: List[Token] = [end_of_file_token]
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               expression_node)
-
-    node_result: NodeResult = parse_tokens_for_expression(tokens)
-
-    assert expected_output == node_result
-
-
 def test_parser_can_generate_correct_ast_for_multiple_terms():
     """
     This test checks that the parser can properly generate an AST for multiple
@@ -544,6 +509,40 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
                                                term)
 
     node_result: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_expression_with_one_term():
+    """
+    This test checks if the parser can properly generate an AST for a simple
+    expression with a singular term but multiple factors
+    """
+
+    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
+
+    tokens: List[Token] = [
+        decimal_literal_token, multiply_token, decimal_literal_token,
+        end_of_file_token
+    ]
+
+    single_factor: FactorNode = FactorNode(decimal_literal_token.value)
+    multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
+    
+    factor_for_additional_term: FactorNode = FactorNode(decimal_literal_token.value)
+    additional_term: TermNode = TermNode(factor_for_additional_term)
+
+    term_node: TermNode = TermNode(single_factor, multiply_operator,
+                                   additional_term)
+
+    expression_node: ExpressionNode = ExpressionNode(term_node)
+    
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
 
     assert expected_output == node_result
 
