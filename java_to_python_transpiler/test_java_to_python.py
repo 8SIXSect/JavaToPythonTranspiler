@@ -1,5 +1,7 @@
 import random
 from typing import List
+
+from _pytest.config import filter_traceback_for_conftest_import_failure
 from java_to_python_transpiler.java_to_python import (
     COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE,
     END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
@@ -463,32 +465,6 @@ def test_parser_can_generate_correct_error_for_complex_term():
     assert expected_output == node_output 
 
 
-def test_parser_can_generate_correct_ast_for_simple_expression():
-    """
-    This test checks if the parser can properly generate an AST for a simple
-    expression with a singular term and that term has a singular factor.
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value() 
-    
-    tokens: List[Token] = [
-        decimal_literal_token,
-        end_of_file_token
-    ]
-
-    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
-    term_node: TermNode = TermNode(factor_node)
-    expression_node: ExpressionNode = ExpressionNode(term_node)
-
-    expected_output_tokens = [end_of_file_token]
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               expression_node)
-
-    node_result: NodeResult = parse_tokens_for_expression(tokens)
-
-    assert expected_output == node_result 
-
-
 def test_parser_can_generate_correct_ast_for_multiple_terms():
     """
     This test checks that the parser can properly generate an AST for multiple
@@ -524,6 +500,32 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
     assert expected_output == node_result
 
 
+def test_parser_can_generate_correct_ast_for_simple_expression():
+    """
+    This test checks if the parser can properly generate an AST for a simple
+    expression with a singular term and that term has a singular factor.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value() 
+    
+    tokens: List[Token] = [
+        decimal_literal_token,
+        end_of_file_token
+    ]
+
+    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+    term_node: TermNode = TermNode(factor_node)
+    expression_node: ExpressionNode = ExpressionNode(term_node)
+
+    expected_output_tokens = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result 
+
+
 def test_parser_can_generate_correct_ast_for_expression_with_one_term():
     """
     This test checks if the parser can properly generate an AST for a simple
@@ -551,6 +553,54 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
     expected_output_tokens: List[Token] = [end_of_file_token]
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_complex_expression():
+    """
+    This test checks that the parser can correctly generate an AST for a
+    complex expression like "5+5" or "3-3"
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: List[Token] = [
+        decimal_literal_token, plus_token, decimal_literal_token,
+        end_of_file_token
+    ]
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    additional_expression: ExpressionNode = ExpressionNode(term)
+
+    expression: ExpressionNode = ExpressionNode(term, ArithmeticOperator.PLUS,
+                                                additional_expression)
+
+    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, expression)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_complex_expression():
+    """
+    This test checks that the parser can correctly generate an error for a
+    complex expression with an error.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    tokens: List[Token] = [
+        decimal_literal_token, plus_token, minus_token,
+        end_of_file_token
+    ]
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
