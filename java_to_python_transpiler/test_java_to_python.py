@@ -1,7 +1,6 @@
 import random
 from typing import List
 
-from _pytest.config import filter_traceback_for_conftest_import_failure
 from java_to_python_transpiler.java_to_python import (
     COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE,
     END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
@@ -15,7 +14,6 @@ from java_to_python_transpiler.java_to_python import (
     LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
-import pytest
 
 
 # These tokens may be reused throughout the tests in this file
@@ -293,26 +291,6 @@ def generate_number_token_with_random_value() -> Token:
     token_value: str = str(random_number)
 
     return Token(DECIMAL_LITERAL_TOKEN_TYPE, token_value)
-
-
-
-def test_report_error_for_parser_returns_proper_error_object():
-    """
-    This test checks if the function `report_error_for_parser` returns
-    the correct ParserFailure object.
-    """
-
-    INPUT: str = "5 +"
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output: ParserFailure = ParserFailure(error_message)
-
-    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
-    assert isinstance(lexer_result, list) 
-
-    parser_result: ParserResult = parse_list_of_tokens(lexer_result)
-
-    assert expected_output == parser_result
 
 
 def test_parser_can_generate_correct_ast_for_single_factor():
@@ -605,4 +583,48 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
     assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_given_faulty_input():
+    """
+    This test checks the parser's entrypoint function `parse_list_of_tokens`
+    to see if it can generate the correct error output given a faulty input
+    """
+
+    tokens: List[Token] = [
+        plus_token,
+        end_of_file_token
+    ]
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output: ParserFailure = ParserFailure(error_message)
+
+    parser_result: ParserResult = parse_list_of_tokens(tokens)
+
+    assert expected_output == parser_result
+
+
+def test_parser_can_generate_correct_ast():
+    """
+    This test checks the parser's entrypoint function `parse_list_of_tokens'
+    to see if it can generate the correct AST
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: List[Token] = [
+        decimal_literal_token, plus_token, decimal_literal_token,
+        end_of_file_token
+    ]
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    additional_expression: ExpressionNode = ExpressionNode(term)
+
+    expression: ExpressionNode = ExpressionNode(term, ArithmeticOperator.PLUS,
+                                                additional_expression)
+
+    parser_result: ParserResult = parse_list_of_tokens(tokens)
+
+    assert expression == parser_result
 
