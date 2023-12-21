@@ -2,9 +2,9 @@
 This module contains methods for transpiling source to source
 """
 
-from typing import List, Union
-from java_to_python_transpiler.java_to_python import (ExpressionNode,
-                                                      ParserFailure,
+from typing import List, Optional, Union
+from java_to_python_transpiler.java_to_python import (ArgumentList, ArithmeticOperator, ExpressionNode, FactorNode, MethodCall, Node,
+                                                      ParserFailure, TermNode,
                                                       Token,
                                                       LexerFailure,
                                                       scan_and_tokenize_input,
@@ -16,7 +16,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "method_call(arg1, arg2)"
+    user_input = "add(80, 10) - 4 + equals + eightySix"
 
     lexer_result: Union[List[Token], LexerFailure] = \
             scan_and_tokenize_input(user_input)
@@ -34,5 +34,41 @@ def test_parser():
         print(parser_result.error_messasge)
         return
 
-    print(parser_result)
+    format_ast(0, parser_result)
+
+
+def format_ast(indent: int, node: Node | ArithmeticOperator | None):
+    extra_indent: int = indent + 4
+
+    if isinstance(node, ExpressionNode):
+        print(indent * " " + "-> expr")
+        format_ast(extra_indent, node.single_term_node) 
+        format_ast(extra_indent, node.operator)
+        format_ast(extra_indent, node.additional_expression_node)
+
+    elif isinstance(node, TermNode):
+        print(indent * " " + "-> term")
+        format_ast(extra_indent, node.single_factor_node)
+        format_ast(extra_indent, node.operator)
+        format_ast(extra_indent, node.additional_term_node)
+
+    elif isinstance(node, ArithmeticOperator):
+        print(indent * " " + "|" + " " + node.value)
+
+    elif isinstance(node, FactorNode):
+
+        if node.method_call is None:
+            print(indent * " " + "|" + " " + node.number_or_identifier)
+        else:
+            format_ast(extra_indent, node.method_call)
+
+    elif isinstance(node, MethodCall):
+        print(indent * " " + "-> method_call")
+        print(indent * " " + "|" + " " + node.identifier)
+        format_ast(extra_indent, node.argument_list)
+
+    elif isinstance(node, ArgumentList):
+        print(indent * " " + "-> argument_list")
+        format_ast(extra_indent, node.argument)
+        format_ast(extra_indent, node.additional_argument_list)
 

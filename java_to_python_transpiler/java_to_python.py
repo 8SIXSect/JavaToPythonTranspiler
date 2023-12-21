@@ -382,6 +382,8 @@ class ArgumentList:
     additional_argument_list: Optional[ArgumentList] = None
 
 
+Node = ExpressionNode | TermNode | FactorNode | MethodCall | ArgumentList
+
 ERROR_MESSAGE_FOR_PARSER: str = "Unexpected token type, {0}"
 
 
@@ -588,8 +590,8 @@ def parse_tokens_for_method_call(tokens: List[Token]) -> NodeResult:
     if isinstance(node_result_argument_list, NodeFailure):
         return node_result_argument_list
 
-    # potential issues here
-    new_tokens: List[Token]  = node_result_argument_list.tokens.copy()
+    # potential issues here because of copy
+    new_tokens: List[Token] = node_result_argument_list.tokens.copy()
 
     current_token: Token = new_tokens.pop(0)
     if current_token.token_type != RIGHT_PARENTHESIS_TOKEN_TYPE:
