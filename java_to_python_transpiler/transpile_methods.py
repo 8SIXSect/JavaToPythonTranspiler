@@ -16,7 +16,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "0/0/0/0"
+    user_input = "method_call(arg1, arg2)"
 
     lexer_result: Union[List[Token], LexerFailure] = \
             scan_and_tokenize_input(user_input)

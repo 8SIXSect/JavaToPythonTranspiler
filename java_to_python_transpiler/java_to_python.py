@@ -250,7 +250,7 @@ class NodeSuccess:
     """
 
     tokens: List[Token]
-    node: Union[ExpressionNode, TermNode, FactorNode]
+    node: ExpressionNode | TermNode | FactorNode | MethodCall | ArgumentList
 
 
 @dataclass
@@ -536,11 +536,118 @@ def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
         IDENTIFIER_TOKEN_TYPE,
     ]
 
-    current_token: Token = tokens.pop(0)
+    # The purpose for not popping off tokens[0] is b/c method_call may need to
+    # use it. So it will be deleted later on when required
+    current_token: Token = tokens[0]
 
     if current_token.token_type not in FACTOR_TOKEN_TYPES:
+        print(tokens, current_token)
         return report_error_in_parser(current_token.token_type)
 
-    factor_node: FactorNode = FactorNode(number_or_identifier=current_token.value)
+    next_token: Token = tokens[1]
+
+    conditions_for_method_call: List[bool] = [
+        current_token.token_type == IDENTIFIER_TOKEN_TYPE,
+        next_token.token_type == LEFT_PARENTHESIS_TOKEN_TYPE
+    ]
+
+    if all(conditions_for_method_call):
+
+        node_result_for_method_call: NodeResult = parse_tokens_for_method_call(tokens)
+        
+        if isinstance(node_result_for_method_call, NodeFailure):
+            return node_result_for_method_call
+
+        assert isinstance(node_result_for_method_call.node, MethodCall)
+    
+        factor_node: FactorNode = \
+                FactorNode(method_call=node_result_for_method_call.node)
+
+        return NodeSuccess(node_result_for_method_call.tokens, factor_node)
+
+    del tokens[0]
+
+    # You may need to add a check for END_OF_FILE but idk yet
+    factor_node: FactorNode = FactorNode(current_token.value)
     return NodeSuccess(tokens, factor_node)
+
+
+def parse_tokens_for_method_call(tokens: List[Token]) -> NodeResult:
+    """
+    This function parses a list of tokens in order to turn them into a MethodCall
+    object.
+    """
+
+    identifier_token: Token = tokens.pop(0)
+    identifier: str = identifier_token.value
+
+    tokens.pop(0)
+
+    node_result_argument_list: NodeResult = parse_tokens_for_argument_list(tokens)
+    
+    if isinstance(node_result_argument_list, NodeFailure):
+        return node_result_argument_list
+
+    # potential issues here
+    new_tokens: List[Token]  = node_result_argument_list.tokens.copy()
+
+    current_token: Token = new_tokens.pop(0)
+    if current_token.token_type != RIGHT_PARENTHESIS_TOKEN_TYPE:
+        return report_error_in_parser(current_token.token_type)
+
+    assert isinstance(node_result_argument_list.node, ArgumentList)
+
+    method_call: MethodCall = MethodCall(identifier, node_result_argument_list.node)
+    return NodeSuccess(new_tokens, method_call)
+
+
+def parse_tokens_for_argument_list(tokens: List[Token]) -> NodeResult:
+    """
+    This function parses a list of tokens in order to turn them into an
+    ArgumentList object.
+    """
+
+    current_token: Token = tokens[0]
+    if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
+        return report_error_in_parser(END_OF_FILE_TOKEN_TYPE)
+    
+    node_result_expression: NodeResult = parse_tokens_for_expression(tokens)
+
+    if isinstance(node_result_expression, NodeFailure):
+        return node_result_expression
+
+    new_tokens: List[Token] = node_result_expression.tokens.copy()
+
+    NEXT_EXPECTED_TOKEN_TYPES: List[TokenType] = [
+        COMMA_TOKEN_TYPE,
+        RIGHT_PARENTHESIS_TOKEN_TYPE
+    ]
+
+    next_token: Token = new_tokens[0]
+    if next_token.token_type not in NEXT_EXPECTED_TOKEN_TYPES:
+        return report_error_in_parser(next_token.token_type)
+
+    assert isinstance(node_result_expression.node, ExpressionNode)
+
+    if next_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
+        argument_list: ArgumentList = ArgumentList(node_result_expression.node)
+        return NodeSuccess(tokens, argument_list)
+
+    # The purpose of this code is to delete comma from tokens
+    new_tokens.pop(0)
+
+    node_result_additional_argument_list: NodeResult = \
+            parse_tokens_for_argument_list(new_tokens)
+
+    if isinstance(node_result_additional_argument_list, NodeFailure):
+        return node_result_additional_argument_list
+
+    assert isinstance(node_result_additional_argument_list.node, ArgumentList)
+
+    argument_list: ArgumentList = ArgumentList(
+        node_result_expression.node,
+        node_result_additional_argument_list.node
+    )
+
+    return NodeSuccess(node_result_additional_argument_list.tokens, argument_list)
 
