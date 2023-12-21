@@ -1,3 +1,4 @@
+import random
 from typing import List
 from java_to_python_transpiler.java_to_python import (
     COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE,
@@ -12,6 +13,7 @@ from java_to_python_transpiler.java_to_python import (
     LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
+import pytest
 
 
 # These tokens may be reused throughout the tests in this file
@@ -279,6 +281,19 @@ def test_lexer_can_generate_proper_keyword_tokens():
     assert expected_output == lexer_output
 
 
+def generate_number_token_with_random_value() -> Token:
+    """
+    This is a helper function that generates a Token object with a random int
+    value
+    """
+
+    random_number: int = random.randint(0, 100)
+    token_value: str = str(random_number)
+
+    return Token(DECIMAL_LITERAL_TOKEN_TYPE, token_value)
+
+
+
 def test_report_error_for_parser_returns_proper_error_object():
     """
     This test checks if the function `report_error_for_parser` returns
@@ -304,15 +319,14 @@ def test_parser_can_generate_correct_ast_for_single_factor():
     correct FactorNode object.
     """
 
-    INPUT: str = "86"
+    decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, INPUT)
     tokens: List[Token] = [
         decimal_literal_token,
         end_of_file_token
     ]
 
-    factor_node: FactorNode = FactorNode(INPUT)
+    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
     expected_output_tokens: List[Token] = [end_of_file_token]
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                factor_node)
@@ -348,15 +362,14 @@ def test_parser_can_generate_correct_ast_for_simple_term():
     function.
     """
 
-    INPUT: str = "86"
 
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, INPUT)
+    decimal_literal_token: Token = generate_number_token_with_random_value()
     tokens: List[Token] = [
         decimal_literal_token,
         end_of_file_token
     ]
 
-    factor_node: FactorNode = FactorNode(INPUT)
+    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
     term_node: TermNode = TermNode(factor_node)
 
     expected_output_tokens: List[Token] = [end_of_file_token]
@@ -374,8 +387,8 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
     `parse_tokens_for_term` function, 
     """
 
-    first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    second_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "3")
+    first_decimal_literal_token: Token = generate_number_token_with_random_value()
+    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
 
     tokens: List[Token] = [
         first_decimal_literal_token, multiply_token, second_decimal_literal_token,
@@ -405,8 +418,8 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     `parse_tokens_for_term` function, 
     """
 
-    first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    second_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "3")
+    first_decimal_literal_token: Token = generate_number_token_with_random_value() 
+    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
 
     tokens: List[Token] = [
         first_decimal_literal_token, divide_token, second_decimal_literal_token,
@@ -435,7 +448,7 @@ def test_parser_can_generate_correct_error_for_complex_term():
     a syntax error kind of term like "5//" or "5*"
     """
 
-    first_decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    first_decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: List[Token] = [
         first_decimal_literal_token, divide_token, divide_token,
@@ -456,7 +469,7 @@ def test_parser_can_generate_correct_ast_for_simple_expression():
     expression with a singular term and that term has a singular factor.
     """
 
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
+    decimal_literal_token: Token = generate_number_token_with_random_value() 
     
     tokens: List[Token] = [
         decimal_literal_token,
@@ -482,9 +495,7 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
     terms at once
     """
  
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
-    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
+    decimal_literal_token: Token = generate_number_token_with_random_value() 
 
     tokens: List[Token] = [
         decimal_literal_token, multiply_token, decimal_literal_token,
@@ -519,8 +530,7 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
     expression with a singular term but multiple factors
     """
 
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, "86")
-    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: List[Token] = [
         decimal_literal_token, multiply_token, decimal_literal_token,
