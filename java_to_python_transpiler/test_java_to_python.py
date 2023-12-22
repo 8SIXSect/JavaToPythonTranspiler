@@ -1,5 +1,5 @@
 import random
-from typing import List
+from typing import List, Tuple
 
 from java_to_python_transpiler.java_to_python import (
     COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE,
@@ -10,8 +10,10 @@ from java_to_python_transpiler.java_to_python import (
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
-    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArithmeticOperator, ExpressionNode, FactorNode,
-    LexerFailure, NodeFailure, NodeResult, NodeSuccess, ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_term,
+    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArithmeticOperator,
+    ExpressionNode, FactorNode, LexerFailure, NodeFailure, NodeResult, NodeSuccess,
+    ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens,
+    parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -49,7 +51,7 @@ def test_lexer_can_generate_tokens_for_single_line_comment():
     LEXER_INPUT: str = "// this is in a `comment`"
 
     expected_output_token: Token = Token(SINGLE_LINE_COMMENT_TOKEN_TYPE, LEXER_INPUT)
-    expected_output: List[Token] = [expected_output_token, end_of_file_token] 
+    expected_output: Tuple[Token, Token] = (expected_output_token, end_of_file_token)
  
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -73,12 +75,12 @@ def test_lexer_can_generate_token_for_grouping_characters():
     left_bracket_token: Token = Token(LEFT_BRACKET_TOKEN_TYPE, "[")
     right_bracket_token: Token = Token(RIGHT_BRACKET_TOKEN_TYPE, "]")
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, ...] = (
         left_parenthesis_token, right_parenthesis_token,
         left_curly_braces_token, right_curly_braces_token,
         left_bracket_token, right_bracket_token,
         end_of_file_token
-    ]
+    )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -96,10 +98,10 @@ def test_lexer_can_generate_tokens_for_punctuation_characters():
     semi_colon_token: Token = Token(SEMI_COLON_TOKEN_TYPE, ";")
     comma_token: Token = Token(COMMA_TOKEN_TYPE, ",")
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, ...] = (
         semi_colon_token, comma_token, comma_token, semi_colon_token,
         end_of_file_token
-    ]
+    )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -118,11 +120,11 @@ def test_lexer_can_generate_tokens_for_comparison_operators():
     greater_than_token: Token = Token(GREATER_THAN_TOKEN_TYPE, ">")
     equals_token: Token = Token(EQUALS_TOKEN_TYPE, "=")
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, ...] = (
         equals_token, greater_than_token, equals_token, less_than_token,
         equals_token,
         end_of_file_token
-    ]
+    )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -142,11 +144,11 @@ def test_lexer_can_generate_tokens_for_arithmetic_operators():
     multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
     divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, ...] = (
         plus_token, plus_token, divide_token, multiply_token, minus_token,
         divide_token,
         end_of_file_token
-    ]
+        )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -162,10 +164,10 @@ def test_lexer_can_generate_tokens_for_float_literals():
     LEXER_INPUT: str = "86.86"
 
     float_literal_token: Token = Token(FLOAT_LITERAL_TOKEN_TYPE, LEXER_INPUT)
-    expected_output: List[Token] = [float_literal_token, end_of_file_token]
+    expected_output: Tuple[Token, Token] = (float_literal_token, end_of_file_token)
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
-
+    
     assert expected_output == lexer_output
 
 
@@ -178,7 +180,7 @@ def test_lexer_can_generate_tokens_for_decimal_literals():
     LEXER_INPUT: str = "86868686"
 
     decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, LEXER_INPUT)
-    expected_output: List[Token] = [decimal_literal_token, end_of_file_token]
+    expected_output: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -195,10 +197,10 @@ def test_lexer_can_generate_tokens_for_string_literals():
 
     first_string_literal_token: Token = Token(STRING_LITERAL_TOKEN_TYPE, '"hello"')
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, Token] = (
         first_string_literal_token,
         end_of_file_token
-    ]
+    )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -217,10 +219,10 @@ def test_lexer_can_generate_tokens_for_identifiers():
     second_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "sixth")
     third_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "sector")
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, ...] = (
         first_identifier_token, second_identifier_token, third_identifier_token,
         end_of_file_token
-    ]
+    )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -235,7 +237,7 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_no_input():
 
     LEXER_INPUT: str = ""
 
-    expected_output: List[Token] = [end_of_file_token]
+    expected_output: Tuple[Token] = (end_of_file_token,)
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
     
@@ -250,7 +252,7 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
 
     LEXER_INPUT: str = "               \t     \n \n   "
 
-    expected_output: List[Token] = [end_of_file_token]
+    expected_output: Tuple[Token] = (end_of_file_token,)
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -271,10 +273,10 @@ def test_lexer_can_generate_proper_keyword_tokens():
     short_token: Token = Token(SHORT_TOKEN_TYPE, "short")
     while_token: Token = Token(WHILE_TOKEN_TYPE, "while")
 
-    expected_output: List[Token] = [
+    expected_output: Tuple[Token, ...] = (
         true_token, short_token, while_token,
         end_of_file_token
-    ]
+    )
 
     lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
@@ -301,13 +303,10 @@ def test_parser_can_generate_correct_ast_for_single_factor():
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: List[Token] = [
-        decimal_literal_token,
-        end_of_file_token
-    ]
+    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
     factor_node: FactorNode = FactorNode(decimal_literal_token.value)
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                factor_node)
 
@@ -322,15 +321,13 @@ def test_parser_can_generate_correct_error_for_factor():
     correct NodeFailure object.
     """
 
-    INPUT: str = "+"
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
     expected_output: NodeFailure = NodeFailure(error_message)
 
-    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
-    assert isinstance(lexer_result, list) 
+    tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
 
-    node_result: NodeResult = parse_tokens_for_factor(lexer_result)
+    node_result: NodeResult = parse_tokens_for_factor(tokens)
 
     assert expected_output == node_result
 
@@ -344,15 +341,12 @@ def test_parser_can_generate_correct_ast_for_simple_term():
 
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    tokens: List[Token] = [
-        decimal_literal_token,
-        end_of_file_token
-    ]
+    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
     factor_node: FactorNode = FactorNode(decimal_literal_token.value)
     term_node: TermNode = TermNode(factor_node)
 
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
@@ -370,10 +364,10 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
     first_decimal_literal_token: Token = generate_number_token_with_random_value()
     second_decimal_literal_token: Token = generate_number_token_with_random_value() 
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         first_decimal_literal_token, multiply_token, second_decimal_literal_token,
         end_of_file_token
-    ]
+    )
 
     single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
     
@@ -383,7 +377,7 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
     term_node: TermNode = TermNode(single_factor, ArithmeticOperator.MULTIPLY,
                                    additional_term)
 
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
@@ -401,10 +395,10 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     first_decimal_literal_token: Token = generate_number_token_with_random_value() 
     second_decimal_literal_token: Token = generate_number_token_with_random_value() 
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         first_decimal_literal_token, divide_token, second_decimal_literal_token,
         end_of_file_token
-    ]
+    )
 
     single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
     
@@ -414,7 +408,7 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     term_node: TermNode = TermNode(single_factor, ArithmeticOperator.DIVIDE,
                                    additional_term)
 
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
@@ -430,10 +424,10 @@ def test_parser_can_generate_correct_error_for_complex_term():
 
     first_decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         first_decimal_literal_token, divide_token, divide_token,
         end_of_file_token
-    ]
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
     expected_output: NodeFailure = NodeFailure(error_message)
@@ -451,11 +445,11 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
  
     decimal_literal_token: Token = generate_number_token_with_random_value() 
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, ...] = (
         decimal_literal_token, multiply_token, decimal_literal_token,
         divide_token, decimal_literal_token,
         end_of_file_token
-    ]
+    )
 
     first_factor: FactorNode = FactorNode(decimal_literal_token.value)
     second_factor: FactorNode = FactorNode(decimal_literal_token.value)
@@ -469,7 +463,7 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
                               additional_term)
 
 
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                term)
 
@@ -486,16 +480,13 @@ def test_parser_can_generate_correct_ast_for_simple_expression():
 
     decimal_literal_token: Token = generate_number_token_with_random_value() 
     
-    tokens: List[Token] = [
-        decimal_literal_token,
-        end_of_file_token
-    ]
+    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
     factor_node: FactorNode = FactorNode(decimal_literal_token.value)
     term_node: TermNode = TermNode(factor_node)
     expression_node: ExpressionNode = ExpressionNode(term_node)
 
-    expected_output_tokens = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                expression_node)
 
@@ -512,10 +503,10 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         decimal_literal_token, multiply_token, decimal_literal_token,
         end_of_file_token
-    ]
+    )
 
     single_factor: FactorNode = FactorNode(decimal_literal_token.value)
     multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
@@ -528,7 +519,7 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
 
     expression_node: ExpressionNode = ExpressionNode(term_node)
     
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
                                                expression_node)
 
@@ -545,10 +536,10 @@ def test_parser_can_generate_correct_ast_for_complex_expression():
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         decimal_literal_token, plus_token, decimal_literal_token,
         end_of_file_token
-    ]
+    )
 
     factor: FactorNode = FactorNode(decimal_literal_token.value)
     term: TermNode = TermNode(factor)
@@ -557,7 +548,7 @@ def test_parser_can_generate_correct_ast_for_complex_expression():
     expression: ExpressionNode = ExpressionNode(term, ArithmeticOperator.PLUS,
                                                 additional_expression)
 
-    expected_output_tokens: List[Token] = [end_of_file_token]
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, expression)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
@@ -572,10 +563,10 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     """
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         decimal_literal_token, plus_token, minus_token,
         end_of_file_token
-    ]
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
     expected_output: NodeFailure = NodeFailure(error_message)
@@ -591,10 +582,7 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     to see if it can generate the correct error output given a faulty input
     """
 
-    tokens: List[Token] = [
-        plus_token,
-        end_of_file_token
-    ]
+    tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
     expected_output: ParserFailure = ParserFailure(error_message)
@@ -612,10 +600,10 @@ def test_parser_can_generate_correct_ast():
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: List[Token] = [
+    tokens: Tuple[Token, Token, Token, Token] = (
         decimal_literal_token, plus_token, decimal_literal_token,
         end_of_file_token
-    ]
+    )
 
     factor: FactorNode = FactorNode(decimal_literal_token.value)
     term: TermNode = TermNode(factor)
