@@ -422,6 +422,8 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
     a mathematical expression.
     """
 
+    #breakpoint()
+
     EXPRESSION_TOKEN_TYPES: Tuple[TokenType, TokenType] = (PLUS_TOKEN_TYPE,
                                                            MINUS_TOKEN_TYPE)
 
@@ -436,8 +438,11 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
     node_success_for_simple_expression: NodeSuccess = \
             NodeSuccess(term_node_result.tokens, expression_node)
 
+    # PROBLEM LIES HERE
+    new_tokens: List[Token] = term_node_result.tokens.copy()
+
     # We don't pop the token off b/c there's a chance it's not a + or -
-    current_token: Token = tokens[0]
+    current_token: Token = new_tokens[0]
 
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
         return node_success_for_simple_expression
@@ -445,7 +450,7 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
     if current_token.token_type not in EXPRESSION_TOKEN_TYPES:
         return node_success_for_simple_expression 
 
-    del tokens[0]
+    del new_tokens[0]
 
     expression_node_operator: ArithmeticOperator 
 
@@ -455,7 +460,7 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
         expression_node_operator = ArithmeticOperator.MINUS
 
     additional_expression_node_result: NodeResult = \
-            parse_tokens_for_expression(term_node_result.tokens)
+            parse_tokens_for_expression(new_tokens)
     
     if isinstance(additional_expression_node_result, NodeFailure):
         return additional_expression_node_result
@@ -478,6 +483,8 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     a mathematical term.
     """
 
+    #breakpoint()
+
     TERM_TOKEN_TYPES: Tuple[TokenType, TokenType] = (MULTIPLY_TOKEN_TYPE,
                                                      DIVIDE_TOKEN_TYPE)
 
@@ -489,11 +496,13 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     assert isinstance(factor_node_result.node, FactorNode)
     term_node: TermNode = TermNode(factor_node_result.node)
 
+    new_tokens: List[Token] = factor_node_result.tokens.copy()
+
     node_success_for_simple_term: NodeSuccess = \
-            NodeSuccess(factor_node_result.tokens, term_node)
+            NodeSuccess(new_tokens, term_node)
 
     # We don't pop the token off b/c there's a chance it's not a + or -
-    current_token: Token = tokens[0]
+    current_token: Token = new_tokens[0]
 
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
         return node_success_for_simple_term
@@ -501,7 +510,7 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     if current_token.token_type not in TERM_TOKEN_TYPES:
         return node_success_for_simple_term 
 
-    del tokens[0]
+    del new_tokens[0]
 
     term_node_operator: ArithmeticOperator 
 
@@ -511,7 +520,7 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
         term_node_operator = ArithmeticOperator.DIVIDE
 
     additional_term_node_result: NodeResult = \
-            parse_tokens_for_term(factor_node_result.tokens)
+            parse_tokens_for_term(new_tokens)
     
     if isinstance(additional_term_node_result, NodeFailure):
         return additional_term_node_result
@@ -532,6 +541,8 @@ def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical term.
     """
+
+    #breakpoint()
 
     FACTOR_TOKEN_TYPES: List[str] = [
         DECIMAL_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, FALSE_TOKEN_TYPE,
@@ -580,6 +591,8 @@ def parse_tokens_for_method_call(tokens: List[Token]) -> NodeResult:
     object.
     """
 
+    #breakpoint()
+
     identifier_token: Token = tokens.pop(0)
     identifier: str = identifier_token.value
 
@@ -608,6 +621,8 @@ def parse_tokens_for_argument_list(tokens: List[Token]) -> NodeResult:
     This function parses a list of tokens in order to turn them into an
     ArgumentList object.
     """
+
+    #breakpoint()
 
     current_token: Token = tokens[0]
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
