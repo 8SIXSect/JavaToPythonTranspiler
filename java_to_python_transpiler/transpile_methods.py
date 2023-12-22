@@ -3,8 +3,8 @@ This module contains methods for transpiling source to source
 """
 
 from typing import List, Optional, Union
-from java_to_python_transpiler.java_to_python import (ArgumentList, ArithmeticOperator, ExpressionNode, FactorNode, MethodCall, Node,
-                                                      ParserFailure, TermNode,
+from java_to_python_transpiler.java_to_python import (ArgumentList, ArithmeticOperator, ExpressionNode, FactorNode, LexerResult, MethodCall, Node,
+                                                      ParserFailure, ParserResult, TermNode,
                                                       Token,
                                                       LexerFailure,
                                                       scan_and_tokenize_input,
@@ -16,19 +16,17 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "add(80, 10) - 4 + equals + eightySix"
+    user_input: str = "add(80, 10) - 4 + equals + eightySix"
 
-    lexer_result: Union[List[Token], LexerFailure] = \
-            scan_and_tokenize_input(user_input)
+    lexer_result: LexerResult = scan_and_tokenize_input(user_input)
 
     if isinstance(lexer_result, LexerFailure):
         print(lexer_result.error_message)
         return
 
-    assert isinstance(lexer_result, list)
+    assert isinstance(lexer_result, tuple)
 
-    parser_result: Union[ExpressionNode, ParserFailure] = \
-            parse_list_of_tokens(lexer_result)
+    parser_result: ParserResult = parse_list_of_tokens(lexer_result)
 
     if isinstance(parser_result, ParserFailure):
         print(parser_result.error_messasge)

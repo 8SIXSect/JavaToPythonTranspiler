@@ -126,7 +126,7 @@ def report_error_for_lexer(unknown_character: str) -> LexerFailure:
     return LexerFailure(error_message)
 
 
-LexerResult = List[Token] | LexerFailure
+LexerResult = Tuple[Token, ...] | LexerFailure
 
 
 def scan_and_tokenize_input(user_input: str) -> LexerResult:
@@ -226,7 +226,9 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
     tokens_with_keywords_as_list.append(end_of_file_token)
 
-    return tokens_with_keywords_as_list
+    tokens_as_tuple: Tuple[Token, ...] = tuple(tokens_with_keywords_as_list)
+
+    return tokens_as_tuple 
 
 
 @dataclass
@@ -249,7 +251,7 @@ class NodeSuccess:
     `node` is the output to be added to the AST
     """
 
-    tokens: List[Token]
+    tokens: Tuple[Token, ...]
     node: ExpressionNode | TermNode | FactorNode | MethodCall | ArgumentList
 
 
@@ -400,7 +402,7 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
 ParserResult = ExpressionNode | ParserFailure
 
 
-def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
+def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
     """ This functions purpose is to be the entrypoint for the parser """
 
     root_node_result: NodeResult = parse_tokens_for_expression(tokens)
@@ -416,13 +418,11 @@ def parse_list_of_tokens(tokens: List[Token]) -> ParserResult:
 NodeResult = Union[NodeSuccess, NodeFailure]
 
 
-def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
+def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical expression.
     """
-
-    #breakpoint()
 
     EXPRESSION_TOKEN_TYPES: Tuple[TokenType, TokenType] = (PLUS_TOKEN_TYPE,
                                                            MINUS_TOKEN_TYPE)
@@ -433,16 +433,13 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
         return term_node_result
 
     assert isinstance(term_node_result.node, TermNode)
-    expression_node = ExpressionNode(term_node_result.node)
+    expression_node: ExpressionNode = ExpressionNode(term_node_result.node)
 
     node_success_for_simple_expression: NodeSuccess = \
             NodeSuccess(term_node_result.tokens, expression_node)
 
-    # PROBLEM LIES HERE
-    new_tokens: List[Token] = term_node_result.tokens.copy()
-
     # We don't pop the token off b/c there's a chance it's not a + or -
-    current_token: Token = new_tokens[0]
+    current_token: Token = term_node_result.tokens[0]
 
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
         return node_success_for_simple_expression
@@ -450,24 +447,25 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
     if current_token.token_type not in EXPRESSION_TOKEN_TYPES:
         return node_success_for_simple_expression 
 
-    del new_tokens[0]
+    # The purpose of this statement is to "delete" the first index of tokens
+    # (but it's a tuple so you can't modify it)
+    tokens_after_deleting_operator: Tuple[Token, ...] = term_node_result.tokens[1:]
 
-    expression_node_operator: ArithmeticOperator 
-
-    if current_token.token_type == PLUS_TOKEN_TYPE:
-        expression_node_operator = ArithmeticOperator.PLUS
-    else:
-        expression_node_operator = ArithmeticOperator.MINUS
+    expression_node_operator: ArithmeticOperator = (
+        ArithmeticOperator.PLUS
+        if current_token.token_type == PLUS_TOKEN_TYPE
+        else ArithmeticOperator.MINUS 
+    )
 
     additional_expression_node_result: NodeResult = \
-            parse_tokens_for_expression(new_tokens)
+            parse_tokens_for_expression(tokens_after_deleting_operator)
     
     if isinstance(additional_expression_node_result, NodeFailure):
         return additional_expression_node_result
 
     assert isinstance(additional_expression_node_result.node, ExpressionNode)
 
-    complex_expression_node = ExpressionNode(
+    complex_expression_node: ExpressionNode = ExpressionNode(
         expression_node.single_term_node,
         expression_node_operator,
         additional_expression_node_result.node
@@ -477,13 +475,11 @@ def parse_tokens_for_expression(tokens: List[Token]) -> NodeResult:
                        complex_expression_node)
 
 
-def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
+def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical term.
     """
-
-    #breakpoint()
 
     TERM_TOKEN_TYPES: Tuple[TokenType, TokenType] = (MULTIPLY_TOKEN_TYPE,
                                                      DIVIDE_TOKEN_TYPE)
@@ -496,13 +492,10 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     assert isinstance(factor_node_result.node, FactorNode)
     term_node: TermNode = TermNode(factor_node_result.node)
 
-    new_tokens: List[Token] = factor_node_result.tokens.copy()
-
     node_success_for_simple_term: NodeSuccess = \
-            NodeSuccess(new_tokens, term_node)
+            NodeSuccess(factor_node_result.tokens, term_node)
 
-    # We don't pop the token off b/c there's a chance it's not a + or -
-    current_token: Token = new_tokens[0]
+    current_token: Token = factor_node_result.tokens[0]
 
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
         return node_success_for_simple_term
@@ -510,17 +503,16 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     if current_token.token_type not in TERM_TOKEN_TYPES:
         return node_success_for_simple_term 
 
-    del new_tokens[0]
+    tokens_after_deleting_operator: Tuple[Token, ...] = factor_node_result.tokens[1:]
 
-    term_node_operator: ArithmeticOperator 
-
-    if current_token.token_type == MULTIPLY_TOKEN_TYPE:
-        term_node_operator = ArithmeticOperator.MULTIPLY
-    else:
-        term_node_operator = ArithmeticOperator.DIVIDE
+    term_node_operator: ArithmeticOperator = (
+        ArithmeticOperator.MULTIPLY
+        if current_token.token_type == MULTIPLY_TOKEN_TYPE
+        else ArithmeticOperator.DIVIDE
+    )
 
     additional_term_node_result: NodeResult = \
-            parse_tokens_for_term(new_tokens)
+            parse_tokens_for_term(tokens_after_deleting_operator)
     
     if isinstance(additional_term_node_result, NodeFailure):
         return additional_term_node_result
@@ -536,33 +528,31 @@ def parse_tokens_for_term(tokens: List[Token]) -> NodeResult:
     return NodeSuccess(additional_term_node_result.tokens, complex_term_node)
 
 
-def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
+def parse_tokens_for_factor(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical term.
     """
 
-    #breakpoint()
 
-    FACTOR_TOKEN_TYPES: List[str] = [
+    FACTOR_TOKEN_TYPES: Tuple[TokenType, TokenType, TokenType, TokenType] = (
         DECIMAL_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, FALSE_TOKEN_TYPE,
         IDENTIFIER_TOKEN_TYPE,
-    ]
+    )
 
     # The purpose for not popping off tokens[0] is b/c method_call may need to
     # use it. So it will be deleted later on when required
     current_token: Token = tokens[0]
 
     if current_token.token_type not in FACTOR_TOKEN_TYPES:
-        print(tokens, current_token)
         return report_error_in_parser(current_token.token_type)
 
     next_token: Token = tokens[1]
 
-    conditions_for_method_call: List[bool] = [
+    conditions_for_method_call: Tuple[bool, bool] = (
         current_token.token_type == IDENTIFIER_TOKEN_TYPE,
         next_token.token_type == LEFT_PARENTHESIS_TOKEN_TYPE
-    ]
+    )
 
     if all(conditions_for_method_call):
 
@@ -578,51 +568,51 @@ def parse_tokens_for_factor(tokens: List[Token]) -> NodeResult:
 
         return NodeSuccess(node_result_for_method_call.tokens, factor_node)
 
-    del tokens[0]
+    tokens_after_deleting_current_token: Tuple[Token, ...] = tokens[1:]
 
     # You may need to add a check for END_OF_FILE but idk yet
     factor_node: FactorNode = FactorNode(current_token.value)
-    return NodeSuccess(tokens, factor_node)
+    return NodeSuccess(tokens_after_deleting_current_token, factor_node)
 
 
-def parse_tokens_for_method_call(tokens: List[Token]) -> NodeResult:
+def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     This function parses a list of tokens in order to turn them into a MethodCall
     object.
     """
 
-    #breakpoint()
 
-    identifier_token: Token = tokens.pop(0)
-    identifier: str = identifier_token.value
+    identifier_token: Token = tokens[0]
 
-    tokens.pop(0)
+    # The purpose of this line is to remove identifier token and left parenthesis
+    tokens_without_identifier_and_parenthesis: Tuple[Token, ...] = tokens[2:]
 
-    node_result_argument_list: NodeResult = parse_tokens_for_argument_list(tokens)
+    node_result_argument_list: NodeResult = \
+            parse_tokens_for_argument_list(tokens_without_identifier_and_parenthesis)
     
     if isinstance(node_result_argument_list, NodeFailure):
         return node_result_argument_list
 
-    # potential issues here because of copy
-    new_tokens: List[Token] = node_result_argument_list.tokens.copy()
+    current_token: Token = node_result_argument_list.tokens[0]
+    tokens_after_deleting_right_parenthesis: Tuple[Token, ...] = \
+            node_result_argument_list.tokens[1:]
 
-    current_token: Token = new_tokens.pop(0)
     if current_token.token_type != RIGHT_PARENTHESIS_TOKEN_TYPE:
         return report_error_in_parser(current_token.token_type)
 
     assert isinstance(node_result_argument_list.node, ArgumentList)
 
-    method_call: MethodCall = MethodCall(identifier, node_result_argument_list.node)
-    return NodeSuccess(new_tokens, method_call)
+    method_call: MethodCall = MethodCall(identifier_token.value,
+                                         node_result_argument_list.node)
+    return NodeSuccess(tokens_after_deleting_right_parenthesis, method_call)
 
 
-def parse_tokens_for_argument_list(tokens: List[Token]) -> NodeResult:
+def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     This function parses a list of tokens in order to turn them into an
     ArgumentList object.
     """
 
-    #breakpoint()
 
     current_token: Token = tokens[0]
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
@@ -633,14 +623,12 @@ def parse_tokens_for_argument_list(tokens: List[Token]) -> NodeResult:
     if isinstance(node_result_expression, NodeFailure):
         return node_result_expression
 
-    new_tokens: List[Token] = node_result_expression.tokens.copy()
-
-    NEXT_EXPECTED_TOKEN_TYPES: List[TokenType] = [
+    NEXT_EXPECTED_TOKEN_TYPES: Tuple[TokenType, TokenType] = (
         COMMA_TOKEN_TYPE,
         RIGHT_PARENTHESIS_TOKEN_TYPE
-    ]
+    )
 
-    next_token: Token = new_tokens[0]
+    next_token: Token = node_result_expression.tokens[0]
     if next_token.token_type not in NEXT_EXPECTED_TOKEN_TYPES:
         return report_error_in_parser(next_token.token_type)
 
@@ -648,13 +636,13 @@ def parse_tokens_for_argument_list(tokens: List[Token]) -> NodeResult:
 
     if next_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
         argument_list: ArgumentList = ArgumentList(node_result_expression.node)
-        return NodeSuccess(tokens, argument_list)
+        return NodeSuccess(node_result_expression.tokens, argument_list)
 
     # The purpose of this code is to delete comma from tokens
-    new_tokens.pop(0)
+    tokens_after_deleting_comma: Tuple[Token, ...] = node_result_expression.tokens[1:]
 
     node_result_additional_argument_list: NodeResult = \
-            parse_tokens_for_argument_list(new_tokens)
+            parse_tokens_for_argument_list(tokens_after_deleting_comma)
 
     if isinstance(node_result_additional_argument_list, NodeFailure):
         return node_result_additional_argument_list
