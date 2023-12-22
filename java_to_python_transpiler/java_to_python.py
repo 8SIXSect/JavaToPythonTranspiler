@@ -380,7 +380,7 @@ class ArgumentList:
     with a singular argument.
     """
 
-    argument: ExpressionNode
+    argument: Optional[ExpressionNode] = None
     additional_argument_list: Optional[ArgumentList] = None
 
 
@@ -534,7 +534,6 @@ def parse_tokens_for_factor(tokens: Tuple[Token, ...]) -> NodeResult:
     a mathematical term.
     """
 
-
     FACTOR_TOKEN_TYPES: Tuple[TokenType, TokenType, TokenType, TokenType] = (
         DECIMAL_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, FALSE_TOKEN_TYPE,
         IDENTIFIER_TOKEN_TYPE,
@@ -581,7 +580,6 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
     object.
     """
 
-
     identifier_token: Token = tokens[0]
 
     # The purpose of this line is to remove identifier token and left parenthesis
@@ -613,11 +611,16 @@ def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
     ArgumentList object.
     """
 
-
     current_token: Token = tokens[0]
+    
     if current_token.token_type == END_OF_FILE_TOKEN_TYPE:
         return report_error_in_parser(END_OF_FILE_TOKEN_TYPE)
-    
+
+    # The purpose of this if statement is to account for no argument method calls 
+    if current_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
+        argument_list: ArgumentList = ArgumentList()
+        return NodeSuccess(tokens, argument_list)
+
     node_result_expression: NodeResult = parse_tokens_for_expression(tokens)
 
     if isinstance(node_result_expression, NodeFailure):
