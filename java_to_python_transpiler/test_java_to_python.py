@@ -10,10 +10,10 @@ from java_to_python_transpiler.java_to_python import (
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
-    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArithmeticOperator,
-    ExpressionNode, FactorNode, LexerFailure, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens,
-    parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_term,
+    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
+    ExpressionNode, FactorNode, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
+    ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_argument_list,
+    parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_method_call, parse_tokens_for_term,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -24,6 +24,9 @@ plus_token: Token = Token(PLUS_TOKEN_TYPE, "+")
 minus_token: Token = Token(MINUS_TOKEN_TYPE, "-")
 multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
 divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
+
+left_parenthesis_token: Token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
+right_parenthesis_token: Token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -293,6 +296,30 @@ def generate_number_token_with_random_value() -> Token:
     token_value: str = str(random_number)
 
     return Token(DECIMAL_LITERAL_TOKEN_TYPE, token_value)
+
+
+def test_parser_can_generate_correct_ast_for_no_argument_method_call():
+    """
+    This test checks that the parser can correctly generate a MethodCall object
+    using the `parse_tokens_for_method_call` function.
+    """
+ 
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "func")
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        identifier_token, left_parenthesis_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    argument_list: ArgumentList = ArgumentList()
+    method_call: MethodCall = MethodCall(identifier_token.value, argument_list)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, method_call)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_single_factor():

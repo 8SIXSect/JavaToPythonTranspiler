@@ -589,6 +589,7 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
             parse_tokens_for_argument_list(tokens_without_identifier_and_parenthesis)
     
     if isinstance(node_result_argument_list, NodeFailure):
+        print(tokens_without_identifier_and_parenthesis)
         return node_result_argument_list
 
     current_token: Token = node_result_argument_list.tokens[0]

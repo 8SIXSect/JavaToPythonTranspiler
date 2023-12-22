@@ -16,7 +16,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input: str = "add(80, 10) - 4 + equals + eightySix"
+    user_input: str = "meth()"
 
     lexer_result: LexerResult = scan_and_tokenize_input(user_input)
 
