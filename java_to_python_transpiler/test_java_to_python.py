@@ -322,6 +322,27 @@ def test_parser_can_generate_correct_ast_for_no_argument_method_call():
     assert expected_output == node_result
 
 
+def test_parser_can_generate_correct_error_for_method_call_when_expecting_parenthesis():
+    """
+    This test checks if the function `parse_tokens_for_method_call` returns the
+    correct NodeFailure object when given an input that has a syntax error.
+    """
+
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "hlelo")
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        identifier_token, left_parenthesis_token, plus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
 def test_parser_can_generate_correct_ast_for_single_factor():
     """
     This test checks if the function `parse_tokens_for_factor` returns the
