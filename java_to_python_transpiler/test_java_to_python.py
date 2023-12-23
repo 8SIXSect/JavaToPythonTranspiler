@@ -307,7 +307,14 @@ def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
     without an arguments supplied.
     """
 
-    NotImplemented
+    tokens: Tuple[Token, Token] = (right_parenthesis_token, end_of_file_token)
+
+    argument_list: ArgumentList = ArgumentList() 
+    expected_output: NodeSuccess = NodeSuccess(tokens, argument_list)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_single_argument_list():
@@ -317,7 +324,28 @@ def test_parser_can_generate_correct_ast_for_single_argument_list():
     of a singular argument.
     """
 
-    NotImplemented
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token] = (
+        decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    expression: ExpressionNode = ExpressionNode(term)
+
+    argument_list: ArgumentList = ArgumentList(expression)
+    
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_parenthesis_token, end_of_file_token
+    )
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, argument_list)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_multiple_argument_list():
@@ -327,7 +355,29 @@ def test_parser_can_generate_correct_ast_for_multiple_argument_list():
     of multiple arguments.
     """
 
-    NotImplemented
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        decimal_literal_token, comma_token, decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    expression: ExpressionNode = ExpressionNode(term)
+
+    additional_argument_list: ArgumentList = ArgumentList(expression)
+    argument_list: ArgumentList = ArgumentList(expression, additional_argument_list)
+    
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_parenthesis_token, end_of_file_token
+    )
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, argument_list)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesis_or_comma():
@@ -336,7 +386,20 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     when supplied a faulty input that omits either a comma or a parenthesis.
     """
 
-    NotImplemented
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        decimal_literal_token, comma_token, decimal_literal_token,
+        decimal_literal_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DECIMAL_LITERAL_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_no_argument_method_call():
