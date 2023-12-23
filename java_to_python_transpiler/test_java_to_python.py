@@ -27,6 +27,7 @@ divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
 
 left_parenthesis_token: Token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
 right_parenthesis_token: Token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
+comma_token: Token = Token(COMMA_TOKEN_TYPE, ",")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -298,6 +299,46 @@ def generate_number_token_with_random_value() -> Token:
     return Token(DECIMAL_LITERAL_TOKEN_TYPE, token_value)
 
 
+
+def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
+    """
+    This test checks that the parser can correctly generate an ArgumentList object
+    using the `parse_tokens_for_argument_list` function when given an input
+    without an arguments supplied.
+    """
+
+    NotImplemented
+
+
+def test_parser_can_generate_correct_ast_for_single_argument_list():
+    """
+    This test checks that the parser can correctly generate an ArgumentList object
+    using the `parse_tokens_for_argument_list` function when given an input
+    of a singular argument.
+    """
+
+    NotImplemented
+
+
+def test_parser_can_generate_correct_ast_for_multiple_argument_list():
+    """
+    This test checks that the parser can correctly generate an ArgumentList object
+    using the `parse_tokens_for_argument_list` function when given an input
+    of multiple arguments.
+    """
+
+    NotImplemented
+
+
+def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesis_or_comma():
+    """
+    This test checks that the parser can correctly generate a NodeFailure object
+    when supplied a faulty input that omits either a comma or a parenthesis.
+    """
+
+    NotImplemented
+
+
 def test_parser_can_generate_correct_ast_for_no_argument_method_call():
     """
     This test checks that the parser can correctly generate a MethodCall object
@@ -337,6 +378,67 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
     expected_output: NodeFailure = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_argument_method_call():
+    """
+    This test checks if the function `parse_tokens_for_method_call` returns the
+    correct MethodCall object when given a single argument.
+    """
+
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token, Token, Token] = (
+        identifier_token, left_parenthesis_token, decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    expression: ExpressionNode = ExpressionNode(term)
+
+    argument_list: ArgumentList = ArgumentList(expression)
+    method_call: MethodCall = MethodCall(identifier_token.value, argument_list)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, method_call)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call():
+    """
+    This test checks if the function `parse_tokens_for_method_call` returns the
+    correct MethodCall object when given a tuple of multiple arguments as input.
+    """
+
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        identifier_token, left_parenthesis_token, decimal_literal_token,
+        comma_token, decimal_literal_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    expression: ExpressionNode = ExpressionNode(term)
+
+    additional_argument_list: ArgumentList = ArgumentList(expression)
+    argument_list: ArgumentList = ArgumentList(expression, additional_argument_list)
+    method_call: MethodCall = MethodCall(identifier_token.value, argument_list)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, method_call)
 
     node_result: NodeResult = parse_tokens_for_method_call(tokens)
 

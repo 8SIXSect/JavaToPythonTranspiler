@@ -16,7 +16,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input: str = "meth()"
+    user_input: str = "meth(123, 456)"
 
     lexer_result: LexerResult = scan_and_tokenize_input(user_input)
 
