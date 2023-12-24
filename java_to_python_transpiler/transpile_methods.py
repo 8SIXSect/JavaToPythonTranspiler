@@ -56,43 +56,48 @@ def test_variable_initialization():
         format_ast(0, node_result.node)
 
 
+def print_with_indent(indent_level: int, output: str):
+    indent: str = indent_level * " "
+    print(indent + output)
+
+
 def format_ast(indent: int, node: Node | ArithmeticOperator | None):
     extra_indent: int = indent + 4
 
     if isinstance(node, ExpressionNode):
-        print(indent * " " + "-> expr")
+        print_with_indent(indent, "-> expr")
         format_ast(extra_indent, node.single_term_node) 
         format_ast(extra_indent, node.operator)
         format_ast(extra_indent, node.additional_expression_node)
 
     elif isinstance(node, TermNode):
-        print(indent * " " + "-> term")
+        print_with_indent(indent, "-> term")
         format_ast(extra_indent, node.single_factor_node)
         format_ast(extra_indent, node.operator)
         format_ast(extra_indent, node.additional_term_node)
 
     elif isinstance(node, ArithmeticOperator):
-        print(indent * " " + "|" + " " + node.value)
+        print_with_indent(indent, "|" + " " + node.value)
 
     elif isinstance(node, FactorNode):
 
         if node.method_call is None:
-            print(indent * " " + "|" + " " + node.number_or_identifier)
+            print_with_indent(indent, "|" + " " + node.number_or_identifier)
         else:
             format_ast(extra_indent, node.method_call)
 
     elif isinstance(node, MethodCall):
-        print(indent * " " + "-> method_call")
-        print(indent * " " + "|" + " " + node.identifier)
+        print_with_indent(indent, "-> method_call")
+        print_with_indent(indent, "|" + " " + node.identifier)
         format_ast(extra_indent, node.argument_list)
 
     elif isinstance(node, ArgumentList):
-        print(indent * " " + "-> argument_list")
+        print_with_indent(indent, "-> argument_list")
         format_ast(extra_indent, node.argument)
         format_ast(extra_indent, node.additional_argument_list)
 
     elif isinstance(node, VariableInitialization):
-        print(indent * " " + "-> variable_init")
-        print(indent * " " + "|" + " " + node.identifier)
+        print_with_indent(indent, "-> variable_init")
+        print_with_indent(indent, "|" + " " + node.identifier)
         format_ast(extra_indent, node.expression)
 
