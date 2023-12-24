@@ -252,7 +252,12 @@ class NodeSuccess:
     """
 
     tokens: Tuple[Token, ...]
-    node: ExpressionNode | TermNode | FactorNode | MethodCall | ArgumentList
+ 
+    node: Union[
+        ExpressionNode, TermNode, FactorNode,
+        MethodCall, ArgumentList,
+        VariableInitialization
+    ]
 
 
 @dataclass
@@ -384,7 +389,26 @@ class ArgumentList:
     additional_argument_list: Optional[ArgumentList] = None
 
 
-Node = ExpressionNode | TermNode | FactorNode | MethodCall | ArgumentList
+@dataclass
+class VariableInitialization:
+    """
+    Represents a variable being initialized.
+
+    `identifier` is represented by a string; this is the name of the variable
+
+    `expression` is represented by an `ExpressionNode`; this is the value of the
+    variable
+    """
+
+    identifier: str
+    expression: ExpressionNode
+
+
+Node = Union[
+    ExpressionNode, TermNode, FactorNode,
+    MethodCall, ArgumentList,
+    VariableInitialization
+]
 
 ERROR_MESSAGE_FOR_PARSER: str = "Unexpected token type, {0}"
 
@@ -416,6 +440,41 @@ def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
 
 
 NodeResult = Union[NodeSuccess, NodeFailure]
+
+
+def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a VariableInitialization
+    object.
+    """
+
+    tokens_with_variable_type_removed: Tuple[Token, ...] = tokens[1:]
+
+    identifier_token: Token = tokens_with_variable_type_removed[0]
+    
+    tokens_with_identifier_removed: Tuple[Token, ...] = \
+            tokens_with_variable_type_removed[1:]
+
+    current_token: Token = tokens_with_identifier_removed[0]
+    if current_token.token_type != EQUALS_TOKEN_TYPE:
+        return report_error_in_parser(current_token.token_type)
+
+    tokens_with_equals_removed: Tuple[Token, ...] = tokens_with_identifier_removed[1:]
+
+    node_result_for_expression: NodeResult = parse_tokens_for_expression(
+        tokens_with_equals_removed
+    )
+
+    if isinstance(node_result_for_expression, NodeFailure):
+        return node_result_for_expression
+
+    assert isinstance(node_result_for_expression.node, ExpressionNode)
+
+    variable_initialization: VariableInitialization = VariableInitialization(
+        identifier_token.value, node_result_for_expression.node
+    )
+
+    return NodeSuccess(node_result_for_expression.tokens, variable_initialization)
 
 
 def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
@@ -589,7 +648,6 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
             parse_tokens_for_argument_list(tokens_without_identifier_and_parenthesis)
     
     if isinstance(node_result_argument_list, NodeFailure):
-        print(tokens_without_identifier_and_parenthesis)
         return node_result_argument_list
 
     current_token: Token = node_result_argument_list.tokens[0]

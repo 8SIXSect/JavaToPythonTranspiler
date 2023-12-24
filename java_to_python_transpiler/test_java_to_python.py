@@ -2,9 +2,9 @@ import random
 from typing import List, Tuple
 
 from java_to_python_transpiler.java_to_python import (
-    COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE,
+    COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE,
     END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
-    FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE,
+    FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, INT_TOKEN_TYPE,
     LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
     LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE,
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
@@ -12,8 +12,8 @@ from java_to_python_transpiler.java_to_python import (
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, TermNode, Token, LexerResult, parse_list_of_tokens, parse_tokens_for_argument_list,
-    parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_method_call, parse_tokens_for_term,
+    ParserFailure, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens, parse_tokens_for_argument_list,
+    parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_method_call, parse_tokens_for_term, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -28,6 +28,8 @@ divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
 left_parenthesis_token: Token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
 right_parenthesis_token: Token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
 comma_token: Token = Token(COMMA_TOKEN_TYPE, ",")
+semi_colon_token: Token = Token(SEMI_COLON_TOKEN_TYPE, ";")
+equals_token: Token = Token(EQUALS_TOKEN_TYPE, "equals")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -785,6 +787,86 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     expected_output: NodeFailure = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_variable_initialization():
+    """
+    This test checks that the parser can correctly generate a
+    VariableInitialization object using the
+    `parse_tokens_for_variable_initilization` function
+    """
+
+    variable_type_token: Token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "my_var")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        variable_type_token, identifier_token, equals_token,
+        decimal_literal_token,
+        end_of_file_token
+    )
+
+    factor: FactorNode = FactorNode(decimal_literal_token.value)
+    term: TermNode = TermNode(factor)
+    expression: ExpressionNode = ExpressionNode(term)
+    
+    variable_intialization: VariableInitialization = VariableInitialization(
+        identifier_token.value, expression
+    )
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+                                               variable_intialization)
+
+    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_return_correct_error_for_initialization_when_expects_equals():
+    """
+    This test checks that the parser's function
+    `parse_tokens_for_variable_initialization` can return the correct NodeFailure
+    object when given a tuple of tokens that omits the equals sign. 
+    """
+
+    variable_type_token: Token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "my_error_prone_var")
+
+    tokens: Tuple[Token, Token, Token] = (
+        variable_type_token, identifier_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_return_correct_error_for_initialization_when_expects_expression():
+    """
+    This test checks the function `parse_tokens_for_variable_initialization`
+    can return the correct NodeFailure object when given a list of tokens
+    that omits an expression (which is required).
+    """
+
+    variable_type_token: Token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "anju")
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        variable_type_token, identifier_token, equals_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output: NodeFailure = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
 
     assert expected_output == node_result
 

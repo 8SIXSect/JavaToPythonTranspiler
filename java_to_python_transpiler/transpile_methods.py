@@ -3,10 +3,10 @@ This module contains methods for transpiling source to source
 """
 
 from typing import List, Optional, Union
-from java_to_python_transpiler.java_to_python import (ArgumentList, ArithmeticOperator, ExpressionNode, FactorNode, LexerResult, MethodCall, Node,
+from java_to_python_transpiler.java_to_python import (ArgumentList, ArithmeticOperator, ExpressionNode, FactorNode, LexerResult, MethodCall, Node, NodeResult, NodeSuccess,
                                                       ParserFailure, ParserResult, TermNode,
                                                       Token,
-                                                      LexerFailure,
+                                                      LexerFailure, VariableInitialization, parse_tokens_for_variable_initialization,
                                                       scan_and_tokenize_input,
                                                       parse_list_of_tokens
                                                       )
@@ -33,6 +33,27 @@ def test_parser():
         return
 
     format_ast(0, parser_result)
+
+
+def test_variable_initialization():
+    PROMPT: str = "? - "
+
+    while True: 
+        user_input: str = input(PROMPT)
+
+        lexer_result: LexerResult = scan_and_tokenize_input(user_input)
+
+        if isinstance(lexer_result, LexerFailure):
+            print(lexer_result.error_message)
+            return
+ 
+        assert isinstance(lexer_result, tuple)
+
+        node_result: NodeResult = parse_tokens_for_variable_initialization(lexer_result)
+
+        assert isinstance(node_result, NodeSuccess)
+
+        format_ast(0, node_result.node)
 
 
 def format_ast(indent: int, node: Node | ArithmeticOperator | None):
@@ -69,4 +90,9 @@ def format_ast(indent: int, node: Node | ArithmeticOperator | None):
         print(indent * " " + "-> argument_list")
         format_ast(extra_indent, node.argument)
         format_ast(extra_indent, node.additional_argument_list)
+
+    elif isinstance(node, VariableInitialization):
+        print(indent * " " + "-> variable_init")
+        print(indent * " " + "|" + " " + node.identifier)
+        format_ast(extra_indent, node.expression)
 
