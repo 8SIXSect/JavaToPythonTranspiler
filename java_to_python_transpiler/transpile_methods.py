@@ -78,49 +78,55 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
         extra_indent_level = indent_level + 4
         format_ast(extra_indent_level, node)
 
+    match node:
+        case ExpressionNode(single_term_node, operator, additional_expression_node):
+            print_output("-> expr")
+            format_ast_with_extra_indent(single_term_node) 
+            format_ast_with_extra_indent(operator)
+            format_ast_with_extra_indent(additional_expression_node)
 
-    if isinstance(node, ExpressionNode):
-        print_output("-> expr")
-        format_ast_with_extra_indent(node.single_term_node) 
-        format_ast_with_extra_indent(node.operator)
-        format_ast_with_extra_indent(node.additional_expression_node)
+        case TermNode(single_factor_node, operator, additional_term_node):
+            print_output("-> term")
+            format_ast_with_extra_indent(single_factor_node)
+            format_ast_with_extra_indent(operator)
+            format_ast_with_extra_indent(additional_term_node)
 
-    elif isinstance(node, TermNode):
-        print_output("-> term")
-        format_ast_with_extra_indent(node.single_factor_node)
-        format_ast_with_extra_indent(node.operator)
-        format_ast_with_extra_indent(node.additional_term_node)
+        case (
+                ArithmeticOperator.PLUS, ArithmeticOperator.MINUS,
+                ArithmeticOperator.MULTIPLY, ArithmeticOperator.DIVIDE
+            ):
 
-    elif isinstance(node, ArithmeticOperator):
-        print_output(node.value, True)
+            print_output(node.value, True)
 
-    elif isinstance(node, FactorNode):
+        case FactorNode(number_or_identifier, None):
+            print_output(number_or_identifier, True)
 
-        if node.method_call is None:
-            print_output(node.number_or_identifier, True)
-        else:
-            format_ast_with_extra_indent(node.method_call)
+        case FactorNode(None, method_call):
+            format_ast_with_extra_indent(method_call)
 
-    elif isinstance(node, MethodCall):
-        print_output("-> method_call")
-        print_output(node.identifier, True)
-        format_ast_with_extra_indent(node.argument_list)
+        case MethodCall(identifier, argument_list):
+            print_output("-> method_call")
+            print_output(identifier, True)
+            format_ast_with_extra_indent(argument_list)
 
-    elif isinstance(node, ArgumentList):
-        print_output("-> argument_list")
-        format_ast_with_extra_indent(node.argument)
-        format_ast_with_extra_indent(node.additional_argument_list)
+        case ArgumentList(argument, additional_argument_list):
+            print_output("-> argument_list")
+            format_ast_with_extra_indent(argument)
+            format_ast_with_extra_indent(additional_argument_list)
 
-    elif isinstance(node, VariableInitialization):
-        print_output("-> variable_init")
-        print_output(node.identifier, True)
-        format_ast_with_extra_indent(node.expression)
+        case VariableInitialization(identifier, expression):
+            print_output("-> variable_init")
+            print_output(identifier, True)
+            format_ast_with_extra_indent(expression)
 
-    elif isinstance(node, ReturnStatement):
-        print_output("-> return_stmt")
-        format_ast_with_extra_indent(node.expression)
+        case ReturnStatement(expression):
+            print_output("-> return_stmt")
+            format_ast_with_extra_indent(expression)
 
-    elif isinstance(node, InlineStatement):
-        print_output("-> inline_stmt")
-        format_ast_with_extra_indent(node.statement)
+        case InlineStatement(statement):
+            print_output("-> inline_stmt")
+            format_ast_with_extra_indent(statement)
+
+        case _:
+            pass
 
