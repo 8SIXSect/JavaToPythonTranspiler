@@ -2,18 +2,18 @@ import random
 from typing import List, Tuple
 
 from java_to_python_transpiler.java_to_python import (
-    COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE,
+    CHAR_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE,
     END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
     FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, INT_TOKEN_TYPE,
     LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
-    LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE,
+    LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, LONG_TOKEN_TYPE, MINUS_TOKEN_TYPE,
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RETURN_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
-    ExpressionNode, FactorNode, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
+    ExpressionNode, FactorNode, InlineStatement, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
     ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens,
-    parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor,
+    parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement,
     parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
@@ -781,6 +781,92 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_return_statement_with_semicolon():
+    """
+    This checks if the function `parse_tokens_for_inline_statement` can correctly
+    parse the tokens and construct a ReturnStatement object given an input that
+    ends in a semicolon.
+
+    Note: I don't think it's necessary to test both an empty and non-empty
+    return statements because there are already tests for that. All this test
+    cares about is if you have a semicolon after it.
+    """
+
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tuple[Token, Token, Token] = (
+        return_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    
+    expected_output_tokens: Tuple[Token] = tokens[2:]
+    expected_output = NodeSuccess(expected_output_tokens, inline_statement)
+
+    node_result: NodeResult = parse_tokens_for_inline_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_initialization_with_semicolon():
+    """
+    This test checks that the parser can generate an ast for an InlineStatement
+    with a VariableInitialization object. Pretty much, it makes sure that you
+    can get this to work: "int x = 86;" (with the semicolon).
+    """
+
+    variable_type_token = Token(CHAR_TOKEN_TYPE, "CHAR")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yolo")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        variable_type_token, identifier_token, equals_token,
+        decimal_literal_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    variable_initialization = VariableInitialization(identifier_token.value,
+                                                     expression)
+
+    inline_statement = InlineStatement(variable_initialization)
+    
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, inline_statement)
+
+    node_result: NodeResult = parse_tokens_for_inline_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_statement_that_expects_semicolon():
+    """
+    This test checks that the parser can generate an error when it expects a
+    semicolon for an InlineStatement but doesn't get it.
+    """
+
+    variable_type_token = Token(LONG_TOKEN_TYPE, "LONG")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yolo")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        variable_type_token, identifier_token, equals_token,
+        decimal_literal_token, divide_token, decimal_literal_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_inline_statement(tokens)
 
     assert expected_output == node_result
 

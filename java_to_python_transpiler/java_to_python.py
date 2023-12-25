@@ -255,8 +255,8 @@ class NodeSuccess:
     node: Union[
         ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
-        VariableInitialization,
-        ReturnStatement
+        VariableInitialization, ReturnStatement,
+        InlineStatement
     ]
 
 
@@ -416,6 +416,18 @@ class ReturnStatement:
     expression: Optional[ExpressionNode] = None
 
 
+@dataclass
+class InlineStatement:
+    """
+    Represents a statement that ends with a semicolon opposed to a BlockStatement.
+
+    `statement` can is represented by any of the statement objects like
+    ReturnStatement or VariableInitialization
+    """
+
+    statement: ReturnStatement | VariableInitialization
+
+
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
 
 
@@ -448,6 +460,14 @@ def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
 # TODO: Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
 # HOwever, that may only apply to statements but no if expr reaches semi, it stops
 NodeResult = Union[NodeSuccess, NodeFailure]
+
+
+def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct an InlineStatement object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
