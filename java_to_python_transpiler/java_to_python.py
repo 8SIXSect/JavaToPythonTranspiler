@@ -460,6 +460,10 @@ def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
 # TODO: Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
 # HOwever, that may only apply to statements but no if expr reaches semi, it stops
 NodeResult = Union[NodeSuccess, NodeFailure]
+VARIABLE_TYPES: Tuple[TokenType, ...] = (
+    INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
+    BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
+)
 
 
 def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
@@ -467,7 +471,61 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     Parses a tuple of tokens in order to construct an InlineStatement object.
     """
 
-    NotImplemented
+    current_token: Token = tokens[0]
+    
+    if current_token.token_type == RETURN_TOKEN_TYPE:
+        
+        node_result_for_return_statement: NodeResult = \
+                parse_tokens_for_return_statement(tokens)
+
+        if isinstance(node_result_for_return_statement, NodeFailure):
+            return node_result_for_return_statement
+
+        assert isinstance(node_result_for_return_statement.node, ReturnStatement)
+
+        expected_semicolon_token: Token = node_result_for_return_statement.tokens[0]
+
+        if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
+            return report_error_in_parser(expected_semicolon_token.token_type)
+
+        tokens_with_semicolon_removed: Tuple[Token, ...] = \
+                node_result_for_return_statement.tokens[1:]
+
+        inline_statement = InlineStatement(node_result_for_return_statement.node)
+        return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
+
+    next_token: Token = tokens[1]
+    
+    conditions_for_variable_initialization: Tuple[bool, bool] = (
+        current_token.token_type in VARIABLE_TYPES,
+        next_token.token_type == IDENTIFIER_TOKEN_TYPE
+    )
+
+    if all(conditions_for_variable_initialization):
+        node_result_for_initialization: NodeResult = \
+                parse_tokens_for_variable_initialization(tokens)
+
+        if isinstance(node_result_for_initialization, NodeFailure):
+            return node_result_for_initialization
+
+        assert isinstance(node_result_for_initialization.node, VariableInitialization)
+ 
+        expected_semicolon_token: Token = node_result_for_initialization.tokens[0]
+
+        if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
+            return report_error_in_parser(expected_semicolon_token.token_type)
+       
+        tokens_with_semicolon_removed: Tuple[Token, ...] = \
+                node_result_for_initialization.tokens[1:]
+
+        inline_statement = InlineStatement(node_result_for_initialization.node)
+        return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
+
+    # It's easier to structure the error at the bottom opposed to the top for
+    # this function b/c there will be many more inline stmts added and the
+    # structure won't change
+
+    return report_error_in_parser(current_token.token_type)
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:

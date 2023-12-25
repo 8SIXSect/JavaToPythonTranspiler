@@ -5,9 +5,9 @@ This module contains methods for transpiling source to source
 from typing import Callable, List, Optional, Union
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator,
-    ExpressionNode, FactorNode, LexerResult, MethodCall, NodeResult, NodeSuccess,
+    ExpressionNode, FactorNode, InlineStatement, LexerResult, MethodCall, NodeResult, NodeSuccess,
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableInitialization, parse_tokens_for_return_statement,
+    LexerFailure, VariableInitialization, parse_tokens_for_inline_statement, parse_tokens_for_return_statement,
     parse_tokens_for_variable_initialization,
     scan_and_tokenize_input,
     parse_list_of_tokens
@@ -37,7 +37,7 @@ def test_parser():
     format_ast(0, parser_result)
 
 
-def test_return_statement():
+def test_inline_statement():
 
     while True: 
         user_input: str = input(PROMPT)
@@ -50,7 +50,7 @@ def test_return_statement():
  
         assert isinstance(lexer_result, tuple)
 
-        node_result: NodeResult = parse_tokens_for_return_statement(lexer_result)
+        node_result: NodeResult = parse_tokens_for_inline_statement(lexer_result)
 
         assert isinstance(node_result, NodeSuccess)
 
@@ -61,8 +61,8 @@ Node = Union[
     ExpressionNode, TermNode, FactorNode,
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement,
-
-    ]
+    InlineStatement,
+]
 
 
 def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
@@ -119,4 +119,8 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
     elif isinstance(node, ReturnStatement):
         print_output("-> return_stmt")
         format_ast_with_extra_indent(node.expression)
+
+    elif isinstance(node, InlineStatement):
+        print_output("-> inline_stmt")
+        format_ast_with_extra_indent(node.statement)
 
