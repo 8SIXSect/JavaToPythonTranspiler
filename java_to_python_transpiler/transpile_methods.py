@@ -7,7 +7,7 @@ from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, LexerResult, MethodCall, NodeResult, NodeSuccess,
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableInitialization,
+    LexerFailure, VariableInitialization, parse_tokens_for_return_statement,
     parse_tokens_for_variable_initialization,
     scan_and_tokenize_input,
     parse_list_of_tokens
@@ -37,7 +37,7 @@ def test_parser():
     format_ast(0, parser_result)
 
 
-def test_variable_initialization():
+def test_return_statement():
 
     while True: 
         user_input: str = input(PROMPT)
@@ -50,7 +50,7 @@ def test_variable_initialization():
  
         assert isinstance(lexer_result, tuple)
 
-        node_result: NodeResult = parse_tokens_for_variable_initialization(lexer_result)
+        node_result: NodeResult = parse_tokens_for_return_statement(lexer_result)
 
         assert isinstance(node_result, NodeSuccess)
 
@@ -66,7 +66,8 @@ Node = Union[
     ExpressionNode, TermNode, FactorNode,
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement,
-]
+
+    ]
 
 def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
     extra_indent_level = indent_level + 4
