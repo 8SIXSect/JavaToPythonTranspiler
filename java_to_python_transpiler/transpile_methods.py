@@ -92,7 +92,7 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
         format_ast_with_extra_indent(node.additional_term_node)
 
     elif isinstance(node, ArithmeticOperator):
-        print_output("|" + " " + node.value)
+        print_output(node.value, True)
 
     elif isinstance(node, FactorNode):
 
