@@ -56,7 +56,7 @@ def test_variable_initialization():
 
         format_ast(0, node_result.node)
 
-
+# OMFG ADD CURRYING IN HERE
 def print_with_indent(indent_level: int, output: str):
     indent: str = indent_level * " "
     print(indent + output)
@@ -106,5 +106,9 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
     elif isinstance(node, VariableInitialization):
         print_with_indent(indent_level, "-> variable_init")
         print_with_indent(indent_level, "|" + " " + node.identifier)
+        format_ast(extra_indent_level, node.expression)
+
+    elif isinstance(node, ReturnStatement):
+        print_with_indent(indent_level, "-> return_stmt")
         format_ast(extra_indent_level, node.expression)
 
