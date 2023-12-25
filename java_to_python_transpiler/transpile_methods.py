@@ -2,7 +2,7 @@
 This module contains methods for transpiling source to source
 """
 
-from typing import List, Optional, Union
+from typing import Callable, List, Optional, Union
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, LexerResult, MethodCall, NodeResult, NodeSuccess,
@@ -56,11 +56,6 @@ def test_return_statement():
 
         format_ast(0, node_result.node)
 
-# OMFG ADD CURRYING IN HERE
-def print_with_indent(indent_level: int, output: str):
-    indent: str = indent_level * " "
-    print(indent + output)
-
 
 Node = Union[
     ExpressionNode, TermNode, FactorNode,
@@ -69,47 +64,59 @@ Node = Union[
 
     ]
 
+
 def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
-    extra_indent_level = indent_level + 4
+
+    def print_output(output: str, with_pipe_symbol: bool = False):
+        indent: str = " " * indent_level
+        prefix: str = ("| " if with_pipe_symbol else "")
+        
+        print(indent + prefix + output)
+
+    
+    def format_ast_with_extra_indent(node: Node | ArithmeticOperator | None):
+        extra_indent_level = indent_level + 4
+        format_ast(extra_indent_level, node)
+
 
     if isinstance(node, ExpressionNode):
-        print_with_indent(indent_level, "-> expr")
-        format_ast(extra_indent_level, node.single_term_node) 
-        format_ast(extra_indent_level, node.operator)
-        format_ast(extra_indent_level, node.additional_expression_node)
+        print_output("-> expr")
+        format_ast_with_extra_indent(node.single_term_node) 
+        format_ast_with_extra_indent(node.operator)
+        format_ast_with_extra_indent(node.additional_expression_node)
 
     elif isinstance(node, TermNode):
-        print_with_indent(indent_level, "-> term")
-        format_ast(extra_indent_level, node.single_factor_node)
-        format_ast(extra_indent_level, node.operator)
-        format_ast(extra_indent_level, node.additional_term_node)
+        print_output("-> term")
+        format_ast_with_extra_indent(node.single_factor_node)
+        format_ast_with_extra_indent(node.operator)
+        format_ast_with_extra_indent(node.additional_term_node)
 
     elif isinstance(node, ArithmeticOperator):
-        print_with_indent(indent_level, "|" + " " + node.value)
+        print_output("|" + " " + node.value)
 
     elif isinstance(node, FactorNode):
 
         if node.method_call is None:
-            print_with_indent(indent_level, "|" + " " + node.number_or_identifier)
+            print_output(node.number_or_identifier, True)
         else:
-            format_ast(extra_indent_level, node.method_call)
+            format_ast_with_extra_indent(node.method_call)
 
     elif isinstance(node, MethodCall):
-        print_with_indent(indent_level, "-> method_call")
-        print_with_indent(indent_level, "|" + " " + node.identifier)
-        format_ast(extra_indent_level, node.argument_list)
+        print_output("-> method_call")
+        print_output(node.identifier, True)
+        format_ast_with_extra_indent(node.argument_list)
 
     elif isinstance(node, ArgumentList):
-        print_with_indent(indent_level, "-> argument_list")
-        format_ast(extra_indent_level, node.argument)
-        format_ast(extra_indent_level, node.additional_argument_list)
+        print_output("-> argument_list")
+        format_ast_with_extra_indent(node.argument)
+        format_ast_with_extra_indent(node.additional_argument_list)
 
     elif isinstance(node, VariableInitialization):
-        print_with_indent(indent_level, "-> variable_init")
-        print_with_indent(indent_level, "|" + " " + node.identifier)
-        format_ast(extra_indent_level, node.expression)
+        print_output("-> variable_init")
+        print_output(node.identifier, True)
+        format_ast_with_extra_indent(node.expression)
 
     elif isinstance(node, ReturnStatement):
-        print_with_indent(indent_level, "-> return_stmt")
-        format_ast(extra_indent_level, node.expression)
+        print_output("-> return_stmt")
+        format_ast_with_extra_indent(node.expression)
 
