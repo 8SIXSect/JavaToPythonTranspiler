@@ -413,7 +413,7 @@ class ReturnStatement:
     returned.
     """
 
-    expression: ExpressionNode
+    expression: Optional[ExpressionNode] = None
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -445,6 +445,8 @@ def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
     return root_node_result.node
 
 
+# TODO: Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
+# HOwever, that may only apply to statements but no if expr reaches semi, it stops
 NodeResult = Union[NodeSuccess, NodeFailure]
 
 
@@ -453,7 +455,27 @@ def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     Parses a tuple of tokens in order to construct a ReturnStatement object.
     """
 
-    NotImplemented
+    tokens_with_return_token_removed: Tuple[Token, ...] = tokens[1:]
+
+    current_token: Token = tokens_with_return_token_removed[0]
+    if current_token.token_type == SEMI_COLON_TOKEN_TYPE:
+
+        # Semicolon will get removed later on :: not here
+        return_statement = ReturnStatement()
+        return NodeSuccess(tokens_with_return_token_removed, return_statement)
+
+    node_result_for_expression: NodeResult = parse_tokens_for_expression(
+        tokens_with_return_token_removed
+    )
+
+    if isinstance(node_result_for_expression, NodeFailure):
+        return node_result_for_expression
+
+    assert isinstance(node_result_for_expression.node, ExpressionNode)
+
+    return_statement = ReturnStatement(node_result_for_expression.node)
+
+    return NodeSuccess(node_result_for_expression.tokens, return_statement)
 
 
 def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeResult:

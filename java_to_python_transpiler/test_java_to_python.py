@@ -871,10 +871,13 @@ def test_parser_can_generate_correct_ast_for_empty_return_statement():
     """
 
     return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tuple[Token, Token] = (return_statement_token, end_of_file_token)
+    tokens: Tuple[Token, Token, Token] = (
+        return_statement_token, semi_colon_token,
+        end_of_file_token
+    )
 
     return_statement = ReturnStatement()
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = tokens[1:]
     expected_output = NodeSuccess(expected_output_tokens, return_statement)
 
     node_result: NodeResult = parse_tokens_for_return_statement(tokens)
@@ -892,19 +895,23 @@ def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
     return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, Token, Token, Token, Token] = (
+    tokens: Tuple[Token, ...] = (
         return_statement_token, decimal_literal_token, plus_token,
-        decimal_literal_token,
+        decimal_literal_token, semi_colon_token,
         end_of_file_token
     )
 
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
-    expression = ExpressionNode(term)
+
+    additional_expression = ExpressionNode(term)
+    expression = ExpressionNode(term, ArithmeticOperator.PLUS,
+                                additional_expression)
 
     return_statement = ReturnStatement(expression)
 
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = (semi_colon_token,
+                                                   end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, return_statement)
 
     node_result: NodeResult = parse_tokens_for_return_statement(tokens)
