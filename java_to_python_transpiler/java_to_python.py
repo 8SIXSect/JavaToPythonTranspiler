@@ -15,52 +15,52 @@ TokenType = str
 
 
 # todo: convert these strings into an enumeration
-SINGLE_LINE_COMMENT_TOKEN_TYPE: str = "SINGLE_LINE_COMMENT"
-LEFT_PARENTHESIS_TOKEN_TYPE: str = "LEFT_PARENTHESIS"
-RIGHT_PARENTHESIS_TOKEN_TYPE: str = "RIGHT_PARENTHESIS"
-LEFT_CURLY_BRACE_TOKEN_TYPE: str = "LEFT_CURLY_BRACE"
-RIGHT_CURLY_BRACE_TOKEN_TYPE: str = "RIGHT_CURLY_BRACE"
-LEFT_BRACKET_TOKEN_TYPE: str = "LEFT_BRACKET"
-RIGHT_BRACKET_TOKEN_TYPE: str = "RIGHT_BRACKET"
-SEMI_COLON_TOKEN_TYPE: str = "SEMI_COLON"
-COMMA_TOKEN_TYPE: str = "COMMA"
-EQUALS_TOKEN_TYPE: str = "EQUALS"
-LESS_THAN_TOKEN_TYPE: str = "LESS_THAN"
-GREATER_THAN_TOKEN_TYPE: str = "GREATER_THAN"
-PLUS_TOKEN_TYPE: str = "PLUS"
-MINUS_TOKEN_TYPE: str = "MINUS"
-MULTIPLY_TOKEN_TYPE: str = "MULTIPLY"
-DIVIDE_TOKEN_TYPE: str = "DIVIDE"
-FLOAT_LITERAL_TOKEN_TYPE: str = "FLOAT_LITERAL"
-DECIMAL_LITERAL_TOKEN_TYPE: str = "DECIMAL_LITERAL"
-STRING_LITERAL_TOKEN_TYPE: str = "STRING_LITERAL"
-WHITESPACE_TOKEN_TYPE: str = "WHITESPACE"
-IDENTIFIER_TOKEN_TYPE: str = "IDENTIFIER"
-END_OF_FILE_TOKEN_TYPE: str = "EOF"
+SINGLE_LINE_COMMENT_TOKEN_TYPE = "SINGLE_LINE_COMMENT"
+LEFT_PARENTHESIS_TOKEN_TYPE = "LEFT_PARENTHESIS"
+RIGHT_PARENTHESIS_TOKEN_TYPE = "RIGHT_PARENTHESIS"
+LEFT_CURLY_BRACE_TOKEN_TYPE = "LEFT_CURLY_BRACE"
+RIGHT_CURLY_BRACE_TOKEN_TYPE = "RIGHT_CURLY_BRACE"
+LEFT_BRACKET_TOKEN_TYPE = "LEFT_BRACKET"
+RIGHT_BRACKET_TOKEN_TYPE = "RIGHT_BRACKET"
+SEMI_COLON_TOKEN_TYPE = "SEMI_COLON"
+COMMA_TOKEN_TYPE = "COMMA"
+EQUALS_TOKEN_TYPE = "EQUALS"
+LESS_THAN_TOKEN_TYPE = "LESS_THAN"
+GREATER_THAN_TOKEN_TYPE = "GREATER_THAN"
+PLUS_TOKEN_TYPE = "PLUS"
+MINUS_TOKEN_TYPE = "MINUS"
+MULTIPLY_TOKEN_TYPE = "MULTIPLY"
+DIVIDE_TOKEN_TYPE = "DIVIDE"
+FLOAT_LITERAL_TOKEN_TYPE = "FLOAT_LITERAL"
+DECIMAL_LITERAL_TOKEN_TYPE = "DECIMAL_LITERAL"
+STRING_LITERAL_TOKEN_TYPE = "STRING_LITERAL"
+WHITESPACE_TOKEN_TYPE = "WHITESPACE"
+IDENTIFIER_TOKEN_TYPE = "IDENTIFIER"
+END_OF_FILE_TOKEN_TYPE = "EOF"
 
-TRUE_TOKEN_TYPE: str = r"TRUE"
-FALSE_TOKEN_TYPE: str = r"FALSE"
-NULL_TOKEN_TYPE: str = r"NULL"
-PUBLIC_TOKEN_TYPE: str = r"PUBLIC"
-PRIVATE_TOKEN_TYPE: str = r"PRIVATE"
-VOID_TOKEN_TYPE: str = r"VOID"
-STATIC_TOKEN_TYPE: str = r"STATIC"
-BYTE_TOKEN_TYPE: str = r"BYTE"
-SHORT_TOKEN_TYPE: str = r"SHORT"
-CHAR_TOKEN_TYPE: str = r"CHAR"
-INT_TOKEN_TYPE: str = r"INT"
-LONG_TOKEN_TYPE: str = r"LONG"
-FLOAT_TOKEN_TYPE: str = r"FLOAT"
-DOUBLE_TOKEN_TYPE: str = r"DOUBLE"
-BOOLEAN_TOKEN_TYPE: str = r"BOOLEAN"
-CLASS_TOKEN_TYPE: str = r"CLASS"
-RETURN_TOKEN_TYPE: str = r"RETURN"
-NEW_TOKEN_TYPE: str = r"NEW"
-PACKAGE_TOKEN_TYPE: str = r"PACKAGE"
-IMPORT_TOKEN_TYPE: str = r"IMPORT"
-IF_TOKEN_TYPE: str = r"IF"
-ELSE_TOKEN_TYPE: str = r"ELSE"
-WHILE_TOKEN_TYPE: str = r"WHILE"
+TRUE_TOKEN_TYPE = r"TRUE"
+FALSE_TOKEN_TYPE = r"FALSE"
+NULL_TOKEN_TYPE = r"NULL"
+PUBLIC_TOKEN_TYPE = r"PUBLIC"
+PRIVATE_TOKEN_TYPE = r"PRIVATE"
+VOID_TOKEN_TYPE = r"VOID"
+STATIC_TOKEN_TYPE = r"STATIC"
+BYTE_TOKEN_TYPE = r"BYTE"
+SHORT_TOKEN_TYPE = r"SHORT"
+CHAR_TOKEN_TYPE = r"CHAR"
+INT_TOKEN_TYPE = r"INT"
+LONG_TOKEN_TYPE = r"LONG"
+FLOAT_TOKEN_TYPE = r"FLOAT"
+DOUBLE_TOKEN_TYPE = r"DOUBLE"
+BOOLEAN_TOKEN_TYPE = r"BOOLEAN"
+CLASS_TOKEN_TYPE = r"CLASS"
+RETURN_TOKEN_TYPE = r"RETURN"
+NEW_TOKEN_TYPE = r"NEW"
+PACKAGE_TOKEN_TYPE = r"PACKAGE"
+IMPORT_TOKEN_TYPE = r"IMPORT"
+IF_TOKEN_TYPE = r"IF"
+ELSE_TOKEN_TYPE = r"ELSE"
+WHILE_TOKEN_TYPE = r"WHILE"
 
 
 TOKEN_PATTERNS: Dict[str, str] = {
@@ -112,7 +112,7 @@ class LexerFailure:
     error_message: str
 
 
-ERROR_MESSAGE_FOR_LEXER: str = "Found an unknown character, '{0}'"
+ERROR_MESSAGE_FOR_LEXER = "Found an unknown character, '{0}'"
 
 
 def report_error_for_lexer(unknown_character: str) -> LexerFailure:
@@ -133,7 +133,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     """ This function's purpose is to be the entrypoint for the lexer. """
 
     tokens: List[Token] = []
-    position: int = 0
+    position = 0
     length_of_input: int = len(user_input)
     
     while position < length_of_input:
@@ -155,7 +155,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
                     break
 
                 token_value: str = match.group(0)
-                token: Token = Token(token_type, token_value) 
+                token = Token(token_type, token_value) 
                 tokens.append(token)
 
                 break
@@ -204,7 +204,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
             r"while": WHILE_TOKEN_TYPE,
         }
         
-        token_type_not_identifier: bool = token.token_type != IDENTIFIER_TOKEN_TYPE
+        token_type_not_identifier = token.token_type != IDENTIFIER_TOKEN_TYPE
         keywords_keys: KeysView = KEYWORDS.keys()
 
         if token_type_not_identifier or (token.value not in keywords_keys):
@@ -213,8 +213,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
         keyword_token_type: str = KEYWORDS[token.value]
 
         # The value is kind of redundant
-        keyword_value: str = token.value
-        keyword_token: Token = Token(keyword_token_type, keyword_value)
+        keyword_token = Token(keyword_token_type, token.value)
 
         return keyword_token
 
@@ -223,7 +222,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     tokens_with_keywords_as_list: List[Token] = list(tokens_with_keywords)
 
     # Reminder, let's stop using mutable data and switch to immutable data
-    end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
+    end_of_file_token = Token(END_OF_FILE_TOKEN_TYPE, "")
     tokens_with_keywords_as_list.append(end_of_file_token)
 
     tokens_as_tuple: Tuple[Token, ...] = tuple(tokens_with_keywords_as_list)
@@ -256,7 +255,8 @@ class NodeSuccess:
     node: Union[
         ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
-        VariableInitialization
+        VariableInitialization,
+        ReturnStatement
     ]
 
 
@@ -404,13 +404,19 @@ class VariableInitialization:
     expression: ExpressionNode
 
 
-Node = Union[
-    ExpressionNode, TermNode, FactorNode,
-    MethodCall, ArgumentList,
-    VariableInitialization
-]
+@dataclass
+class ReturnStatement:
+    """
+    Represents a return statement.
 
-ERROR_MESSAGE_FOR_PARSER: str = "Unexpected token type, {0}"
+    `expression` is represented by an ExpressionNode; this is the value being
+    returned.
+    """
+
+    expression: ExpressionNode
+
+
+ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
 
 
 def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
@@ -418,7 +424,7 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     This function's purpose is to report an error found in the parser
     """
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(unexpected_token_type)
+    error_message = ERROR_MESSAGE_FOR_PARSER.format(unexpected_token_type)
 
     return NodeFailure(error_message)
 
@@ -440,6 +446,14 @@ def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
 
 
 NodeResult = Union[NodeSuccess, NodeFailure]
+
+
+def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a ReturnStatement object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeResult:
@@ -470,7 +484,7 @@ def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeR
 
     assert isinstance(node_result_for_expression.node, ExpressionNode)
 
-    variable_initialization: VariableInitialization = VariableInitialization(
+    variable_initialization = VariableInitialization(
         identifier_token.value, node_result_for_expression.node
     )
 
@@ -494,8 +508,8 @@ def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
     assert isinstance(term_node_result.node, TermNode)
     expression_node: ExpressionNode = ExpressionNode(term_node_result.node)
 
-    node_success_for_simple_expression: NodeSuccess = \
-            NodeSuccess(term_node_result.tokens, expression_node)
+    node_success_for_simple_expression = NodeSuccess(term_node_result.tokens,
+                                                     expression_node)
 
     # We don't pop the token off b/c there's a chance it's not a + or -
     current_token: Token = term_node_result.tokens[0]
@@ -510,7 +524,7 @@ def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
     # (but it's a tuple so you can't modify it)
     tokens_after_deleting_operator: Tuple[Token, ...] = term_node_result.tokens[1:]
 
-    expression_node_operator: ArithmeticOperator = (
+    expression_node_operator = (
         ArithmeticOperator.PLUS
         if current_token.token_type == PLUS_TOKEN_TYPE
         else ArithmeticOperator.MINUS 
@@ -524,7 +538,7 @@ def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
 
     assert isinstance(additional_expression_node_result.node, ExpressionNode)
 
-    complex_expression_node: ExpressionNode = ExpressionNode(
+    complex_expression_node = ExpressionNode(
         expression_node.single_term_node,
         expression_node_operator,
         additional_expression_node_result.node
@@ -549,9 +563,9 @@ def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
         return factor_node_result
 
     assert isinstance(factor_node_result.node, FactorNode)
-    term_node: TermNode = TermNode(factor_node_result.node)
+    term_node = TermNode(factor_node_result.node)
 
-    node_success_for_simple_term: NodeSuccess = \
+    node_success_for_simple_term = \
             NodeSuccess(factor_node_result.tokens, term_node)
 
     current_token: Token = factor_node_result.tokens[0]
@@ -564,7 +578,7 @@ def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
 
     tokens_after_deleting_operator: Tuple[Token, ...] = factor_node_result.tokens[1:]
 
-    term_node_operator: ArithmeticOperator = (
+    term_node_operator = (
         ArithmeticOperator.MULTIPLY
         if current_token.token_type == MULTIPLY_TOKEN_TYPE
         else ArithmeticOperator.DIVIDE
@@ -578,7 +592,7 @@ def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
 
     assert isinstance(additional_term_node_result.node, TermNode)
 
-    complex_term_node: TermNode = TermNode(
+    complex_term_node = TermNode(
         term_node.single_factor_node,
         term_node_operator,
         additional_term_node_result.node
@@ -621,15 +635,14 @@ def parse_tokens_for_factor(tokens: Tuple[Token, ...]) -> NodeResult:
 
         assert isinstance(node_result_for_method_call.node, MethodCall)
     
-        factor_node: FactorNode = \
-                FactorNode(method_call=node_result_for_method_call.node)
+        factor_node = FactorNode(method_call=node_result_for_method_call.node)
 
         return NodeSuccess(node_result_for_method_call.tokens, factor_node)
 
     tokens_after_deleting_current_token: Tuple[Token, ...] = tokens[1:]
 
     # You may need to add a check for END_OF_FILE but idk yet
-    factor_node: FactorNode = FactorNode(current_token.value)
+    factor_node = FactorNode(current_token.value)
     return NodeSuccess(tokens_after_deleting_current_token, factor_node)
 
 
@@ -659,7 +672,7 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
 
     assert isinstance(node_result_argument_list.node, ArgumentList)
 
-    method_call: MethodCall = MethodCall(identifier_token.value,
+    method_call = MethodCall(identifier_token.value,
                                          node_result_argument_list.node)
     return NodeSuccess(tokens_after_deleting_right_parenthesis, method_call)
 
@@ -677,7 +690,7 @@ def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
 
     # The purpose of this if statement is to account for no argument method calls 
     if current_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
-        argument_list: ArgumentList = ArgumentList()
+        argument_list = ArgumentList()
         return NodeSuccess(tokens, argument_list)
 
     node_result_expression: NodeResult = parse_tokens_for_expression(tokens)
@@ -697,7 +710,7 @@ def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
     assert isinstance(node_result_expression.node, ExpressionNode)
 
     if next_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
-        argument_list: ArgumentList = ArgumentList(node_result_expression.node)
+        argument_list = ArgumentList(node_result_expression.node)
         return NodeSuccess(node_result_expression.tokens, argument_list)
 
     # The purpose of this code is to delete comma from tokens
@@ -711,7 +724,7 @@ def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
 
     assert isinstance(node_result_additional_argument_list.node, ArgumentList)
 
-    argument_list: ArgumentList = ArgumentList(
+    argument_list = ArgumentList(
         node_result_expression.node,
         node_result_additional_argument_list.node
     )

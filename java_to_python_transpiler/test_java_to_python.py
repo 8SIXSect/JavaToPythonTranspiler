@@ -7,29 +7,30 @@ from java_to_python_transpiler.java_to_python import (
     FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, INT_TOKEN_TYPE,
     LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
     LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, MINUS_TOKEN_TYPE,
-    MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
+    MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RETURN_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens, parse_tokens_for_argument_list,
-    parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_method_call, parse_tokens_for_term, parse_tokens_for_variable_initialization,
+    ParserFailure, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens,
+    parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor,
+    parse_tokens_for_method_call, parse_tokens_for_term, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
 
 # These tokens may be reused throughout the tests in this file
-end_of_file_token: Token = Token(END_OF_FILE_TOKEN_TYPE, "")
-plus_token: Token = Token(PLUS_TOKEN_TYPE, "+")
-minus_token: Token = Token(MINUS_TOKEN_TYPE, "-")
-multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
-divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
+end_of_file_token = Token(END_OF_FILE_TOKEN_TYPE, "")
+plus_token = Token(PLUS_TOKEN_TYPE, "+")
+minus_token = Token(MINUS_TOKEN_TYPE, "-")
+multiply_token = Token(MULTIPLY_TOKEN_TYPE, "*")
+divide_token = Token(DIVIDE_TOKEN_TYPE, "/")
 
-left_parenthesis_token: Token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
-right_parenthesis_token: Token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
-comma_token: Token = Token(COMMA_TOKEN_TYPE, ",")
-semi_colon_token: Token = Token(SEMI_COLON_TOKEN_TYPE, ";")
-equals_token: Token = Token(EQUALS_TOKEN_TYPE, "equals")
+left_parenthesis_token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
+right_parenthesis_token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
+comma_token = Token(COMMA_TOKEN_TYPE, ",")
+semi_colon_token = Token(SEMI_COLON_TOKEN_TYPE, ";")
+equals_token = Token(EQUALS_TOKEN_TYPE, "equals")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -38,10 +39,10 @@ def test_report_error_for_lexer_returns_proper_error_object():
     the correct LexerFailure object.
     """
 
-    UNKNOWN_CHARACTER: str = "~"
+    UNKNOWN_CHARACTER = "~"
 
     error_message: str = ERROR_MESSAGE_FOR_LEXER.format(UNKNOWN_CHARACTER)
-    expected_output: LexerFailure = LexerFailure(error_message)
+    expected_output = LexerFailure(error_message)
 
     report_error_output: LexerFailure = report_error_for_lexer(UNKNOWN_CHARACTER)
 
@@ -54,14 +55,14 @@ def test_lexer_can_generate_tokens_for_single_line_comment():
     with a token type of SINGLE LINE COMMMENT.
     """
 
-    LEXER_INPUT: str = "// this is in a `comment`"
+    INPUT = "// this is in a `comment`"
 
-    expected_output_token: Token = Token(SINGLE_LINE_COMMENT_TOKEN_TYPE, LEXER_INPUT)
+    expected_output_token = Token(SINGLE_LINE_COMMENT_TOKEN_TYPE, INPUT)
     expected_output: Tuple[Token, Token] = (expected_output_token, end_of_file_token)
  
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_token_for_grouping_characters():
@@ -70,16 +71,16 @@ def test_lexer_can_generate_token_for_grouping_characters():
     for parenthesis, curly braces, and brackets
     """
 
-    LEXER_INPUT: str = "(){}[]"
+    INPUT = "(){}[]"
 
-    left_parenthesis_token: Token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
-    right_parenthesis_token: Token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
+    left_parenthesis_token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
+    right_parenthesis_token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
 
-    left_curly_braces_token: Token = Token(LEFT_CURLY_BRACE_TOKEN_TYPE, "{")
-    right_curly_braces_token: Token = Token(RIGHT_CURLY_BRACE_TOKEN_TYPE, "}")
+    left_curly_braces_token = Token(LEFT_CURLY_BRACE_TOKEN_TYPE, "{")
+    right_curly_braces_token = Token(RIGHT_CURLY_BRACE_TOKEN_TYPE, "}")
 
-    left_bracket_token: Token = Token(LEFT_BRACKET_TOKEN_TYPE, "[")
-    right_bracket_token: Token = Token(RIGHT_BRACKET_TOKEN_TYPE, "]")
+    left_bracket_token = Token(LEFT_BRACKET_TOKEN_TYPE, "[")
+    right_bracket_token = Token(RIGHT_BRACKET_TOKEN_TYPE, "]")
 
     expected_output: Tuple[Token, ...] = (
         left_parenthesis_token, right_parenthesis_token,
@@ -88,9 +89,9 @@ def test_lexer_can_generate_token_for_grouping_characters():
         end_of_file_token
     )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_tokens_for_punctuation_characters():
@@ -99,19 +100,19 @@ def test_lexer_can_generate_tokens_for_punctuation_characters():
     semicolons and commas.
     """
 
-    LEXER_INPUT: str = ";,,;"
+    INPUT = ";,,;"
 
-    semi_colon_token: Token = Token(SEMI_COLON_TOKEN_TYPE, ";")
-    comma_token: Token = Token(COMMA_TOKEN_TYPE, ",")
+    semi_colon_token = Token(SEMI_COLON_TOKEN_TYPE, ";")
+    comma_token = Token(COMMA_TOKEN_TYPE, ",")
 
     expected_output: Tuple[Token, ...] = (
         semi_colon_token, comma_token, comma_token, semi_colon_token,
         end_of_file_token
     )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output 
+    assert expected_output == lexer_result 
 
 
 def test_lexer_can_generate_tokens_for_comparison_operators():
@@ -120,11 +121,11 @@ def test_lexer_can_generate_tokens_for_comparison_operators():
     less than, greater than, and the equals sign
     """
 
-    LEXER_INPUT: str = "=>=<="
+    LEXER_INPUT = "=>=<="
 
-    less_than_token: Token = Token(LESS_THAN_TOKEN_TYPE, "<")
-    greater_than_token: Token = Token(GREATER_THAN_TOKEN_TYPE, ">")
-    equals_token: Token = Token(EQUALS_TOKEN_TYPE, "=")
+    less_than_token = Token(LESS_THAN_TOKEN_TYPE, "<")
+    greater_than_token = Token(GREATER_THAN_TOKEN_TYPE, ">")
+    equals_token = Token(EQUALS_TOKEN_TYPE, "=")
 
     expected_output: Tuple[Token, ...] = (
         equals_token, greater_than_token, equals_token, less_than_token,
@@ -132,9 +133,9 @@ def test_lexer_can_generate_tokens_for_comparison_operators():
         end_of_file_token
     )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
 
-    assert expected_output == lexer_output 
+    assert expected_output == lexer_result 
 
 
 def test_lexer_can_generate_tokens_for_arithmetic_operators():
@@ -143,12 +144,12 @@ def test_lexer_can_generate_tokens_for_arithmetic_operators():
     plus, minus, multiply, and divide
     """
 
-    LEXER_INPUT: str = "++/*-/"
+    INPUT = "++/*-/"
 
-    plus_token: Token = Token(PLUS_TOKEN_TYPE, "+")
-    minus_token: Token = Token(MINUS_TOKEN_TYPE, "-")
-    multiply_token: Token = Token(MULTIPLY_TOKEN_TYPE, "*")
-    divide_token: Token = Token(DIVIDE_TOKEN_TYPE, "/")
+    plus_token = Token(PLUS_TOKEN_TYPE, "+")
+    minus_token = Token(MINUS_TOKEN_TYPE, "-")
+    multiply_token = Token(MULTIPLY_TOKEN_TYPE, "*")
+    divide_token = Token(DIVIDE_TOKEN_TYPE, "/")
 
     expected_output: Tuple[Token, ...] = (
         plus_token, plus_token, divide_token, multiply_token, minus_token,
@@ -156,9 +157,9 @@ def test_lexer_can_generate_tokens_for_arithmetic_operators():
         end_of_file_token
         )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_tokens_for_float_literals():
@@ -167,14 +168,14 @@ def test_lexer_can_generate_tokens_for_float_literals():
     float literals.
     """
 
-    LEXER_INPUT: str = "86.86"
+    INPUT = "86.86"
 
-    float_literal_token: Token = Token(FLOAT_LITERAL_TOKEN_TYPE, LEXER_INPUT)
+    float_literal_token = Token(FLOAT_LITERAL_TOKEN_TYPE, INPUT)
     expected_output: Tuple[Token, Token] = (float_literal_token, end_of_file_token)
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
     
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_tokens_for_decimal_literals():
@@ -183,14 +184,14 @@ def test_lexer_can_generate_tokens_for_decimal_literals():
     decimal literals.
     """
 
-    LEXER_INPUT: str = "86868686"
+    INPUT = "86868686"
 
-    decimal_literal_token: Token = Token(DECIMAL_LITERAL_TOKEN_TYPE, LEXER_INPUT)
+    decimal_literal_token = Token(DECIMAL_LITERAL_TOKEN_TYPE, INPUT)
     expected_output: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_tokens_for_string_literals():
@@ -199,18 +200,18 @@ def test_lexer_can_generate_tokens_for_string_literals():
     string literals.
     """
 
-    LEXER_INPUT: str = '"hello"'
+    INPUT = '"hello"'
 
-    first_string_literal_token: Token = Token(STRING_LITERAL_TOKEN_TYPE, '"hello"')
+    first_string_literal_token = Token(STRING_LITERAL_TOKEN_TYPE, '"hello"')
 
     expected_output: Tuple[Token, Token] = (
         first_string_literal_token,
         end_of_file_token
     )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_tokens_for_identifiers():
@@ -219,20 +220,20 @@ def test_lexer_can_generate_tokens_for_identifiers():
     identifiers.
     """
 
-    LEXER_INPUT: str = "eighty sixth sector"
+    INPUT = "eighty sixth sector"
 
-    first_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "eighty")
-    second_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "sixth")
-    third_identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "sector")
+    first_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "eighty")
+    second_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sixth")
+    third_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sector")
 
     expected_output: Tuple[Token, ...] = (
         first_identifier_token, second_identifier_token, third_identifier_token,
         end_of_file_token
     )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_only_end_of_file_token_when_given_no_input():
@@ -241,13 +242,13 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_no_input():
     Token (an end of file token) when given no input
     """
 
-    LEXER_INPUT: str = ""
+    INPUT = ""
 
     expected_output: Tuple[Token] = (end_of_file_token,)
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
     
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
@@ -256,13 +257,13 @@ def test_lexer_can_generate_only_end_of_file_token_when_given_only_whitespace():
     Token (an end of file token) when given only whitespace in the input
     """
 
-    LEXER_INPUT: str = "               \t     \n \n   "
+    INPUT = "               \t     \n \n   "
 
     expected_output: Tuple[Token] = (end_of_file_token,)
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def test_lexer_can_generate_proper_keyword_tokens():
@@ -273,20 +274,20 @@ def test_lexer_can_generate_proper_keyword_tokens():
     Token(identifier, "true")
     """
 
-    LEXER_INPUT: str = "true short while"
+    INPUT = "true short while"
 
-    true_token: Token = Token(TRUE_TOKEN_TYPE, "true")
-    short_token: Token = Token(SHORT_TOKEN_TYPE, "short")
-    while_token: Token = Token(WHILE_TOKEN_TYPE, "while")
+    true_token = Token(TRUE_TOKEN_TYPE, "true")
+    short_token = Token(SHORT_TOKEN_TYPE, "short")
+    while_token = Token(WHILE_TOKEN_TYPE, "while")
 
     expected_output: Tuple[Token, ...] = (
         true_token, short_token, while_token,
         end_of_file_token
     )
 
-    lexer_output: LexerResult = scan_and_tokenize_input(LEXER_INPUT)
+    lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
-    assert expected_output == lexer_output
+    assert expected_output == lexer_result
 
 
 def generate_number_token_with_random_value() -> Token:
@@ -296,10 +297,9 @@ def generate_number_token_with_random_value() -> Token:
     """
 
     random_number: int = random.randint(0, 100)
-    token_value: str = str(random_number)
+    token_value = str(random_number)
 
     return Token(DECIMAL_LITERAL_TOKEN_TYPE, token_value)
-
 
 
 def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
@@ -311,8 +311,8 @@ def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
 
     tokens: Tuple[Token, Token] = (right_parenthesis_token, end_of_file_token)
 
-    argument_list: ArgumentList = ArgumentList() 
-    expected_output: NodeSuccess = NodeSuccess(tokens, argument_list)
+    argument_list = ArgumentList() 
+    expected_output = NodeSuccess(tokens, argument_list)
 
     node_result: NodeResult = parse_tokens_for_argument_list(tokens)
 
@@ -334,16 +334,16 @@ def test_parser_can_generate_correct_ast_for_single_argument_list():
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
 
-    argument_list: ArgumentList = ArgumentList(expression)
+    argument_list = ArgumentList(expression)
     
     expected_output_tokens: Tuple[Token, Token] = (
         right_parenthesis_token, end_of_file_token
     )
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, argument_list)
+    expected_output = NodeSuccess(expected_output_tokens, argument_list)
 
     node_result: NodeResult = parse_tokens_for_argument_list(tokens)
 
@@ -365,17 +365,17 @@ def test_parser_can_generate_correct_ast_for_multiple_argument_list():
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
 
-    additional_argument_list: ArgumentList = ArgumentList(expression)
-    argument_list: ArgumentList = ArgumentList(expression, additional_argument_list)
+    additional_argument_list = ArgumentList(expression)
+    argument_list = ArgumentList(expression, additional_argument_list)
     
     expected_output_tokens: Tuple[Token, Token] = (
         right_parenthesis_token, end_of_file_token
     )
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, argument_list)
+    expected_output = NodeSuccess(expected_output_tokens, argument_list)
 
     node_result: NodeResult = parse_tokens_for_argument_list(tokens)
 
@@ -397,7 +397,7 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DECIMAL_LITERAL_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_argument_list(tokens)
 
@@ -410,18 +410,18 @@ def test_parser_can_generate_correct_ast_for_no_argument_method_call():
     using the `parse_tokens_for_method_call` function.
     """
  
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "func")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "func")
 
     tokens: Tuple[Token, Token, Token, Token] = (
         identifier_token, left_parenthesis_token, right_parenthesis_token,
         end_of_file_token
     )
 
-    argument_list: ArgumentList = ArgumentList()
-    method_call: MethodCall = MethodCall(identifier_token.value, argument_list)
+    argument_list = ArgumentList()
+    method_call = MethodCall(identifier_token.value, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, method_call)
+    expected_output = NodeSuccess(expected_output_tokens, method_call)
 
     node_result: NodeResult = parse_tokens_for_method_call(tokens)
 
@@ -434,7 +434,7 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
     correct NodeFailure object when given an input that has a syntax error.
     """
 
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "hlelo")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "hlelo")
 
     tokens: Tuple[Token, Token, Token, Token] = (
         identifier_token, left_parenthesis_token, plus_token,
@@ -442,7 +442,7 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_method_call(tokens)
 
@@ -455,7 +455,7 @@ def test_parser_can_generate_correct_ast_for_single_argument_method_call():
     correct MethodCall object when given a single argument.
     """
 
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tuple[Token, Token, Token, Token, Token] = (
@@ -464,15 +464,15 @@ def test_parser_can_generate_correct_ast_for_single_argument_method_call():
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
 
-    argument_list: ArgumentList = ArgumentList(expression)
-    method_call: MethodCall = MethodCall(identifier_token.value, argument_list)
+    argument_list = ArgumentList(expression)
+    method_call = MethodCall(identifier_token.value, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, method_call)
+    expected_output = NodeSuccess(expected_output_tokens, method_call)
 
     node_result: NodeResult = parse_tokens_for_method_call(tokens)
 
@@ -485,7 +485,7 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
     correct MethodCall object when given a tuple of multiple arguments as input.
     """
 
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tuple[Token, ...] = (
@@ -494,16 +494,16 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
 
-    additional_argument_list: ArgumentList = ArgumentList(expression)
-    argument_list: ArgumentList = ArgumentList(expression, additional_argument_list)
-    method_call: MethodCall = MethodCall(identifier_token.value, argument_list)
+    additional_argument_list = ArgumentList(expression)
+    argument_list = ArgumentList(expression, additional_argument_list)
+    method_call = MethodCall(identifier_token.value, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, method_call)
+    expected_output = NodeSuccess(expected_output_tokens, method_call)
 
     node_result: NodeResult = parse_tokens_for_method_call(tokens)
 
@@ -520,9 +520,9 @@ def test_parser_can_generate_correct_ast_for_single_factor():
 
     tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
-    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
+    factor_node = FactorNode(decimal_literal_token.value)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
+    expected_output = NodeSuccess(expected_output_tokens,
                                                factor_node)
 
     node_output: NodeResult = parse_tokens_for_factor(tokens)
@@ -538,7 +538,7 @@ def test_parser_can_generate_correct_error_for_factor():
 
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
 
@@ -558,11 +558,11 @@ def test_parser_can_generate_correct_ast_for_simple_term():
     decimal_literal_token: Token = generate_number_token_with_random_value()
     tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
-    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
-    term_node: TermNode = TermNode(factor_node)
+    factor_node = FactorNode(decimal_literal_token.value)
+    term_node = TermNode(factor_node)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
+    expected_output = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
@@ -584,16 +584,15 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
         end_of_file_token
     )
 
-    single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
+    single_factor = FactorNode(first_decimal_literal_token.value)
     
-    factor_for_additional_term: FactorNode = FactorNode(second_decimal_literal_token.value)
-    additional_term: TermNode = TermNode(factor_for_additional_term)
+    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(single_factor, ArithmeticOperator.MULTIPLY,
-                                   additional_term)
+    term_node = TermNode(single_factor, ArithmeticOperator.MULTIPLY, additional_term)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
+    expected_output = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
@@ -615,16 +614,16 @@ def test_parser_can_generate_correct_ast_for_divide_term():
         end_of_file_token
     )
 
-    single_factor: FactorNode = FactorNode(first_decimal_literal_token.value)
+    single_factor = FactorNode(first_decimal_literal_token.value)
     
-    factor_for_additional_term: FactorNode = FactorNode(second_decimal_literal_token.value)
-    additional_term: TermNode = TermNode(factor_for_additional_term)
+    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(single_factor, ArithmeticOperator.DIVIDE,
+    term_node = TermNode(single_factor, ArithmeticOperator.DIVIDE,
                                    additional_term)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, term_node)
+    expected_output = NodeSuccess(expected_output_tokens, term_node)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
@@ -645,7 +644,7 @@ def test_parser_can_generate_correct_error_for_complex_term():
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
 
@@ -666,21 +665,20 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
         end_of_file_token
     )
 
-    first_factor: FactorNode = FactorNode(decimal_literal_token.value)
-    second_factor: FactorNode = FactorNode(decimal_literal_token.value)
-    third_factor: FactorNode = FactorNode(decimal_literal_token.value)
+    first_factor = FactorNode(decimal_literal_token.value)
+    second_factor = FactorNode(decimal_literal_token.value)
+    third_factor = FactorNode(decimal_literal_token.value)
     
-    additional_term_of_additional_term: TermNode = TermNode(third_factor)
-    additional_term: TermNode = TermNode(second_factor, ArithmeticOperator.DIVIDE,
-                                         additional_term_of_additional_term)
+    additional_term_of_additional_term = TermNode(third_factor)
+    additional_term = TermNode(second_factor, ArithmeticOperator.DIVIDE,
+                               additional_term_of_additional_term)
     
-    term: TermNode = TermNode(first_factor, ArithmeticOperator.MULTIPLY,
+    term = TermNode(first_factor, ArithmeticOperator.MULTIPLY,
                               additional_term)
 
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               term)
+    expected_output = NodeSuccess(expected_output_tokens, term)
 
     node_result: NodeResult = parse_tokens_for_term(tokens)
 
@@ -697,13 +695,12 @@ def test_parser_can_generate_correct_ast_for_simple_expression():
     
     tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
 
-    factor_node: FactorNode = FactorNode(decimal_literal_token.value)
-    term_node: TermNode = TermNode(factor_node)
-    expression_node: ExpressionNode = ExpressionNode(term_node)
+    factor_node = FactorNode(decimal_literal_token.value)
+    term_node = TermNode(factor_node)
+    expression_node = ExpressionNode(term_node)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               expression_node)
+    expected_output = NodeSuccess(expected_output_tokens, expression_node)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
@@ -723,20 +720,18 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
         end_of_file_token
     )
 
-    single_factor: FactorNode = FactorNode(decimal_literal_token.value)
-    multiply_operator: ArithmeticOperator = ArithmeticOperator.MULTIPLY
+    single_factor = FactorNode(decimal_literal_token.value)
+    multiply_operator = ArithmeticOperator.MULTIPLY
     
-    factor_for_additional_term: FactorNode = FactorNode(decimal_literal_token.value)
-    additional_term: TermNode = TermNode(factor_for_additional_term)
+    factor_for_additional_term = FactorNode(decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
 
-    term_node: TermNode = TermNode(single_factor, multiply_operator,
-                                   additional_term)
+    term_node = TermNode(single_factor, multiply_operator, additional_term)
 
-    expression_node: ExpressionNode = ExpressionNode(term_node)
+    expression_node = ExpressionNode(term_node)
     
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               expression_node)
+    expected_output = NodeSuccess(expected_output_tokens, expression_node)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
@@ -756,15 +751,14 @@ def test_parser_can_generate_correct_ast_for_complex_expression():
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    additional_expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    additional_expression = ExpressionNode(term)
 
-    expression: ExpressionNode = ExpressionNode(term, ArithmeticOperator.PLUS,
-                                                additional_expression)
+    expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens, expression)
+    expected_output = NodeSuccess(expected_output_tokens, expression)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
@@ -784,7 +778,7 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
 
@@ -798,8 +792,8 @@ def test_parser_can_generate_correct_ast_for_variable_initialization():
     `parse_tokens_for_variable_initilization` function
     """
 
-    variable_type_token: Token = Token(INT_TOKEN_TYPE, "INT")
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "my_var")
+    variable_type_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_var")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tuple[Token, ...] = (
@@ -808,17 +802,15 @@ def test_parser_can_generate_correct_ast_for_variable_initialization():
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
     
-    variable_intialization: VariableInitialization = VariableInitialization(
-        identifier_token.value, expression
-    )
+    variable_intialization = VariableInitialization(identifier_token.value,
+                                                    expression)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output: NodeSuccess = NodeSuccess(expected_output_tokens,
-                                               variable_intialization)
+    expected_output = NodeSuccess(expected_output_tokens, variable_intialization)
 
     node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
 
@@ -832,8 +824,8 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_equals(
     object when given a tuple of tokens that omits the equals sign. 
     """
 
-    variable_type_token: Token = Token(INT_TOKEN_TYPE, "INT")
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "my_error_prone_var")
+    variable_type_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_error_prone_var")
 
     tokens: Tuple[Token, Token, Token] = (
         variable_type_token, identifier_token,
@@ -841,7 +833,7 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_equals(
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
 
@@ -855,8 +847,8 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_express
     that omits an expression (which is required).
     """
 
-    variable_type_token: Token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
-    identifier_token: Token = Token(IDENTIFIER_TOKEN_TYPE, "anju")
+    variable_type_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "anju")
 
     tokens: Tuple[Token, Token, Token, Token] = (
         variable_type_token, identifier_token, equals_token,
@@ -864,11 +856,22 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_express
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output: NodeFailure = NodeFailure(error_message)
+    expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
 
     assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_empty_return_statement():
+    """
+    This test checks that the function `parse_tokens_for_return_statement`
+    can return the correct ReturnStatement object when given an empty return
+    statement (i.e. returning without an expression provided)
+    """
+
+    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tuple[Token, Token] = (return_statement_token, end_of_file_token)
 
 
 def test_parser_can_generate_correct_error_given_faulty_input():
@@ -880,7 +883,7 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
-    expected_output: ParserFailure = ParserFailure(error_message)
+    expected_output = ParserFailure(error_message)
 
     parser_result: ParserResult = parse_list_of_tokens(tokens)
 
@@ -900,12 +903,11 @@ def test_parser_can_generate_correct_ast():
         end_of_file_token
     )
 
-    factor: FactorNode = FactorNode(decimal_literal_token.value)
-    term: TermNode = TermNode(factor)
-    additional_expression: ExpressionNode = ExpressionNode(term)
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    additional_expression = ExpressionNode(term)
 
-    expression: ExpressionNode = ExpressionNode(term, ArithmeticOperator.PLUS,
-                                                additional_expression)
+    expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
 
     parser_result: ParserResult = parse_list_of_tokens(tokens)
 
