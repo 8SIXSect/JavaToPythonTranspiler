@@ -12,9 +12,9 @@ from java_to_python_transpiler.java_to_python import (
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens,
+    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens,
     parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor,
-    parse_tokens_for_method_call, parse_tokens_for_term, parse_tokens_for_variable_initialization,
+    parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -872,6 +872,65 @@ def test_parser_can_generate_correct_ast_for_empty_return_statement():
 
     return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
     tokens: Tuple[Token, Token] = (return_statement_token, end_of_file_token)
+
+    return_statement = ReturnStatement()
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, return_statement)
+
+    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
+    """
+    This test checks that the function `parse_tokens_for_return_Statement`
+    can return the correct ReturnStatement object when given an expression that
+    is not empty for the return statement
+    """
+
+    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token, Token, Token] = (
+        return_statement_token, decimal_literal_token, plus_token,
+        decimal_literal_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    return_statement = ReturnStatement(expression)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, return_statement)
+
+    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parse_can_generate_correct_error_given_invalid_expression_to_return():
+    """
+    This test cehcks that the function `parse_tokens_for_return_statement` can
+    return the correct error when given an invalid expression to return.
+    """
+    
+    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+
+    tokens: Tuple[Token, Token, Token] = (
+        return_statement_token, return_statement_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_error_given_faulty_input():
