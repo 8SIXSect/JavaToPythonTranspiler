@@ -1028,7 +1028,7 @@ def test_parse_can_generate_correct_error_given_invalid_expression_to_return():
 
 def test_parser_can_generate_correct_error_given_faulty_input():
     """
-    This test checks the parser's entrypoint function `parse_list_of_tokens`
+    This test checks the parser's entrypoint function `parse_tokens`
     to see if it can generate the correct error output given a faulty input
     """
 
@@ -1044,14 +1044,14 @@ def test_parser_can_generate_correct_error_given_faulty_input():
 
 def test_parser_can_generate_correct_ast():
     """
-    This test checks the parser's entrypoint function `parse_list_of_tokens'
+    This test checks the parser's entrypoint function `parse_tokens'
     to see if it can generate the correct AST
     """
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, plus_token, decimal_literal_token,
+    tokens: Tuple[Token, Token, Token, Token, Token] = (
+        decimal_literal_token, plus_token, decimal_literal_token, semi_colon_token,
         end_of_file_token
     )
 
@@ -1060,8 +1060,9 @@ def test_parser_can_generate_correct_ast():
     additional_expression = ExpressionNode(term)
 
     expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
+    expected_output = InlineStatement(expression)
 
     parser_result: ParserResult = parse_tokens(tokens)
 
-    assert expression == parser_result
+    assert expected_output == parser_result
 
