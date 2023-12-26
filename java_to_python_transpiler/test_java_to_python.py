@@ -1073,27 +1073,6 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_error_for_variable_increment_with_one_plus():
-    """
-    This test checks that the parser can correctly generate an error using the
-    `parse_tokens_for_variable_increment` when given a tuple of tokens that only
-    has one plus sign and not two
-    """
-
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "ident")
-    tokens: Tuple[Token, ...] = (
-        identifier_token, plus_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
-
-    assert expected_output == node_result
-
-
 def test_parser_can_generate_correct_ast():
     """
     This test checks the parser's entrypoint function `parse_tokens'

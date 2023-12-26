@@ -441,7 +441,10 @@ class InlineStatement:
     ReturnStatement or VariableInitialization
     """
 
-    statement: ReturnStatement | VariableInitialization | ExpressionNode
+    statement: Union[
+        ReturnStatement, VariableInitialization, VariableIncrement,
+        ExpressionNode
+    ] 
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -536,6 +539,40 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
         inline_statement = InlineStatement(node_result_for_initialization.node)
         return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
 
+    length_of_tokens: int = len(tokens)
+
+    # The purpose for being 5 is it should have [id, plus, plus, semicol, eof]
+    if length_of_tokens >= 5:
+
+        next_next_token: Token = tokens[2]
+        
+        conditions_for_variable_increment: Tuple[bool, bool, bool] = (
+            current_token.token_type == IDENTIFIER_TOKEN_TYPE,
+            next_token.token_type == PLUS_TOKEN_TYPE,
+            next_next_token.token_type == PLUS_TOKEN_TYPE,
+        )
+
+        if all(conditions_for_variable_increment):
+            node_result_for_increment: NodeResult = \
+                    parse_tokens_for_variable_increment(tokens)
+
+            if isinstance(node_result_for_increment, NodeFailure):
+                return node_result_for_increment
+
+            assert isinstance(node_result_for_increment.node, VariableInitialization)
+
+            expected_semicolon_token: Token = node_result_for_increment.tokens[0]
+            if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
+                return report_error_in_parser(expected_semicolon_token.token_type)
+
+            tokens_with_semicolon_removed: Tuple[Token, ...] = \
+                    node_result_for_increment.tokens[1:]
+
+            inline_statement = InlineStatement(node_result_for_increment.node)
+
+            return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
+
+
     # If no other statement, then try to parse an expression
     node_result_for_expression: NodeResult = parse_tokens_for_expression(tokens)
 
@@ -563,15 +600,8 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
     identifier_token: Token = tokens[0]
 
     # The purpose for removing the first two indicies is because inline stmt
-    # already checks that the first two tokens are correct so we safely remove
-    tokens_with_identifier_and_plus_removed: Tuple[Token, ...] = tokens[2:]
-
-    expected_plus_token: Token = tokens_with_identifier_and_plus_removed[0]
-    if expected_plus_token.token_type != PLUS_TOKEN_TYPE:
-        return report_error_in_parser(expected_plus_token.token_type)
-
-    tokens_with_both_pluses_removed: Tuple[Token, ...] = \
-            tokens_with_identifier_and_plus_removed[1:]
+    # already checks that the first three tokens are correct so we safely remove
+    tokens_with_increment_removed: Tuple[Token, ...] = tokens[3:]
 
     factor = FactorNode(DEFAULT_INCREMENT)
     term = TermNode(factor)
@@ -579,8 +609,7 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
 
     variable_increment = VariableIncrement(identifier_token.value, expression)
 
-    return NodeSuccess(tokens_with_both_pluses_removed, variable_increment)
-
+    return NodeSuccess(tokens_with_increment_removed, variable_increment)
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
