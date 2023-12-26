@@ -67,6 +67,7 @@ Node = Union[
 
 def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
 
+
     def print_output(output: str, with_pipe_symbol: bool = False):
         indent: str = " " * indent_level
         prefix: str = ("| " if with_pipe_symbol else "")
@@ -77,6 +78,7 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
     def format_ast_with_extra_indent(node: Node | ArithmeticOperator | None):
         extra_indent_level = indent_level + 4
         format_ast(extra_indent_level, node)
+
 
     match node:
         case ExpressionNode(single_term_node, operator, additional_expression_node):
