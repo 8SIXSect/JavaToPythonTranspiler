@@ -12,7 +12,7 @@ from java_to_python_transpiler.java_to_python import (
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, InlineStatement, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableInitialization, parse_list_of_tokens,
+    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableInitialization, parse_tokens,
     parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement,
     parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
@@ -1037,7 +1037,7 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
     expected_output = ParserFailure(error_message)
 
-    parser_result: ParserResult = parse_list_of_tokens(tokens)
+    parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
 
@@ -1061,7 +1061,7 @@ def test_parser_can_generate_correct_ast():
 
     expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
 
-    parser_result: ParserResult = parse_list_of_tokens(tokens)
+    parser_result: ParserResult = parse_tokens(tokens)
 
     assert expression == parser_result
 

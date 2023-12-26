@@ -441,18 +441,18 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     return NodeFailure(error_message)
 
 
-ParserResult = ExpressionNode | ParserFailure
+ParserResult = InlineStatement | ParserFailure
 
 
-def parse_list_of_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
+def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
     """ This functions purpose is to be the entrypoint for the parser """
 
-    root_node_result: NodeResult = parse_tokens_for_expression(tokens)
+    root_node_result: NodeResult = parse_tokens_for_inline_statement(tokens)
 
     if isinstance(root_node_result, NodeFailure):
         return ParserFailure(root_node_result.error_message)
 
-    assert isinstance(root_node_result.node, ExpressionNode)
+    assert isinstance(root_node_result.node, InlineStatement)
 
     return root_node_result.node
 

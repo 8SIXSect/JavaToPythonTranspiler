@@ -2,15 +2,14 @@
 This module contains methods for transpiling source to source
 """
 
-from typing import Callable, List, Optional, Union
+from typing import Union
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator,
-    ExpressionNode, FactorNode, InlineStatement, LexerResult, MethodCall, NodeResult, NodeSuccess,
+    ExpressionNode, FactorNode, InlineStatement, LexerResult, MethodCall, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableInitialization, parse_tokens_for_inline_statement, parse_tokens_for_return_statement,
-    parse_tokens_for_variable_initialization,
+    LexerFailure, VariableInitialization,
     scan_and_tokenize_input,
-    parse_list_of_tokens
+    parse_tokens
 )
 
 
@@ -18,7 +17,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "meth(123, 456)"
+    user_input = "return meth(123, 456);"
 
     lexer_result: LexerResult = scan_and_tokenize_input(user_input)
 
@@ -28,33 +27,13 @@ def test_parser():
 
     assert isinstance(lexer_result, tuple)
 
-    parser_result: ParserResult = parse_list_of_tokens(lexer_result)
+    parser_result: ParserResult = parse_tokens(lexer_result)
 
     if isinstance(parser_result, ParserFailure):
         print(parser_result.error_messasge)
         return
 
     format_ast(0, parser_result)
-
-
-def test_inline_statement():
-
-    while True: 
-        user_input: str = input(PROMPT)
-
-        lexer_result: LexerResult = scan_and_tokenize_input(user_input)
-
-        if isinstance(lexer_result, LexerFailure):
-            print(lexer_result.error_message)
-            return
- 
-        assert isinstance(lexer_result, tuple)
-
-        node_result: NodeResult = parse_tokens_for_inline_statement(lexer_result)
-
-        assert isinstance(node_result, NodeSuccess)
-
-        format_ast(0, node_result.node)
 
 
 Node = Union[
@@ -103,7 +82,7 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
         case FactorNode(number_or_identifier, None):
             print_output(number_or_identifier, True)
 
-        case FactorNode(None, method_call):
+        case FactorNode("", method_call):
             format_ast_with_extra_indent(method_call)
 
         case MethodCall(identifier, argument_list):
