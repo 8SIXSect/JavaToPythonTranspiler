@@ -12,9 +12,9 @@ from java_to_python_transpiler.java_to_python import (
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, InlineStatement, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableInitialization, parse_tokens,
+    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, parse_tokens,
     parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement,
-    parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_initialization,
+    parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -1040,6 +1040,56 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
+
+
+# TODO: support += operator
+def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
+    """
+    This test checks that the parser can correctly generate an ast for
+    incrementing a variable.
+
+    This test checks for the ++ operator
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yoworld")
+    tokens: Tuple[Token, ...] = (
+        identifier_token, plus_token, plus_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(identifier_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    variable_increment = VariableIncrement(identifier_token.value, expression)
+    
+    expected_output_tokens: Tuple[Token, ...] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, variable_increment)
+
+    node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_variable_increment_with_one_plus():
+    """
+    This test checks that the parser can correctly generate an error using the
+    `parse_tokens_for_variable_increment` when given a tuple of tokens that only
+    has one plus sign and not two
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "ident")
+    tokens: Tuple[Token, ...] = (
+        identifier_token, plus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast():

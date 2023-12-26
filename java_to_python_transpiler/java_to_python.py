@@ -255,7 +255,7 @@ class NodeSuccess:
     node: Union[
         ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
-        VariableInitialization, ReturnStatement,
+        VariableInitialization, ReturnStatement, VariableIncrement,
         InlineStatement
     ]
 
@@ -417,6 +417,22 @@ class ReturnStatement:
 
 
 @dataclass
+class VariableIncrement:
+    """
+    Represents a variable being incremented
+    
+    `identifier` is represented by a string; this is the variable being
+    incremented
+
+    `expression` is represented by an ExpressionNode; this is the amount that
+    the variable is being incremented by
+    """
+
+    identifier: str
+    expression: ExpressionNode 
+
+
+@dataclass
 class InlineStatement:
     """
     Represents a statement that ends with a semicolon opposed to a BlockStatement.
@@ -535,6 +551,14 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
  
     inline_statement = InlineStatement(node_result_for_expression.node)
     return NodeSuccess(node_result_for_expression.tokens, inline_statement)
+
+
+def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a VariableIncrement object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
