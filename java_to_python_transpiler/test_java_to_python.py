@@ -1057,7 +1057,9 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
         end_of_file_token
     )
 
-    factor = FactorNode(identifier_token.value)
+    DEFAULT_INCREMENT = "1"
+
+    factor = FactorNode(DEFAULT_INCREMENT)
     term = TermNode(factor)
     expression = ExpressionNode(term)
 

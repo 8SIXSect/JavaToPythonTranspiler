@@ -558,7 +558,29 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
     Parses a tuple of tokens in order to construct a VariableIncrement object.
     """
 
-    NotImplemented
+    DEFAULT_INCREMENT = "1"
+
+    identifier_token: Token = tokens[0]
+
+    # The purpose for removing the first two indicies is because inline stmt
+    # already checks that the first two tokens are correct so we safely remove
+    tokens_with_identifier_and_plus_removed: Tuple[Token, ...] = tokens[2:]
+
+    expected_plus_token: Token = tokens_with_identifier_and_plus_removed[0]
+    if expected_plus_token.token_type != PLUS_TOKEN_TYPE:
+        return report_error_in_parser(expected_plus_token.token_type)
+
+    tokens_with_both_pluses_removed: Tuple[Token, ...] = \
+            tokens_with_identifier_and_plus_removed[1:]
+
+    factor = FactorNode(DEFAULT_INCREMENT)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    variable_increment = VariableIncrement(identifier_token.value, expression)
+
+    return NodeSuccess(tokens_with_both_pluses_removed, variable_increment)
+
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
