@@ -559,7 +559,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
             if isinstance(node_result_for_increment, NodeFailure):
                 return node_result_for_increment
 
-            assert isinstance(node_result_for_increment.node, VariableInitialization)
+            assert isinstance(node_result_for_increment.node, VariableIncrement)
 
             expected_semicolon_token: Token = node_result_for_increment.tokens[0]
             if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:

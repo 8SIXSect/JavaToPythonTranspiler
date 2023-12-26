@@ -7,7 +7,7 @@ from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator,
     ExpressionNode, FactorNode, InlineStatement, LexerResult, MethodCall, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableInitialization,
+    LexerFailure, VariableIncrement, VariableInitialization,
     scan_and_tokenize_input,
     parse_tokens
 )
@@ -39,7 +39,7 @@ def test_parser():
 Node = Union[
     ExpressionNode, TermNode, FactorNode,
     MethodCall, ArgumentList,
-    VariableInitialization, ReturnStatement,
+    VariableInitialization, ReturnStatement, VariableIncrement,
     InlineStatement,
 ]
 
@@ -97,6 +97,11 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
             print_output("-> return_stmt")
             format_ast_with_extra_indent(expression)
 
+        case VariableIncrement(identifier, expression):
+            print_output("-> variable_inc")
+            print_output(identifier, True)
+            format_ast_with_extra_indent(expression)
+        
         case InlineStatement(statement):
             print_output("-> inline_stmt")
             format_ast_with_extra_indent(statement)
