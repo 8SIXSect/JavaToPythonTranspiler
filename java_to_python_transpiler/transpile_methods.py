@@ -17,7 +17,7 @@ PROMPT = ">>> "
 
 
 def test_parser(): 
-    user_input = "return meth(123, 456);"
+    user_input: str = input(PROMPT)
 
     lexer_result: LexerResult = scan_and_tokenize_input(user_input)
 
@@ -72,13 +72,6 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
             format_ast_with_extra_indent(operator)
             format_ast_with_extra_indent(additional_term_node)
 
-        case (
-                ArithmeticOperator.PLUS, ArithmeticOperator.MINUS,
-                ArithmeticOperator.MULTIPLY, ArithmeticOperator.DIVIDE
-            ):
-
-            print_output(node.value, True)
-
         case FactorNode(number_or_identifier, None):
             print_output(number_or_identifier, True)
 
@@ -109,5 +102,6 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
             format_ast_with_extra_indent(statement)
 
         case _:
-            pass
+            if isinstance(node, ArithmeticOperator):
+                print_output(node.value, True)
 

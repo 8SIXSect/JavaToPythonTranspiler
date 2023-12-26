@@ -425,7 +425,7 @@ class InlineStatement:
     ReturnStatement or VariableInitialization
     """
 
-    statement: ReturnStatement | VariableInitialization
+    statement: ReturnStatement | VariableInitialization | ExpressionNode
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -484,7 +484,6 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
         assert isinstance(node_result_for_return_statement.node, ReturnStatement)
 
         expected_semicolon_token: Token = node_result_for_return_statement.tokens[0]
-
         if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
             return report_error_in_parser(expected_semicolon_token.token_type)
 
@@ -517,15 +516,25 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
        
         tokens_with_semicolon_removed: Tuple[Token, ...] = \
                 node_result_for_initialization.tokens[1:]
-
+ 
         inline_statement = InlineStatement(node_result_for_initialization.node)
         return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
 
-    # It's easier to structure the error at the bottom opposed to the top for
-    # this function b/c there will be many more inline stmts added and the
-    # structure won't change
+    # If no other statement, then try to parse an expression
+    node_result_for_expression: NodeResult = parse_tokens_for_expression(tokens)
 
-    return report_error_in_parser(current_token.token_type)
+    if isinstance(node_result_for_expression, NodeFailure):
+        return node_result_for_expression
+
+    assert isinstance(node_result_for_expression.node, ExpressionNode)
+
+    expected_semicolon_token: Token = node_result_for_expression.tokens[0]
+    
+    if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
+        return report_error_in_parser(expected_semicolon_token.token_type)
+ 
+    inline_statement = InlineStatement(node_result_for_expression.node)
+    return NodeSuccess(node_result_for_expression.tokens, inline_statement)
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
