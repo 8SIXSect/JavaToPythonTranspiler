@@ -1042,7 +1042,6 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     assert expected_output == parser_result
 
 
-# TODO: support += operator
 def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
     """
     This test checks that the parser can correctly generate an ast for
@@ -1060,6 +1059,33 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
     DEFAULT_INCREMENT = "1"
 
     factor = FactorNode(DEFAULT_INCREMENT)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    variable_increment = VariableIncrement(identifier_token.value, expression)
+    
+    expected_output_tokens: Tuple[Token, ...] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, variable_increment)
+
+    node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_increment_with_expression():
+    """
+    This test checks that the parser can generate the correct VariableIncrement
+    object when supplied with an expression like "x += 1" opposed to "x++"
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yoworld")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    tokens: Tuple[Token, ...] = (
+        identifier_token, plus_token, equals_token, decimal_literal_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
 

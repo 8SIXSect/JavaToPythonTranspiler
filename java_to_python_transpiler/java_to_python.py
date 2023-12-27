@@ -541,7 +541,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
 
     length_of_tokens: int = len(tokens)
 
-    # The purpose for being 5 is it should have [id, plus, plus, semicol, eof]
+    # The purpose for being 5 is it should have [id, plus, plus | eq, semicol, eof]
     if length_of_tokens >= 5:
 
         next_next_token: Token = tokens[2]
@@ -549,7 +549,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
         conditions_for_variable_increment: Tuple[bool, bool, bool] = (
             current_token.token_type == IDENTIFIER_TOKEN_TYPE,
             next_token.token_type == PLUS_TOKEN_TYPE,
-            next_next_token.token_type == PLUS_TOKEN_TYPE,
+            next_next_token.token_type in (PLUS_TOKEN_TYPE, EQUALS_TOKEN_TYPE),
         )
 
         if all(conditions_for_variable_increment):
@@ -599,17 +599,34 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
 
     identifier_token: Token = tokens[0]
 
+    # We know for sure that tokens[1] == "+" so this one determine type of inc
+    plus_or_equals_token: Token = tokens[2]
+
     # The purpose for removing the first two indicies is because inline stmt
     # already checks that the first three tokens are correct so we safely remove
     tokens_with_increment_removed: Tuple[Token, ...] = tokens[3:]
 
-    factor = FactorNode(DEFAULT_INCREMENT)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
+    if plus_or_equals_token.token_type == PLUS_TOKEN_TYPE:
+        factor = FactorNode(DEFAULT_INCREMENT)
+        term = TermNode(factor)
+        expression = ExpressionNode(term)
 
-    variable_increment = VariableIncrement(identifier_token.value, expression)
+        variable_increment = VariableIncrement(identifier_token.value, expression)
 
-    return NodeSuccess(tokens_with_increment_removed, variable_increment)
+        return NodeSuccess(tokens_with_increment_removed, variable_increment)
+
+    node_result_for_expression: NodeResult = \
+            parse_tokens_for_expression(tokens_with_increment_removed)
+
+    if isinstance(node_result_for_expression, NodeFailure):
+        return node_result_for_expression
+
+    assert isinstance(node_result_for_expression.node, ExpressionNode)
+
+    variable_increment = VariableIncrement(identifier_token.value,
+                                           node_result_for_expression.node)
+
+    return NodeSuccess(node_result_for_expression.tokens, variable_increment)
 
 
 def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
