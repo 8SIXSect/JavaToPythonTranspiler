@@ -1099,6 +1099,30 @@ def test_parser_can_generate_correct_ast_for_increment_with_expression():
     assert expected_output == node_result
 
 
+def test_parser_can_generate_correct_error_given_bad_expression_to_increment():
+    """
+    This test checks that the parser can correctly generate an error using the
+    `parse_tokens_for_variable_increment` function when given an expression that
+    contains a syntax error like "x += /9".
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
+    decimal_literal_token: Token =  generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        identifier_token, plus_token, equals_token, decimal_literal_token,
+        plus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
+    
+    assert expected_output == node_result
+
+
 def test_parser_can_generate_correct_ast():
     """
     This test checks the parser's entrypoint function `parse_tokens'
