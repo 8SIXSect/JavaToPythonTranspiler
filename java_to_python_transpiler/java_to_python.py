@@ -738,7 +738,74 @@ def parse_tokens_for_comparison_expression(tokens: Tuple[Token, ...]) -> NodeRes
     expression.
     """
 
-    NotImplemented
+    COMPARISON_OPERATOR_TOKEN_TYPES: Tuple[TokenType, ...] = (
+        LESS_THAN_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE,
+        EXCLAMATION_TOKEN_TYPE, EQUALS_TOKEN_TYPE
+    )
+
+    node_result_for_expression: NodeResult = parse_tokens_for_expression(tokens)
+
+    if isinstance(node_result_for_expression, NodeFailure):
+        return node_result_for_expression
+
+    assert isinstance(node_result_for_expression.node, ExpressionNode)
+
+    current_token: Token = node_result_for_expression.tokens[0]
+    if current_token.token_type in (RIGHT_PARENTHESIS_TOKEN_TYPE,
+                                    SEMI_COLON_TOKEN_TYPE):
+        
+        comparison_expression = ComparisonExpression(node_result_for_expression.node)
+        return NodeSuccess(node_result_for_expression.tokens, comparison_expression)
+
+    if current_token.token_type not in COMPARISON_OPERATOR_TOKEN_TYPES:
+        return report_error_in_parser(current_token.token_type)
+
+    next_token: Token = node_result_for_expression.tokens[1]
+    token_types: Tuple[TokenType, TokenType] = (current_token.token_type,
+                                                next_token.token_type)
+
+    operator: ComparisonOperator
+    tokens_after_removing_operator: Tuple[Token, ...]
+    
+    if token_types == (LESS_THAN_TOKEN_TYPE, EQUALS_TOKEN_TYPE):
+        operator = ComparisonOperator.LESS_THAN_OR_EQUAL
+        tokens_after_removing_operator = node_result_for_expression.tokens[2:]
+    
+    elif token_types == (GREATER_THAN_TOKEN_TYPE, EQUALS_TOKEN_TYPE):
+        operator = ComparisonOperator.GREATER_THAN_OR_EQUAL
+        tokens_after_removing_operator = node_result_for_expression.tokens[2:]
+
+    elif token_types == (EXCLAMATION_TOKEN_TYPE, EQUALS_TOKEN_TYPE):
+        operator = ComparisonOperator.NOT_EQUAL
+        tokens_after_removing_operator = node_result_for_expression.tokens[2:]
+
+    elif token_types == (EQUALS_TOKEN_TYPE, EQUALS_TOKEN_TYPE):
+        operator = ComparisonOperator.BOOLEAN_EQUAL
+        tokens_after_removing_operator = node_result_for_expression.tokens[2:]
+
+    elif current_token.token_type == LESS_THAN_TOKEN_TYPE:
+        operator = ComparisonOperator.LESS_THAN
+        tokens_after_removing_operator = node_result_for_expression.tokens[1:]
+
+    else:
+        operator = ComparisonOperator.GREATER_THAN
+        tokens_after_removing_operator = node_result_for_expression.tokens[1:]
+
+    node_result_for_additional_expression: NodeResult = parse_tokens_for_expression(
+            tokens_after_removing_operator
+    )
+
+    if isinstance(node_result_for_additional_expression, NodeFailure):
+        return node_result_for_additional_expression
+
+    assert isinstance(node_result_for_additional_expression.node, ExpressionNode)
+    
+    comparison_expression = ComparisonExpression(
+        node_result_for_expression.node,
+        operator,
+        node_result_for_additional_expression.node)
+
+    return NodeSuccess(node_result_for_additional_expression.tokens, comparison_expression)
 
 
 def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:

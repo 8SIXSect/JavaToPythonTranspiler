@@ -794,14 +794,17 @@ def test_parser_can_generate_correct_ast_for_simple_comparison_expression():
     """
 
     true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
-    tokens: Tuple[Token, Token] = (true_token, end_of_file_token)
+    tokens: Tuple[Token, Token, Token] = (
+        true_token, right_parenthesis_token,
+        end_of_file_token
+    )
 
     factor = FactorNode(true_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
     comparison_expression = ComparisonExpression(expression)
 
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = tokens[1:]
     expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
@@ -821,6 +824,7 @@ def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
 
     tokens: Tuple[Token, ...] = (
         identifier_token, multiply_token, decimal_literal_token,
+        right_parenthesis_token,
         end_of_file_token
     )
 
@@ -834,7 +838,8 @@ def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
 
     comparison_expression = ComparisonExpression(expression)
 
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
+                                                   end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
@@ -855,6 +860,7 @@ def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
 
     tokens: Tuple[Token, ...] = (
         true_token, exclamation_token, equals_token, false_token,
+        right_parenthesis_token,
         end_of_file_token
     )
 
@@ -870,7 +876,8 @@ def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
                                                  ComparisonOperator.NOT_EQUAL,
                                                  additional_expression)
     
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
+                                                   end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
