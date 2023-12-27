@@ -24,6 +24,7 @@ LEFT_BRACKET_TOKEN_TYPE = "LEFT_BRACKET"
 RIGHT_BRACKET_TOKEN_TYPE = "RIGHT_BRACKET"
 SEMI_COLON_TOKEN_TYPE = "SEMI_COLON"
 COMMA_TOKEN_TYPE = "COMMA"
+EXCLAMATION_TOKEN_TYPE = "EXCLAMATION"
 EQUALS_TOKEN_TYPE = "EQUALS"
 LESS_THAN_TOKEN_TYPE = "LESS_THAN"
 GREATER_THAN_TOKEN_TYPE = "GREATER_THAN"
@@ -73,6 +74,7 @@ TOKEN_PATTERNS: Dict[str, str] = {
     r"\]": RIGHT_BRACKET_TOKEN_TYPE,
     r";": SEMI_COLON_TOKEN_TYPE,
     r",": COMMA_TOKEN_TYPE,
+    r"!": EXCLAMATION_TOKEN_TYPE,
     r"=": EQUALS_TOKEN_TYPE,
     r"\<": LESS_THAN_TOKEN_TYPE,
     r"\>": GREATER_THAN_TOKEN_TYPE,
@@ -253,7 +255,7 @@ class NodeSuccess:
     tokens: Tuple[Token, ...]
  
     node: Union[
-        ExpressionNode, TermNode, FactorNode,
+        ComparisonExpression, ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
         InlineStatement
@@ -269,6 +271,44 @@ class NodeFailure:
     """
 
     error_message: str
+
+
+class ComparisonOperator(Enum):
+    """
+    Enumeration class representing comparison operators in a boolean expression.
+
+    Enum Members:
+    - LESS_THAN: Represents the less_than operator '<'
+    - GREATER_THAN: Represents the greater_than operator '>'
+    - LESS_THAN_OR_EQUAL: Represents the less_than_or_equal_to operator '<='
+    - GREATER_THAN_OR_EQUAL: Represents the greater_than_or_equal_to operator '>='
+    - BOOLEAN_EQUAL: Represents the boolean equality operator '=='
+    - NOT_EQUAL: Represents the not equals operator '!='
+    """
+
+    LESS_THAN = "<"
+    GREATER_THAN = ">"
+    LESS_THAN_OR_EQUAL = "<="
+    GREATER_THAN_OR_EQUAL = ">="
+    BOOLEAN_EQUAL = "=="
+    NOT_EQUAL = "!="
+
+
+@dataclass
+class ComparisonExpression:
+    """
+    Represents a boolean expression comparing two expressions to each other.
+
+    `first_expression` is represented by an ExpressionNode
+
+    `operator` is represented by a ComparisonOperator
+    
+    `second_expression` is represented by an ExpressionNode
+    """
+
+    expression: ExpressionNode
+    operator: Optional[ComparisonOperator] = None
+    additional_expression: Optional[ExpressionNode] = None
 
 
 @dataclass
@@ -378,9 +418,9 @@ class ArgumentList:
     """
     Represents a list of arguments.
 
-    argument is represented by an expression node.
+    `argument` is represented by an expression node.
 
-    additonal_argument_list represents additional arguments. This
+    `additonal_argument_list` represents additional arguments. This
     field defaults to None; when it is None, it represents a method being called
     with a singular argument.
     """
@@ -444,7 +484,7 @@ class InlineStatement:
     statement: Union[
         ReturnStatement, VariableInitialization, VariableIncrement,
         ExpressionNode
-    ] 
+    ]
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -690,6 +730,15 @@ def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeR
     )
 
     return NodeSuccess(node_result_for_expression.tokens, variable_initialization)
+
+
+def parse_tokens_for_comparison_expression(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a list of tokens to construct an ast for a boolean comparison
+    expression.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:

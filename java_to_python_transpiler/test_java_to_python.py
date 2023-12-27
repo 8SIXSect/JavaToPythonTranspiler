@@ -3,17 +3,17 @@ from typing import List, Tuple
 
 from java_to_python_transpiler.java_to_python import (
     CHAR_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE,
-    END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
+    END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER, EXCLAMATION_TOKEN_TYPE, FALSE_TOKEN_TYPE,
     FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, INT_TOKEN_TYPE,
     LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
     LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, LONG_TOKEN_TYPE, MINUS_TOKEN_TYPE,
     MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RETURN_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
-    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator,
+    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, InlineStatement, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
     ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, parse_tokens,
-    parse_tokens_for_argument_list, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement,
+    parse_tokens_for_argument_list, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement,
     parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
@@ -781,6 +781,122 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_simple_comparison_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly parse the tokens and construct a ComparisonExpression object
+    given an input that has a singular expression without an operator or
+    additional expression.
+    """
+
+    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
+    tokens: Tuple[Token, Token] = (true_token, end_of_file_token)
+
+    factor = FactorNode(true_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly parse the tokenbs and construct a ComparisonExpression object
+    given an input with one expression that may have multiple factors and terms.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "Lookatme")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        identifier_token, multiply_token, decimal_literal_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(identifier_token.value)
+
+    factor_for_additional_term = FactorNode(decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
+    
+    term = TermNode(factor, ArithmeticOperator.MULTIPLY, additional_term)
+    expression = ExpressionNode(term)
+
+    comparison_expression = ComparisonExpression(expression)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly parse the tokens and construct a ComparisonExpression object
+    given an input with an operator and an additional expression.
+    """
+
+    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
+    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+    exclamation_token = Token(EXCLAMATION_TOKEN_TYPE, "EXCLAMATION")
+
+    tokens: Tuple[Token, ...] = (
+        true_token, exclamation_token, equals_token, false_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(true_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    additional_factor = FactorNode(false_token.value)
+    additional_term = TermNode(additional_factor)
+    additional_expression = ExpressionNode(additional_term)
+
+    comparison_expression = ComparisonExpression(expression,
+                                                 ComparisonOperator.NOT_EQUAL,
+                                                 additional_expression)
+    
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_complex_comparison_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly generate an error for a complex expression with a syntax error
+    """
+    
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    less_than_token = Token(LESS_THAN_TOKEN_TYPE, "<")
+
+    tokens: Tuple[Token, ...] = (
+        decimal_literal_token, less_than_token, plus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
 
     assert expected_output == node_result
 
