@@ -606,6 +606,8 @@ def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(result_for_additional_statement_list.tokens, statement_list)
 
 
+# todo: create a type called Tokens, alias it to Tuple[Token, ...] and replace
+# all instances in this file w/ it
 def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a StatementList object, but
@@ -613,7 +615,29 @@ def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResu
     meant to be used in a block statement).
     """
 
-    NotImplemented
+    expected_left_braces_token: Token = tokens[0]
+    if expected_left_braces_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_left_braces_token.token_type)
+
+    tokens_with_left_braces_removed: Tuple[Token, ...] = tokens[1:]
+    node_result_for_statement_list: NodeResult = parse_tokens_for_statement_list(
+        tokens_with_left_braces_removed
+    )
+
+    if isinstance(node_result_for_statement_list, NodeFailure):
+        return node_result_for_statement_list
+
+    assert isinstance(node_result_for_statement_list.node, StatementList)
+
+    expected_right_braces_token: Token = node_result_for_statement_list.tokens[0]
+    if expected_right_braces_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_right_braces_token.token_type)
+
+    tokens_with_right_braces_removed: Tuple[Token, ...]
+    tokens_with_right_braces_removed = node_result_for_statement_list.tokens[1:]
+
+    return NodeSuccess(tokens_with_right_braces_removed,
+                       node_result_for_statement_list.node)
 
 
 def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
