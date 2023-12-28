@@ -5,7 +5,7 @@ This module contains methods for transpiling source to source
 from typing import Union
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
-    ExpressionNode, FactorNode, InlineStatement, InlineStatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
+    ExpressionNode, FactorNode, InlineStatement, StatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
     LexerFailure, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens_for_comparison_expression,
     scan_and_tokenize_input,
@@ -47,8 +47,8 @@ Node = Union[
     ComparisonExpression, ExpressionNode, TermNode, FactorNode,
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement, VariableIncrement,
-    InlineStatement, InlineStatementList,
-    WhileStatement,
+    InlineStatement, WhileStatement,
+    StatementList,
 
     ArithmeticOperator, ComparisonOperator
 ]
@@ -122,8 +122,8 @@ def format_ast(indent_level: int, node: Node | None):
             print_output("-> inline_stmt")
             format_ast_with_extra_indent(statement)
 
-        case InlineStatementList(statement, additional_statement_list):
-            print_output("-> inline_stmt_list")
+        case StatementList(statement, additional_statement_list):
+            print_output("-> stmt_list")
             format_ast_with_extra_indent(statement)
             format_ast_with_extra_indent(additional_statement_list)
 
