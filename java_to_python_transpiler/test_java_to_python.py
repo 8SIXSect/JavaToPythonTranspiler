@@ -11,9 +11,9 @@ from java_to_python_transpiler.java_to_python import (
     RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
-    ExpressionNode, FactorNode, InlineStatement, InlineStatementList, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
+    ExpressionNode, FactorNode, InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
     ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens,
-    parse_tokens_for_argument_list, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement, parse_tokens_for_inline_statement_list,
+    parse_tokens_for_argument_list, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement, parse_tokens_for_statement_list,
     parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
@@ -932,7 +932,7 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
     expression = ExpressionNode(term)
     comp_expression = ComparisonExpression(expression)
     
-    statement_list = InlineStatementList()
+    statement_list = StatementList()
 
     while_statement = WhileStatement(comp_expression, statement_list)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
@@ -986,7 +986,7 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body
     
     return_statement = ReturnStatement()
     inline_statement = InlineStatement(return_statement)
-    statement_list = InlineStatementList(inline_statement)
+    statement_list = StatementList(inline_statement)
 
     while_statement = WhileStatement(comp_expression, statement_list)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
@@ -1030,10 +1030,10 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements()
 
     tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
     
-    inline_statement_list = InlineStatementList()
+    inline_statement_list = StatementList()
     expected_output = NodeSuccess(tokens, inline_statement_list)
 
-    node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 
@@ -1059,12 +1059,12 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement()
     return_statement = ReturnStatement(comparison_expression)
 
     inline_statement = InlineStatement(return_statement)
-    inline_statement_list = InlineStatementList(inline_statement)
+    inline_statement_list = StatementList(inline_statement)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
 
-    node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 
@@ -1081,7 +1081,7 @@ def test_parser_can_produce_error_for_statement_list_that_fails_initial_statemen
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
     expected_output = NodeFailure(error_message)
 
-    node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 
@@ -1120,15 +1120,15 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
 
     initial_inline_statement = InlineStatement(variable_increment)
     additional_inline_statement = InlineStatement(return_statement)
-    additional_statement_list = InlineStatementList(additional_inline_statement)
+    additional_statement_list = StatementList(additional_inline_statement)
 
-    inline_statement_list = InlineStatementList(initial_inline_statement,
+    inline_statement_list = StatementList(initial_inline_statement,
                                                 additional_statement_list)
 
     expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
 
-    node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
     
     assert expected_output == node_result
 
@@ -1154,7 +1154,7 @@ def test_parser_can_produce_error_for_statement_list_that_fails_additional_state
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(EQUALS_TOKEN_TYPE)
     expected_output = NodeFailure(error_message)
 
-    node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 

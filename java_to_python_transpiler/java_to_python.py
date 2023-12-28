@@ -258,7 +258,7 @@ class NodeSuccess:
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
-        InlineStatement, InlineStatementList,
+        InlineStatement, StatementList,
         WhileStatement,
     ]
 
@@ -489,19 +489,19 @@ class InlineStatement:
 
 
 @dataclass
-class InlineStatementList:
+class StatementList:
     """
     Represents one or more InlineStatement objects.
 
     `statement` (optional) is represented by an InlineStatement object; this the
     first statement of the chain
 
-    `additional_statement_list` (optional) is represented by an
-    InlineStatementList object; this allows to chain the parser together
+    `additional_statement_list` (optional) is represented by a
+    StatementList object; this allows to chain the parser together
     """
 
     statement: Optional[InlineStatement] = None
-    additional_statement_list: Optional[InlineStatementList] = None
+    additional_statement_list: Optional[StatementList] = None
 
 
 @dataclass
@@ -512,12 +512,12 @@ class WhileStatement:
     `comparison_expression` is represented by a ComparisonExpression; this is
     the condition of the while loop
 
-    `statement_list` is represented by an InlineStatementList; this is the body
+    `statement_list` is represented by a StatementList; this is the body
     of the while loop
     """
 
-    comparison_expression: ComparisonExpression
-    statement_list: InlineStatementList
+    comparison_expressionn: ComparisonExpression
+    statement_list: StatementList
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -533,18 +533,18 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     return NodeFailure(error_message)
 
 
-ParserResult = InlineStatementList | ParserFailure
+ParserResult = StatementList | ParserFailure
 
 
 def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
     """ This function's purpose is to be the entrypoint for the parser """
 
-    root_node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
+    root_node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     if isinstance(root_node_result, NodeFailure):
         return ParserFailure(root_node_result.error_message)
 
-    assert isinstance(root_node_result.node, InlineStatementList)
+    assert isinstance(root_node_result.node, StatementList)
 
     return root_node_result.node
 
@@ -558,25 +558,16 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 )
 
 
-def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
     """
-    Parses a tuple of tokens in order to construct a WhileStatement object
+    Parses a tuple of tokens in order to construct an StatementList object
     """
-
-    NotImplemented
-
-
-def parse_tokens_for_inline_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
-    """
-    Parses a tuple of tokens in order to construct an InlineStatementList object
-    """
-
 
     initial_token: Token = tokens[0]
     if initial_token.token_type == RIGHT_CURLY_BRACE_TOKEN_TYPE:
 
-        empty_inline_statement_list = InlineStatementList()
-        return NodeSuccess(tokens, empty_inline_statement_list)
+        empty_statement_list = StatementList()
+        return NodeSuccess(tokens, empty_statement_list)
 
     node_result_for_initial_statement: NodeResult = \
             parse_tokens_for_inline_statement(tokens)
@@ -592,28 +583,33 @@ def parse_tokens_for_inline_statement_list(tokens: Tuple[Token, ...]) -> NodeRes
     # take the eof out of there too
     if current_token.token_type in (RIGHT_CURLY_BRACE_TOKEN_TYPE,
                                     END_OF_FILE_TOKEN_TYPE):
-        simple_inline_statement_list = \
-                InlineStatementList(node_result_for_initial_statement.node)
+        simple_statement_list = StatementList(node_result_for_initial_statement.node)
 
         return NodeSuccess(node_result_for_initial_statement.tokens,
-                           simple_inline_statement_list)
+                           simple_statement_list)
 
     result_for_additional_statement_list: NodeResult
-    result_for_additional_statement_list = parse_tokens_for_inline_statement_list(
+    result_for_additional_statement_list = parse_tokens_for_statement_list(
         node_result_for_initial_statement.tokens
     )
 
     if isinstance(result_for_additional_statement_list, NodeFailure):
         return result_for_additional_statement_list
 
-    assert isinstance(result_for_additional_statement_list.node, InlineStatementList)
+    assert isinstance(result_for_additional_statement_list.node, StatementList)
 
-    statement_list = InlineStatementList(
+    statement_list = StatementList(
         node_result_for_initial_statement.node,
         result_for_additional_statement_list.node
     )
 
     return NodeSuccess(result_for_additional_statement_list.tokens, statement_list)
+
+
+def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a WhileStatement object
+    """
 
 
 def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
