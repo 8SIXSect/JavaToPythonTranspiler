@@ -450,11 +450,11 @@ class ReturnStatement:
     """
     Represents a return statement.
 
-    `expression` is represented by an ExpressionNode; this is the value being
-    returned.
+    `comp_expression` is represented by ComparisonExpression; this is the value
+    being returned.
     """
 
-    expression: Optional[ExpressionNode] = None
+    comp_expression: Optional[ComparisonExpression] = None
 
 
 @dataclass
@@ -774,18 +774,17 @@ def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
         return_statement = ReturnStatement()
         return NodeSuccess(tokens_with_return_token_removed, return_statement)
 
-    node_result_for_expression: NodeResult = parse_tokens_for_expression(
-        tokens_with_return_token_removed
-    )
+    node_result_for_comp_expression: NodeResult = \
+            parse_tokens_for_comparison_expression(tokens_with_return_token_removed)
 
-    if isinstance(node_result_for_expression, NodeFailure):
-        return node_result_for_expression
+    if isinstance(node_result_for_comp_expression, NodeFailure):
+        return node_result_for_comp_expression
 
-    assert isinstance(node_result_for_expression.node, ExpressionNode)
+    assert isinstance(node_result_for_comp_expression.node, ComparisonExpression)
 
-    return_statement = ReturnStatement(node_result_for_expression.node)
+    return_statement = ReturnStatement(node_result_for_comp_expression.node)
 
-    return NodeSuccess(node_result_for_expression.tokens, return_statement)
+    return NodeSuccess(node_result_for_comp_expression.tokens, return_statement)
 
 
 def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeResult:

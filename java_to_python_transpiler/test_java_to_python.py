@@ -944,7 +944,8 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement()
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
-    return_statement = ReturnStatement(expression)
+    comparison_expression = ComparisonExpression(expression)
+    return_statement = ReturnStatement(comparison_expression)
 
     inline_statement = InlineStatement(return_statement)
     inline_statement_list = InlineStatementList(inline_statement)
@@ -1003,7 +1004,8 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     return_factor = FactorNode(identifier_token.value)
     return_term = TermNode(return_factor)
     return_expression = ExpressionNode(return_term)
-    return_statement = ReturnStatement(return_expression)
+    return_comparison_expression = ComparisonExpression(return_expression)
+    return_statement = ReturnStatement(return_comparison_expression)
 
     initial_inline_statement = InlineStatement(variable_increment)
     additional_inline_statement = InlineStatement(return_statement)
@@ -1258,8 +1260,9 @@ def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
     additional_expression = ExpressionNode(term)
     expression = ExpressionNode(term, ArithmeticOperator.PLUS,
                                 additional_expression)
+    comparison_expression = ComparisonExpression(expression)
 
-    return_statement = ReturnStatement(expression)
+    return_statement = ReturnStatement(comparison_expression)
 
     expected_output_tokens: Tuple[Token, Token] = (semi_colon_token,
                                                    end_of_file_token)
