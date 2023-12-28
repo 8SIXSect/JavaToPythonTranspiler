@@ -670,33 +670,20 @@ def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     tokens_with_right_paren_removed: Tuple[Token, ...]
     tokens_with_right_paren_removed = node_result_comp_expression.tokens[1:]
 
-    expected_left_braces_token: Token = tokens_with_right_paren_removed[0]
-    if expected_left_braces_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
-        return report_error_in_parser(expected_left_braces_token.token_type)
-
-    tokens_with_left_braces_removed: Tuple[Token, ...]
-    tokens_with_left_braces_removed = tokens_with_right_paren_removed[1:]
-
-    node_result_statement_list: NodeResult = parse_tokens_for_statement_list(
-        tokens_with_left_braces_removed
+    node_result_for_block_statement: NodeResult
+    node_result_for_block_statement = parse_tokens_for_block_statement_body(
+        tokens_with_right_paren_removed
     )
 
-    if isinstance(node_result_statement_list, NodeFailure):
-        return node_result_statement_list
+    if isinstance(node_result_for_block_statement, NodeFailure):
+        return node_result_for_block_statement
 
-    assert isinstance(node_result_statement_list.node, StatementList)
-
-    expected_right_braces_token: Token = node_result_statement_list.tokens[0]
-    if expected_right_braces_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
-        return report_error_in_parser(expected_right_braces_token.token_type)
-
-    tokens_with_right_braces_removed: Tuple[Token, ...]
-    tokens_with_right_braces_removed = node_result_statement_list.tokens[1:]
+    assert isinstance(node_result_for_block_statement.node, StatementList)
 
     while_statement = WhileStatement(node_result_comp_expression.node,
-                                     node_result_statement_list.node)
+                                     node_result_for_block_statement.node)
 
-    return NodeSuccess(tokens_with_right_braces_removed, while_statement)
+    return NodeSuccess(node_result_for_block_statement.tokens, while_statement)
 
 
 def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
