@@ -487,6 +487,36 @@ class InlineStatement:
     ]
 
 
+@dataclass
+class InlineStatementList:
+    """
+    Represents one or more InlineStatement objects.
+
+    `statement` is represented by an InlineStatement object; this the first
+    statement of the chain
+
+    `additional_statement_list` (optional) is represented by an
+    InlineStatementList object; this allows to chain the parser together
+    """
+
+    statement: InlineStatement
+    additional_statement_list: Optional[InlineStatementList] = None
+
+
+@dataclass
+class WhileStatement:
+    """
+    Represents a while loop.
+    
+    `comparison_expression` is represented by a ComparisonExpression; this is
+    the condition of the while loop
+
+    `statement_list`
+    """
+
+    notimp: int
+
+
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
 
 
@@ -523,6 +553,22 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
     INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
     BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
 )
+
+
+def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a WhileStatement object
+    """
+
+    NotImplemented
+
+
+def parse_tokens_for_inline_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct an InlineStatementList object
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:

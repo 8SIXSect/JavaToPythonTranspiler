@@ -4,10 +4,10 @@ This module contains methods for transpiling source to source
 
 from typing import Union
 from java_to_python_transpiler.java_to_python import (
-    ArgumentList, ArithmeticOperator,
-    ExpressionNode, FactorNode, InlineStatement, LexerResult, MethodCall, 
+    ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
+    ExpressionNode, FactorNode, InlineStatement, InlineStatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableIncrement, VariableInitialization,
+    LexerFailure, VariableIncrement, VariableInitialization, parse_tokens_for_comparison_expression,
     scan_and_tokenize_input,
     parse_tokens
 )
@@ -16,8 +16,7 @@ from java_to_python_transpiler.java_to_python import (
 PROMPT = ">>> "
 
 
-def test_parser(): 
-    user_input: str = input(PROMPT)
+def test_parser(user_input: str): 
 
     lexer_result: LexerResult = scan_and_tokenize_input(user_input)
 
@@ -26,25 +25,35 @@ def test_parser():
         return
 
     assert isinstance(lexer_result, tuple)
-
+    
     parser_result: ParserResult = parse_tokens(lexer_result)
 
     if isinstance(parser_result, ParserFailure):
         print(parser_result.error_messasge)
         return
 
-    format_ast(0, parser_result)
+    format_ast(0, parser_result.statement)
+
+
+def parse_file_and_print_ast(file_name: str):
+    with open(file_name, "r") as file_to_lex:
+        contents: str = file_to_lex.read()
+
+    test_parser(contents)
+    
 
 
 Node = Union[
-    ExpressionNode, TermNode, FactorNode,
+    ComparisonExpression, ExpressionNode, TermNode, FactorNode,
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement, VariableIncrement,
-    InlineStatement,
+    InlineStatement, InlineStatementList,
+
+    ArithmeticOperator, ComparisonOperator
 ]
 
 
-def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
+def format_ast(indent_level: int, node: Node | None):
 
 
     def print_output(output: str, with_pipe_symbol: bool = False):
@@ -60,6 +69,12 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
 
 
     match node:
+        case ComparisonExpression(expression, operator, additional_expression):
+            print_output("-> compare_expr")
+            format_ast_with_extra_indent(expression)
+            format_ast_with_extra_indent(operator)
+            format_ast_with_extra_indent(additional_expression)
+
         case ExpressionNode(single_term_node, operator, additional_expression_node):
             print_output("-> expr")
             format_ast_with_extra_indent(single_term_node) 
@@ -106,7 +121,13 @@ def format_ast(indent_level: int, node: Node | ArithmeticOperator | None):
             print_output("-> inline_stmt")
             format_ast_with_extra_indent(statement)
 
+        case InlineStatementList(statement, additional_statement_list):
+            print_output("-> inline_stmt_list")
+            format_ast_with_extra_indent(statement)
+            format_ast_with_extra_indent(additional_statement_list)
+
         case _:
-            if isinstance(node, ArithmeticOperator):
+            OPERATOR_TYPES: tuple = (ArithmeticOperator, ComparisonOperator)
+            if isinstance(node, OPERATOR_TYPES):
                 print_output(node.value, True)
 
