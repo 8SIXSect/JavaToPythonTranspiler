@@ -1009,7 +1009,7 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body(
 
     tokens: Tuple[Token, ...] = (
         while_token, left_parenthesis_token, true_token, right_parenthesis_token,
-        left_curly_brace_token, identifier_token, divide_token, plus_token,
+        left_curly_brace_token, identifier_token, minus_token, divide_token,
         semi_colon_token, right_curly_brace_token,
         end_of_file_token
     )

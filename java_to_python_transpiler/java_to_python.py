@@ -258,8 +258,8 @@ class NodeSuccess:
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
-        InlineStatement, StatementList,
-        WhileStatement,
+        WhileStatement, InlineStatement,
+        StatementList,
     ]
 
 
@@ -489,22 +489,6 @@ class InlineStatement:
 
 
 @dataclass
-class StatementList:
-    """
-    Represents one or more InlineStatement objects.
-
-    `statement` (optional) is represented by an InlineStatement object; this the
-    first statement of the chain
-
-    `additional_statement_list` (optional) is represented by a
-    StatementList object; this allows to chain the parser together
-    """
-
-    statement: Optional[InlineStatement] = None
-    additional_statement_list: Optional[StatementList] = None
-
-
-@dataclass
 class WhileStatement:
     """
     Represents a while loop.
@@ -518,6 +502,22 @@ class WhileStatement:
 
     comparison_expressionn: ComparisonExpression
     statement_list: StatementList
+
+
+@dataclass
+class StatementList:
+    """
+    Represents one or more InlineStatement objects.
+
+    `statement` (optional) is represented by an InlineStatement object; this the
+    first statement of the chain
+
+    `additional_statement_list` (optional) is represented by a
+    StatementList object; this allows to chain the parser together
+    """
+
+    statement: Optional[InlineStatement] = None
+    additional_statement_list: Optional[StatementList] = None
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -610,6 +610,59 @@ def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement object
     """
+
+    tokens_with_keyword_removed: Tuple[Token, ...] = tokens[1:]
+
+    expected_left_paren_token: Token = tokens_with_keyword_removed[0]
+    if expected_left_paren_token.token_type != LEFT_PARENTHESIS_TOKEN_TYPE:
+        return report_error_in_parser(expected_left_paren_token.token_type)
+
+    tokens_with_left_paren_removed: Tuple[Token] = tokens_with_keyword_removed[1:]
+
+    node_result_comp_expression: NodeResult
+    node_result_comp_expression = parse_tokens_for_comparison_expression(
+        tokens_with_left_paren_removed
+    )
+
+    if isinstance(node_result_comp_expression, NodeFailure):
+        return node_result_comp_expression
+
+    assert isinstance(node_result_comp_expression.node, ComparisonExpression)
+
+    expected_right_paren_token: Token = node_result_comp_expression.tokens[0]
+    if expected_right_paren_token.token_type != RIGHT_PARENTHESIS_TOKEN_TYPE:
+        return report_error_in_parser(expected_right_paren_token.token_type)
+
+    tokens_with_right_paren_removed: Tuple[Token, ...]
+    tokens_with_right_paren_removed = node_result_comp_expression.tokens[1:]
+
+    expected_left_braces_token: Token = tokens_with_right_paren_removed[0]
+    if expected_left_braces_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_left_braces_token.token_type)
+
+    tokens_with_left_braces_removed: Tuple[Token, ...]
+    tokens_with_left_braces_removed = tokens_with_right_paren_removed[1:]
+
+    node_result_statement_list: NodeResult = parse_tokens_for_statement_list(
+        tokens_with_left_braces_removed
+    )
+
+    if isinstance(node_result_statement_list, NodeFailure):
+        return node_result_statement_list
+
+    assert isinstance(node_result_statement_list.node, StatementList)
+
+    expected_right_braces_token: Token = node_result_statement_list.tokens[0]
+    if expected_right_braces_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_right_braces_token.token_type)
+
+    tokens_with_right_braces_removed: Tuple[Token, ...]
+    tokens_with_right_braces_removed = node_result_statement_list.tokens[1:]
+
+    while_statement = WhileStatement(node_result_comp_expression.node,
+                                     node_result_statement_list.node)
+
+    return NodeSuccess(tokens_with_right_braces_removed, while_statement)
 
 
 def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
