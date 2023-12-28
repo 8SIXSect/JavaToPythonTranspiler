@@ -534,9 +534,9 @@ ParserResult = InlineStatement | ParserFailure
 
 
 def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
-    """ This functions purpose is to be the entrypoint for the parser """
+    """ This function's purpose is to be the entrypoint for the parser """
 
-    root_node_result: NodeResult = parse_tokens_for_inline_statement(tokens)
+    root_node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
 
     if isinstance(root_node_result, NodeFailure):
         return ParserFailure(root_node_result.error_message)
@@ -548,7 +548,7 @@ def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
 
 # TODO: Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
 # HOwever, that may only apply to statements but no if expr reaches semi, it stops
-NodeResult = Union[NodeSuccess, NodeFailure]
+NodeResult = NodeSuccess | NodeFailure
 VARIABLE_TYPES: Tuple[TokenType, ...] = (
     INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
     BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
