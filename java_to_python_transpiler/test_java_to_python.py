@@ -12,9 +12,9 @@ from java_to_python_transpiler.java_to_python import (
     SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, InlineStatement, InlineStatementList, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, parse_tokens,
+    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens,
     parse_tokens_for_argument_list, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement, parse_tokens_for_inline_statement_list,
-    parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization,
+    parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -34,6 +34,9 @@ right_parenthesis_token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
 comma_token = Token(COMMA_TOKEN_TYPE, ",")
 semi_colon_token = Token(SEMI_COLON_TOKEN_TYPE, ";")
 equals_token = Token(EQUALS_TOKEN_TYPE, "equals")
+
+
+while_token = Token(WHILE_TOKEN_TYPE, "WHILE")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -907,6 +910,114 @@ def test_parser_can_generate_correct_error_for_complex_comparison_expression():
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    parse the tokens when provided with a while loop without a body.
+    """
+
+    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+    tokens: Tuple[Token, ...] = (
+        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(false_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
+    
+    statement_list = InlineStatementList()
+
+    while_statement = WhileStatement(comp_expression, statement_list)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, while_statement)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condition():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    produce the correct error for a while statement with a syntax error in its
+    condition.
+    """
+
+    tokens: Tuple[Token, ...] = (
+        while_token, left_parenthesis_token, minus_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    parse the tokens when provided with a while with a non-empty body/
+    """
+ 
+    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tuple[Token, ...] = (
+        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, return_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(false_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
+    
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    statement_list = InlineStatementList(inline_statement)
+
+    while_statement = WhileStatement(comp_expression, statement_list)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, while_statement)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+
+    assert expected_output == node_result
+
+   
+def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body():
+    """
+    This test checks if the function `parse_tokens_for_while_staement` can
+    produce the correct error for a while statement with a syntax error in its
+    body.
+    """
+
+    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "variable")
+
+    tokens: Tuple[Token, ...] = (
+        while_token, left_parenthesis_token, true_token, right_parenthesis_token,
+        left_curly_brace_token, identifier_token, divide_token, plus_token,
+        semi_colon_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
 
     assert expected_output == node_result
 

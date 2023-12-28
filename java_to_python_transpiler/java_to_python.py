@@ -516,7 +516,7 @@ class WhileStatement:
     of the while loop
     """
 
-    comparison_expressionn: ComparisonExpression
+    comparison_expression: ComparisonExpression
     statement_list: InlineStatementList
 
 
