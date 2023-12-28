@@ -1,4 +1,5 @@
 import random
+from types import NotImplementedType
 from typing import List, Tuple
 
 from java_to_python_transpiler.java_to_python import (
@@ -13,7 +14,7 @@ from java_to_python_transpiler.java_to_python import (
     STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
     ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens,
-    parse_tokens_for_argument_list, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement, parse_tokens_for_statement_list,
+    parse_tokens_for_argument_list, parse_tokens_for_block_statement_body, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_factor, parse_tokens_for_inline_statement, parse_tokens_for_statement_list,
     parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
@@ -1021,6 +1022,95 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body(
 
     assert expected_output == node_result
 
+
+def test_parser_can_generate_correct_ast_for_block_statement_body():
+    """
+    This test checks if the function `parse_tokens_for_block_statement_body`
+    can correctly parse the tokens when provided with the correct input.
+    """
+    
+    variable_type_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        left_curly_brace_token, variable_type_token, identifier_token,
+        equals_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
+
+    variable_initialization = VariableInitialization(identifier_token.value,
+                                                     comp_expression)
+
+    inline_statement = InlineStatement(variable_initialization)
+    statement_list = StatementList(inline_statement)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, statement_list)
+
+    node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_block_statement_without_left_brace():
+    """
+    This test checks if the function `parse_tokens_for_block_statement_body`
+    can produce the correct error when given an input that omits the opening/left
+    curly brace.
+    """
+ 
+    variable_type_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        variable_type_token, identifier_token,
+        equals_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = \
+            ERROR_MESSAGE_FOR_PARSER.format(DOUBLE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
+    
+    assert expected_output == node_result
+    
+
+
+def test_parser_can_produce_error_for_block_statement_without_right_brace():
+    """
+    This test checks if the function `parse_tokens_for_block_statement_body`
+    can produce the correct error when given an input that omits the opening/left
+    curly brace.
+    """
+ 
+    variable_type_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, ...] = (
+        left_curly_brace_token, variable_type_token, identifier_token,
+        equals_token, decimal_literal_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
+    
+    assert expected_output == node_result
+    
 
 def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements():
     """

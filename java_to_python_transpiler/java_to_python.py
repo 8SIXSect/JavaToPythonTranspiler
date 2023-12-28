@@ -606,6 +606,16 @@ def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(result_for_additional_statement_list.tokens, statement_list)
 
 
+def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a StatementList object, but
+    also checks for open curly braces and closing curly braces (since this is
+    meant to be used in a block statement).
+    """
+
+    NotImplemented
+
+
 def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement object
@@ -617,7 +627,7 @@ def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     if expected_left_paren_token.token_type != LEFT_PARENTHESIS_TOKEN_TYPE:
         return report_error_in_parser(expected_left_paren_token.token_type)
 
-    tokens_with_left_paren_removed: Tuple[Token] = tokens_with_keyword_removed[1:]
+    tokens_with_left_paren_removed: Tuple[Token, ...] = tokens_with_keyword_removed[1:]
 
     node_result_comp_expression: NodeResult
     node_result_comp_expression = parse_tokens_for_comparison_expression(
