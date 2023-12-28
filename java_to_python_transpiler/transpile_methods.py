@@ -32,7 +32,7 @@ def test_parser(user_input: str):
         print(parser_result.error_messasge)
         return
 
-    format_ast(0, parser_result.statement)
+    format_ast(0, parser_result)
 
 
 def parse_file_and_print_ast(file_name: str):

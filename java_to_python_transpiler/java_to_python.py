@@ -437,12 +437,12 @@ class VariableInitialization:
 
     `identifier` is represented by a string; this is the name of the variable
 
-    `expression` is represented by an `ExpressionNode`; this is the value of the
-    variable
+    `comp_expression` is represented by a `ComparisonExpression`; this
+    is the value of the variable
     """
 
     identifier: str
-    expression: ExpressionNode
+    comp_expression: ComparisonExpression 
 
 
 @dataclass
@@ -512,10 +512,12 @@ class WhileStatement:
     `comparison_expression` is represented by a ComparisonExpression; this is
     the condition of the while loop
 
-    `statement_list`
+    `statement_list` is represented by an InlineStatementList; this is the body
+    of the while loop
     """
 
-    notimp: int
+    comparison_expressionn: ComparisonExpression
+    statement_list: InlineStatementList
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -531,7 +533,7 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     return NodeFailure(error_message)
 
 
-ParserResult = InlineStatement | ParserFailure
+ParserResult = InlineStatementList | ParserFailure
 
 
 def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
@@ -542,7 +544,7 @@ def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
     if isinstance(root_node_result, NodeFailure):
         return ParserFailure(root_node_result.error_message)
 
-    assert isinstance(root_node_result.node, InlineStatement)
+    assert isinstance(root_node_result.node, InlineStatementList)
 
     return root_node_result.node
 
@@ -805,20 +807,19 @@ def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeR
 
     tokens_with_equals_removed: Tuple[Token, ...] = tokens_with_identifier_removed[1:]
 
-    node_result_for_expression: NodeResult = parse_tokens_for_expression(
-        tokens_with_equals_removed
-    )
+    node_result_for_comp_expression: NodeResult = \
+            parse_tokens_for_comparison_expression(tokens_with_equals_removed)
 
-    if isinstance(node_result_for_expression, NodeFailure):
-        return node_result_for_expression
+    if isinstance(node_result_for_comp_expression, NodeFailure):
+        return node_result_for_comp_expression
 
-    assert isinstance(node_result_for_expression.node, ExpressionNode)
+    assert isinstance(node_result_for_comp_expression.node, ComparisonExpression)
 
     variable_initialization = VariableInitialization(
-        identifier_token.value, node_result_for_expression.node
+        identifier_token.value, node_result_for_comp_expression.node
     )
 
-    return NodeSuccess(node_result_for_expression.tokens, variable_initialization)
+    return NodeSuccess(node_result_for_comp_expression.tokens, variable_initialization)
 
 
 def parse_tokens_for_comparison_expression(tokens: Tuple[Token, ...]) -> NodeResult:

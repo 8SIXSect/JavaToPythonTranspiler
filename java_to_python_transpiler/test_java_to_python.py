@@ -996,7 +996,9 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
-    variable_increment = VariableInitialization(identifier_token.value, expression)
+    comparison_expression = ComparisonExpression(expression)
+    variable_increment = VariableInitialization(identifier_token.value,
+                                                comparison_expression)
 
     return_factor = FactorNode(identifier_token.value)
     return_term = TermNode(return_factor)
@@ -1092,9 +1094,10 @@ def test_parser_can_generate_correct_ast_for_initialization_with_semicolon():
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
 
     variable_initialization = VariableInitialization(identifier_token.value,
-                                                     expression)
+                                                     comparison_expression)
 
     inline_statement = InlineStatement(variable_initialization)
     
@@ -1143,18 +1146,21 @@ def test_parser_can_generate_correct_ast_for_variable_initialization():
 
     tokens: Tuple[Token, ...] = (
         variable_type_token, identifier_token, equals_token,
-        decimal_literal_token,
+        decimal_literal_token, semi_colon_token,
         end_of_file_token
     )
 
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression);
     
     variable_intialization = VariableInitialization(identifier_token.value,
-                                                    expression)
+                                                    comparison_expression)
 
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = (
+        semi_colon_token, end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, variable_intialization)
 
     node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
