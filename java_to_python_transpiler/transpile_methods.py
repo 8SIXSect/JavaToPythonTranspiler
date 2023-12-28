@@ -7,7 +7,7 @@ from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, InlineStatement, InlineStatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableIncrement, VariableInitialization, parse_tokens_for_comparison_expression,
+    LexerFailure, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens_for_comparison_expression,
     scan_and_tokenize_input,
     parse_tokens
 )
@@ -48,6 +48,7 @@ Node = Union[
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement, VariableIncrement,
     InlineStatement, InlineStatementList,
+    WhileStatement,
 
     ArithmeticOperator, ComparisonOperator
 ]
@@ -125,6 +126,11 @@ def format_ast(indent_level: int, node: Node | None):
             print_output("-> inline_stmt_list")
             format_ast_with_extra_indent(statement)
             format_ast_with_extra_indent(additional_statement_list)
+
+        case WhileStatement(comparison_expression, statement_list):
+            print_output("-> while_stmt")
+            format_ast_with_extra_indent(comparison_expression)
+            format_ast_with_extra_indent(statement_list)
 
         case _:
             OPERATOR_TYPES: tuple = (ArithmeticOperator, ComparisonOperator)
