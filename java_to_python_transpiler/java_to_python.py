@@ -258,7 +258,8 @@ class NodeSuccess:
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
-        InlineStatement
+        InlineStatement, InlineStatementList,
+        WhileStatement,
     ]
 
 
@@ -492,14 +493,14 @@ class InlineStatementList:
     """
     Represents one or more InlineStatement objects.
 
-    `statement` is represented by an InlineStatement object; this the first
-    statement of the chain
+    `statement` (optional) is represented by an InlineStatement object; this the
+    first statement of the chain
 
     `additional_statement_list` (optional) is represented by an
     InlineStatementList object; this allows to chain the parser together
     """
 
-    statement: InlineStatement
+    statement: Optional[InlineStatement] = None
     additional_statement_list: Optional[InlineStatementList] = None
 
 
