@@ -569,7 +569,49 @@ def parse_tokens_for_inline_statement_list(tokens: Tuple[Token, ...]) -> NodeRes
     Parses a tuple of tokens in order to construct an InlineStatementList object
     """
 
-    NotImplemented
+
+    initial_token: Token = tokens[0]
+    if initial_token.token_type == RIGHT_CURLY_BRACE_TOKEN_TYPE:
+
+        empty_inline_statement_list = InlineStatementList()
+        return NodeSuccess(tokens, empty_inline_statement_list)
+
+    node_result_for_initial_statement: NodeResult = \
+            parse_tokens_for_inline_statement(tokens)
+
+    if isinstance(node_result_for_initial_statement, NodeFailure):
+        return node_result_for_initial_statement
+
+    assert isinstance(node_result_for_initial_statement.node, InlineStatement)
+
+    current_token: Token = node_result_for_initial_statement.tokens[0]
+
+    # Eventually, take the eof out. There's another place that does this.
+    # take the eof out of there too
+    if current_token.token_type in (RIGHT_CURLY_BRACE_TOKEN_TYPE,
+                                    END_OF_FILE_TOKEN_TYPE):
+        simple_inline_statement_list = \
+                InlineStatementList(node_result_for_initial_statement.node)
+
+        return NodeSuccess(node_result_for_initial_statement.tokens,
+                           simple_inline_statement_list)
+
+    result_for_additional_statement_list: NodeResult
+    result_for_additional_statement_list = parse_tokens_for_inline_statement_list(
+        node_result_for_initial_statement.tokens
+    )
+
+    if isinstance(result_for_additional_statement_list, NodeFailure):
+        return result_for_additional_statement_list
+
+    assert isinstance(result_for_additional_statement_list.node, InlineStatementList)
+
+    statement_list = InlineStatementList(
+        node_result_for_initial_statement.node,
+        result_for_additional_statement_list.node
+    )
+
+    return NodeSuccess(result_for_additional_statement_list.tokens, statement_list)
 
 
 def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:

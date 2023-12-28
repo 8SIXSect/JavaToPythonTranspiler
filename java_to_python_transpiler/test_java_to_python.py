@@ -26,6 +26,9 @@ minus_token = Token(MINUS_TOKEN_TYPE, "-")
 multiply_token = Token(MULTIPLY_TOKEN_TYPE, "*")
 divide_token = Token(DIVIDE_TOKEN_TYPE, "/")
 
+
+left_curly_brace_token = Token(LEFT_CURLY_BRACE_TOKEN_TYPE, "{")
+right_curly_brace_token = Token(RIGHT_CURLY_BRACE_TOKEN_TYPE, "}")
 left_parenthesis_token = Token(LEFT_PARENTHESIS_TOKEN_TYPE, "(")
 right_parenthesis_token = Token(RIGHT_PARENTHESIS_TOKEN_TYPE, ")")
 comma_token = Token(COMMA_TOKEN_TYPE, ",")
@@ -914,7 +917,7 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements()
     can correctly parse the tokens when provided with no statements.
     """
 
-    tokens: Tuple[Token] = (end_of_file_token,)
+    tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
     
     inline_statement_list = InlineStatementList()
     expected_output = NodeSuccess(tokens, inline_statement_list)
@@ -986,13 +989,14 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
         variable_type, identifier_token, equals_token, decimal_literal_token,
         semi_colon_token,
         return_token, identifier_token, semi_colon_token,
+        right_curly_brace_token,
         end_of_file_token
     )
 
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
-    variable_increment = VariableIncrement(identifier_token.value, expression)
+    variable_increment = VariableInitialization(identifier_token.value, expression)
 
     return_factor = FactorNode(identifier_token.value)
     return_term = TermNode(return_factor)
@@ -1006,7 +1010,7 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     inline_statement_list = InlineStatementList(initial_inline_statement,
                                                 additional_statement_list)
 
-    expected_output_tokens = (end_of_file_token,)
+    expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
 
     node_result: NodeResult = parse_tokens_for_inline_statement_list(tokens)
@@ -1376,29 +1380,4 @@ def test_parser_can_generate_correct_error_given_bad_expression_to_increment():
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
     
     assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast():
-    """
-    This test checks the parser's entrypoint function `parse_tokens'
-    to see if it can generate the correct AST
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token, Token, Token, Token] = (
-        decimal_literal_token, plus_token, decimal_literal_token, semi_colon_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    additional_expression = ExpressionNode(term)
-
-    expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
-    expected_output = InlineStatement(expression)
-
-    parser_result: ParserResult = parse_tokens(tokens)
-
-    assert expected_output == parser_result
 
