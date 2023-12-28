@@ -465,12 +465,12 @@ class VariableIncrement:
     `identifier` is represented by a string; this is the variable being
     incremented
 
-    `expression` is represented by an ExpressionNode; this is the amount that
-    the variable is being incremented by
+    `comp_expression` is represented by ComparisonExpression; this is the amount
+    that the variable is being incremented by.
     """
 
     identifier: str
-    expression: ExpressionNode 
+    comp_expression: ComparisonExpression 
 
 
 @dataclass
@@ -741,18 +741,20 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
         factor = FactorNode(DEFAULT_INCREMENT)
         term = TermNode(factor)
         expression = ExpressionNode(term)
+        comparison_expression = ComparisonExpression(expression)
 
-        variable_increment = VariableIncrement(identifier_token.value, expression)
+        variable_increment = VariableIncrement(identifier_token.value,
+                                               comparison_expression)
 
         return NodeSuccess(tokens_with_increment_removed, variable_increment)
 
     node_result_for_expression: NodeResult = \
-            parse_tokens_for_expression(tokens_with_increment_removed)
+                parse_tokens_for_comparison_expression(tokens_with_increment_removed)
 
     if isinstance(node_result_for_expression, NodeFailure):
         return node_result_for_expression
 
-    assert isinstance(node_result_for_expression.node, ExpressionNode)
+    assert isinstance(node_result_for_expression.node, ComparisonExpression)
 
     variable_increment = VariableIncrement(identifier_token.value,
                                            node_result_for_expression.node)

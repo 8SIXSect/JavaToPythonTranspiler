@@ -1320,7 +1320,7 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
 
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yoworld")
     tokens: Tuple[Token, ...] = (
-        identifier_token, plus_token, plus_token,
+        identifier_token, plus_token, plus_token, semi_colon_token,
         end_of_file_token
     )
 
@@ -1329,10 +1329,11 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
     factor = FactorNode(DEFAULT_INCREMENT)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
 
-    variable_increment = VariableIncrement(identifier_token.value, expression)
+    variable_increment = VariableIncrement(identifier_token.value, comp_expression)
     
-    expected_output_tokens: Tuple[Token, ...] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, ...] = (semi_colon_token, end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, variable_increment)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
@@ -1350,16 +1351,18 @@ def test_parser_can_generate_correct_ast_for_increment_with_expression():
     decimal_literal_token: Token = generate_number_token_with_random_value()
     tokens: Tuple[Token, ...] = (
         identifier_token, plus_token, equals_token, decimal_literal_token,
+        semi_colon_token,
         end_of_file_token
     )
 
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
 
-    variable_increment = VariableIncrement(identifier_token.value, expression)
+    variable_increment = VariableIncrement(identifier_token.value, comp_expression)
     
-    expected_output_tokens: Tuple[Token, ...] = (end_of_file_token,)
+    expected_output_tokens: Tuple[Token, ...] = (semi_colon_token, end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, variable_increment)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
