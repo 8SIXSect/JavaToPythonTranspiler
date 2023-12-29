@@ -585,14 +585,12 @@ def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
     BLOCK_STATEMENT_KEYWORDS: Tuple[TokenType] = (
         WHILE_TOKEN_TYPE,
     )
-
-    if initial_token.token_type in BLOCK_STATEMENT_KEYWORDS:
-        node_result_for_initial_statement: NodeResult
-        node_result_for_initial_statement = parse_tokens_for_block_statement(tokens)
-        # todo: turn this a ternary
-    else:
-        node_result_for_initial_statement: NodeResult = \
-                parse_tokens_for_inline_statement(tokens)
+    
+    node_result_for_initial_statement: NodeResult = (
+        parse_tokens_for_block_statement(tokens)
+        if initial_token.token_type in BLOCK_STATEMENT_KEYWORDS
+        else parse_tokens_for_inline_statement(tokens)
+    )
 
     if isinstance(node_result_for_initial_statement, NodeFailure):
         return node_result_for_initial_statement
