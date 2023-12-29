@@ -653,7 +653,6 @@ def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     return report_error_in_parser("placeholder")
 
 
-# TODO: add two tests for parenthesis; one for left, one for right.
 def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement object
@@ -661,12 +660,48 @@ def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
 
     tokens_with_keyword_removed: Tokens = tokens[1:]
 
-    expected_left_paren_token: Token = tokens_with_keyword_removed[0]
+    node_result_for_comp_expression_with_paren: NodeResult
+    node_result_for_comp_expression_with_paren = parse_tokens_for_expression_in_paren(
+        tokens_with_keyword_removed
+    )
+
+    if isinstance(node_result_for_comp_expression_with_paren, NodeFailure):
+        return node_result_for_comp_expression_with_paren
+
+    assert isinstance(node_result_for_comp_expression_with_paren.node,
+                      ComparisonExpression)
+
+    node_result_for_block_statement: NodeResult
+    node_result_for_block_statement = parse_tokens_for_block_statement_body(
+        node_result_for_comp_expression_with_paren.tokens
+    )
+
+    if isinstance(node_result_for_block_statement, NodeFailure):
+        return node_result_for_block_statement
+
+    assert isinstance(node_result_for_block_statement.node, StatementList)
+
+    while_statement = WhileStatement(
+        node_result_for_comp_expression_with_paren.node,
+        node_result_for_block_statement.node
+    )
+
+    return NodeSuccess(node_result_for_block_statement.tokens, while_statement)
+
+
+# TODO add some tests for this
+def parse_tokens_for_expression_in_paren(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a ComparisonExpression object,
+    but also checks for open parenthesis and closing parenthesis.
+    """
+
+    expected_left_paren_token: Token = tokens[0]
     if expected_left_paren_token.token_type != LEFT_PARENTHESIS_TOKEN_TYPE:
         return report_error_in_parser(expected_left_paren_token.token_type)
-
-    tokens_with_left_paren_removed: Tokens = tokens_with_keyword_removed[1:]
-
+ 
+    tokens_with_left_paren_removed: Tokens = tokens[1:]
+    
     node_result_comp_expression: NodeResult
     node_result_comp_expression = parse_tokens_for_comparison_expression(
         tokens_with_left_paren_removed
@@ -684,20 +719,8 @@ def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
     tokens_with_right_paren_removed: Tokens
     tokens_with_right_paren_removed = node_result_comp_expression.tokens[1:]
 
-    node_result_for_block_statement: NodeResult
-    node_result_for_block_statement = parse_tokens_for_block_statement_body(
-        tokens_with_right_paren_removed
-    )
-
-    if isinstance(node_result_for_block_statement, NodeFailure):
-        return node_result_for_block_statement
-
-    assert isinstance(node_result_for_block_statement.node, StatementList)
-
-    while_statement = WhileStatement(node_result_comp_expression.node,
-                                     node_result_for_block_statement.node)
-
-    return NodeSuccess(node_result_for_block_statement.tokens, while_statement)
+    return NodeSuccess(tokens_with_right_paren_removed,
+                       node_result_comp_expression.node)
 
 
 def parse_tokens_for_block_statement_body(tokens: Tokens) -> NodeResult:
