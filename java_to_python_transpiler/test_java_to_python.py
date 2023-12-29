@@ -965,6 +965,50 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condi
     assert expected_output == node_result
 
 
+def test_parser_can_produce_error_for_while_statement_with_no_left_parenthesis():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    parse the tokenswhen provided with a while loop with no left parenthesis.
+    """
+
+    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
+
+    tokens: Tuple[Token, ...] = (
+        while_token, true_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TRUE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+    
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_while_statement_with_no_right_parenthesis():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    parse the tokenswhen provided with a while loop with no right parenthesis.
+    """
+
+    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+
+    tokens: Tuple[Token, ...] = (
+        while_token, left_parenthesis_token, false_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(LEFT_CURLY_BRACE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+    
+    assert expected_output == node_result
+
+
 def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body():
     """
     This test checks if the function `parse_tokens_for_while_statement` can
