@@ -128,7 +128,8 @@ def report_error_for_lexer(unknown_character: str) -> LexerFailure:
     return LexerFailure(error_message)
 
 
-LexerResult = Tuple[Token, ...] | LexerFailure
+Tokens = Tuple[Token, ...]
+LexerResult = Tokens | LexerFailure
 
 
 def scan_and_tokenize_input(user_input: str) -> LexerResult:
@@ -227,7 +228,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     end_of_file_token = Token(END_OF_FILE_TOKEN_TYPE, "")
     tokens_with_keywords_as_list.append(end_of_file_token)
 
-    tokens_as_tuple: Tuple[Token, ...] = tuple(tokens_with_keywords_as_list)
+    tokens_as_tuple: Tokens = tuple(tokens_with_keywords_as_list)
 
     return tokens_as_tuple 
 
@@ -252,7 +253,7 @@ class NodeSuccess:
     `node` is the output to be added to the AST
     """
 
-    tokens: Tuple[Token, ...]
+    tokens: Tokens
  
     node: Union[
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
@@ -549,7 +550,7 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
 ParserResult = StatementList | ParserFailure
 
 
-def parse_tokens(tokens: Tuple[Token, ...]) -> ParserResult:
+def parse_tokens(tokens: Tokens) -> ParserResult:
     """ This function's purpose is to be the entrypoint for the parser """
 
     root_node_result: NodeResult = parse_tokens_for_statement_list(tokens)
@@ -571,7 +572,7 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 )
 
 
-def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct an StatementList object
     """
@@ -629,7 +630,7 @@ def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
 
 
 # todo: add tests for this function
-def parse_tokens_for_block_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement or some
     other block statement.
@@ -653,9 +654,9 @@ def parse_tokens_for_block_statement(tokens: Tuple[Token, ...]) -> NodeResult:
 
 
 # another todo: move parse for block stmt body below while loop
-# todo: create a type called Tokens, alias it to Tuple[Token, ...] and replace
+# todo: create a type called Tokens, alias it to Tokens and replace
 # all instances in this file w/ it
-def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_block_statement_body(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a StatementList object, but
     also checks for open curly braces and closing curly braces (since this is
@@ -666,7 +667,7 @@ def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResu
     if expected_left_braces_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
         return report_error_in_parser(expected_left_braces_token.token_type)
 
-    tokens_with_left_braces_removed: Tuple[Token, ...] = tokens[1:]
+    tokens_with_left_braces_removed: Tokens = tokens[1:]
     node_result_for_statement_list: NodeResult = parse_tokens_for_statement_list(
         tokens_with_left_braces_removed
     )
@@ -680,7 +681,7 @@ def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResu
     if expected_right_braces_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
         return report_error_in_parser(expected_right_braces_token.token_type)
 
-    tokens_with_right_braces_removed: Tuple[Token, ...]
+    tokens_with_right_braces_removed: Tokens
     tokens_with_right_braces_removed = node_result_for_statement_list.tokens[1:]
 
     return NodeSuccess(tokens_with_right_braces_removed,
@@ -688,18 +689,18 @@ def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResu
 
 
 # TODO: add two tests for parenthesis; one for left, one for right.
-def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement object
     """
 
-    tokens_with_keyword_removed: Tuple[Token, ...] = tokens[1:]
+    tokens_with_keyword_removed: Tokens = tokens[1:]
 
     expected_left_paren_token: Token = tokens_with_keyword_removed[0]
     if expected_left_paren_token.token_type != LEFT_PARENTHESIS_TOKEN_TYPE:
         return report_error_in_parser(expected_left_paren_token.token_type)
 
-    tokens_with_left_paren_removed: Tuple[Token, ...] = tokens_with_keyword_removed[1:]
+    tokens_with_left_paren_removed: Tokens = tokens_with_keyword_removed[1:]
 
     node_result_comp_expression: NodeResult
     node_result_comp_expression = parse_tokens_for_comparison_expression(
@@ -715,7 +716,7 @@ def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     if expected_right_paren_token.token_type != RIGHT_PARENTHESIS_TOKEN_TYPE:
         return report_error_in_parser(expected_right_paren_token.token_type)
 
-    tokens_with_right_paren_removed: Tuple[Token, ...]
+    tokens_with_right_paren_removed: Tokens
     tokens_with_right_paren_removed = node_result_comp_expression.tokens[1:]
 
     node_result_for_block_statement: NodeResult
@@ -734,7 +735,7 @@ def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(node_result_for_block_statement.tokens, while_statement)
 
 
-def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct an InlineStatement object.
     """
@@ -755,7 +756,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
         if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
             return report_error_in_parser(expected_semicolon_token.token_type)
 
-        tokens_with_semicolon_removed: Tuple[Token, ...] = \
+        tokens_with_semicolon_removed: Tokens = \
                 node_result_for_return_statement.tokens[1:]
 
         inline_statement = InlineStatement(node_result_for_return_statement.node)
@@ -782,7 +783,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
         if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
             return report_error_in_parser(expected_semicolon_token.token_type)
        
-        tokens_with_semicolon_removed: Tuple[Token, ...] = \
+        tokens_with_semicolon_removed: Tokens = \
                 node_result_for_initialization.tokens[1:]
  
         inline_statement = InlineStatement(node_result_for_initialization.node)
@@ -814,7 +815,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
             if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
                 return report_error_in_parser(expected_semicolon_token.token_type)
 
-            tokens_with_semicolon_removed: Tuple[Token, ...] = \
+            tokens_with_semicolon_removed: Tokens = \
                     node_result_for_increment.tokens[1:]
 
             inline_statement = InlineStatement(node_result_for_increment.node)
@@ -839,7 +840,7 @@ def parse_tokens_for_inline_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(node_result_for_expression.tokens, inline_statement)
 
 
-def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_variable_increment(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a VariableIncrement object.
     """
@@ -853,7 +854,7 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
 
     # The purpose for removing the first two indicies is because inline stmt
     # already checks that the first three tokens are correct so we safely remove
-    tokens_with_increment_removed: Tuple[Token, ...] = tokens[3:]
+    tokens_with_increment_removed: Tokens = tokens[3:]
 
     if plus_or_equals_token.token_type == PLUS_TOKEN_TYPE:
         factor = FactorNode(DEFAULT_INCREMENT)
@@ -880,12 +881,12 @@ def parse_tokens_for_variable_increment(tokens: Tuple[Token, ...]) -> NodeResult
     return NodeSuccess(node_result_for_expression.tokens, variable_increment)
 
 
-def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_return_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a ReturnStatement object.
     """
 
-    tokens_with_return_token_removed: Tuple[Token, ...] = tokens[1:]
+    tokens_with_return_token_removed: Tokens = tokens[1:]
 
     current_token: Token = tokens_with_return_token_removed[0]
     if current_token.token_type == SEMI_COLON_TOKEN_TYPE:
@@ -907,24 +908,24 @@ def parse_tokens_for_return_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(node_result_for_comp_expression.tokens, return_statement)
 
 
-def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_variable_initialization(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a VariableInitialization
     object.
     """
 
-    tokens_with_variable_type_removed: Tuple[Token, ...] = tokens[1:]
+    tokens_with_variable_type_removed: Tokens = tokens[1:]
 
     identifier_token: Token = tokens_with_variable_type_removed[0]
     
-    tokens_with_identifier_removed: Tuple[Token, ...] = \
+    tokens_with_identifier_removed: Tokens = \
             tokens_with_variable_type_removed[1:]
 
     current_token: Token = tokens_with_identifier_removed[0]
     if current_token.token_type != EQUALS_TOKEN_TYPE:
         return report_error_in_parser(current_token.token_type)
 
-    tokens_with_equals_removed: Tuple[Token, ...] = tokens_with_identifier_removed[1:]
+    tokens_with_equals_removed: Tokens = tokens_with_identifier_removed[1:]
 
     node_result_for_comp_expression: NodeResult = \
             parse_tokens_for_comparison_expression(tokens_with_equals_removed)
@@ -941,7 +942,7 @@ def parse_tokens_for_variable_initialization(tokens: Tuple[Token, ...]) -> NodeR
     return NodeSuccess(node_result_for_comp_expression.tokens, variable_initialization)
 
 
-def parse_tokens_for_comparison_expression(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_comparison_expression(tokens: Tokens) -> NodeResult:
     """
     Parses a list of tokens to construct an ast for a boolean comparison
     expression.
@@ -974,7 +975,7 @@ def parse_tokens_for_comparison_expression(tokens: Tuple[Token, ...]) -> NodeRes
                                                 next_token.token_type)
 
     operator: ComparisonOperator
-    tokens_after_removing_operator: Tuple[Token, ...]
+    tokens_after_removing_operator: Tokens
     
     if token_types == (LESS_THAN_TOKEN_TYPE, EQUALS_TOKEN_TYPE):
         operator = ComparisonOperator.LESS_THAN_OR_EQUAL
@@ -1017,7 +1018,7 @@ def parse_tokens_for_comparison_expression(tokens: Tuple[Token, ...]) -> NodeRes
     return NodeSuccess(node_result_for_additional_expression.tokens, comparison_expression)
 
 
-def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_expression(tokens: Tokens) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical expression.
@@ -1048,7 +1049,7 @@ def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
 
     # The purpose of this statement is to "delete" the first index of tokens
     # (but it's a tuple so you can't modify it)
-    tokens_after_deleting_operator: Tuple[Token, ...] = term_node_result.tokens[1:]
+    tokens_after_deleting_operator: Tokens = term_node_result.tokens[1:]
 
     expression_node_operator = (
         ArithmeticOperator.PLUS
@@ -1074,7 +1075,7 @@ def parse_tokens_for_expression(tokens: Tuple[Token, ...]) -> NodeResult:
                        complex_expression_node)
 
 
-def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_term(tokens: Tokens) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical term.
@@ -1102,7 +1103,7 @@ def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
     if current_token.token_type not in TERM_TOKEN_TYPES:
         return node_success_for_simple_term 
 
-    tokens_after_deleting_operator: Tuple[Token, ...] = factor_node_result.tokens[1:]
+    tokens_after_deleting_operator: Tokens = factor_node_result.tokens[1:]
 
     term_node_operator = (
         ArithmeticOperator.MULTIPLY
@@ -1127,7 +1128,7 @@ def parse_tokens_for_term(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(additional_term_node_result.tokens, complex_term_node)
 
 
-def parse_tokens_for_factor(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_factor(tokens: Tokens) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
     a mathematical term.
@@ -1165,14 +1166,14 @@ def parse_tokens_for_factor(tokens: Tuple[Token, ...]) -> NodeResult:
 
         return NodeSuccess(node_result_for_method_call.tokens, factor_node)
 
-    tokens_after_deleting_current_token: Tuple[Token, ...] = tokens[1:]
+    tokens_after_deleting_current_token: Tokens = tokens[1:]
 
     # You may need to add a check for END_OF_FILE but idk yet
     factor_node = FactorNode(current_token.value)
     return NodeSuccess(tokens_after_deleting_current_token, factor_node)
 
 
-def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_method_call(tokens: Tokens) -> NodeResult:
     """
     This function parses a list of tokens in order to turn them into a MethodCall
     object.
@@ -1181,7 +1182,7 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
     identifier_token: Token = tokens[0]
 
     # The purpose of this line is to remove identifier token and left parenthesis
-    tokens_without_identifier_and_parenthesis: Tuple[Token, ...] = tokens[2:]
+    tokens_without_identifier_and_parenthesis: Tokens = tokens[2:]
 
     node_result_argument_list: NodeResult = \
             parse_tokens_for_argument_list(tokens_without_identifier_and_parenthesis)
@@ -1190,7 +1191,7 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
         return node_result_argument_list
 
     current_token: Token = node_result_argument_list.tokens[0]
-    tokens_after_deleting_right_parenthesis: Tuple[Token, ...] = \
+    tokens_after_deleting_right_parenthesis: Tokens = \
             node_result_argument_list.tokens[1:]
 
     if current_token.token_type != RIGHT_PARENTHESIS_TOKEN_TYPE:
@@ -1203,7 +1204,7 @@ def parse_tokens_for_method_call(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(tokens_after_deleting_right_parenthesis, method_call)
 
 
-def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
+def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
     """
     This function parses a list of tokens in order to turn them into an
     ArgumentList object.
@@ -1240,7 +1241,7 @@ def parse_tokens_for_argument_list(tokens: Tuple[Token, ...]) -> NodeResult:
         return NodeSuccess(node_result_expression.tokens, argument_list)
 
     # The purpose of this code is to delete comma from tokens
-    tokens_after_deleting_comma: Tuple[Token, ...] = node_result_expression.tokens[1:]
+    tokens_after_deleting_comma: Tokens = node_result_expression.tokens[1:]
 
     node_result_additional_argument_list: NodeResult = \
             parse_tokens_for_argument_list(tokens_after_deleting_comma)
