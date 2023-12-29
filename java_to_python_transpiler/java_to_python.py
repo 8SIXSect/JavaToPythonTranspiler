@@ -653,41 +653,6 @@ def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     return report_error_in_parser("placeholder")
 
 
-# another todo: move parse for block stmt body below while loop
-# todo: create a type called Tokens, alias it to Tokens and replace
-# all instances in this file w/ it
-def parse_tokens_for_block_statement_body(tokens: Tokens) -> NodeResult:
-    """
-    Parses a tuple of tokens in order to construct a StatementList object, but
-    also checks for open curly braces and closing curly braces (since this is
-    meant to be used in a block statement).
-    """
-
-    expected_left_braces_token: Token = tokens[0]
-    if expected_left_braces_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
-        return report_error_in_parser(expected_left_braces_token.token_type)
-
-    tokens_with_left_braces_removed: Tokens = tokens[1:]
-    node_result_for_statement_list: NodeResult = parse_tokens_for_statement_list(
-        tokens_with_left_braces_removed
-    )
-
-    if isinstance(node_result_for_statement_list, NodeFailure):
-        return node_result_for_statement_list
-
-    assert isinstance(node_result_for_statement_list.node, StatementList)
-
-    expected_right_braces_token: Token = node_result_for_statement_list.tokens[0]
-    if expected_right_braces_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
-        return report_error_in_parser(expected_right_braces_token.token_type)
-
-    tokens_with_right_braces_removed: Tokens
-    tokens_with_right_braces_removed = node_result_for_statement_list.tokens[1:]
-
-    return NodeSuccess(tokens_with_right_braces_removed,
-                       node_result_for_statement_list.node)
-
-
 # TODO: add two tests for parenthesis; one for left, one for right.
 def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
     """
@@ -733,6 +698,38 @@ def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
                                      node_result_for_block_statement.node)
 
     return NodeSuccess(node_result_for_block_statement.tokens, while_statement)
+
+
+def parse_tokens_for_block_statement_body(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a StatementList object, but
+    also checks for open curly braces and closing curly braces (since this is
+    meant to be used in a block statement).
+    """
+
+    expected_left_braces_token: Token = tokens[0]
+    if expected_left_braces_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_left_braces_token.token_type)
+
+    tokens_with_left_braces_removed: Tokens = tokens[1:]
+    node_result_for_statement_list: NodeResult = parse_tokens_for_statement_list(
+        tokens_with_left_braces_removed
+    )
+
+    if isinstance(node_result_for_statement_list, NodeFailure):
+        return node_result_for_statement_list
+
+    assert isinstance(node_result_for_statement_list.node, StatementList)
+
+    expected_right_braces_token: Token = node_result_for_statement_list.tokens[0]
+    if expected_right_braces_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_right_braces_token.token_type)
+
+    tokens_with_right_braces_removed: Tokens
+    tokens_with_right_braces_removed = node_result_for_statement_list.tokens[1:]
+
+    return NodeSuccess(tokens_with_right_braces_removed,
+                       node_result_for_statement_list.node)
 
 
 def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
