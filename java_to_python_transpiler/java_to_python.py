@@ -258,7 +258,9 @@ class NodeSuccess:
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
-        WhileStatement, InlineStatement,
+        InlineStatement,
+        WhileStatement,
+        BlockStatement,
         StatementList,
     ]
 
@@ -505,6 +507,17 @@ class WhileStatement:
 
 
 @dataclass
+class BlockStatement:
+    """
+    Represents a statement with its own curly braces.
+
+    `statement` is represented by some curly brace statement like WhileStatement
+    """
+
+    statement: WhileStatement
+
+
+@dataclass
 class StatementList:
     """
     Represents one or more InlineStatement objects.
@@ -516,7 +529,7 @@ class StatementList:
     StatementList object; this allows to chain the parser together
     """
 
-    statement: Optional[InlineStatement] = None
+    statement: InlineStatement | BlockStatement | None = None
     additional_statement_list: Optional[StatementList] = None
 
 
@@ -569,13 +582,24 @@ def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
         empty_statement_list = StatementList()
         return NodeSuccess(tokens, empty_statement_list)
 
-    node_result_for_initial_statement: NodeResult = \
-            parse_tokens_for_inline_statement(tokens)
+    BLOCK_STATEMENT_KEYWORDS: Tuple[TokenType] = (
+        WHILE_TOKEN_TYPE,
+    )
+
+    if initial_token.token_type in BLOCK_STATEMENT_KEYWORDS:
+        node_result_for_initial_statement: NodeResult
+        node_result_for_initial_statement = parse_tokens_for_block_statement(tokens)
+        # todo: turn this a ternary
+    else:
+        node_result_for_initial_statement: NodeResult = \
+                parse_tokens_for_inline_statement(tokens)
 
     if isinstance(node_result_for_initial_statement, NodeFailure):
         return node_result_for_initial_statement
 
-    assert isinstance(node_result_for_initial_statement.node, InlineStatement)
+    EXPECTED_TYPES: Tuple[type, type] = (InlineStatement, BlockStatement)
+
+    assert isinstance(node_result_for_initial_statement.node, EXPECTED_TYPES)
 
     current_token: Token = node_result_for_initial_statement.tokens[0]
 
@@ -606,6 +630,31 @@ def parse_tokens_for_statement_list(tokens: Tuple[Token, ...]) -> NodeResult:
     return NodeSuccess(result_for_additional_statement_list.tokens, statement_list)
 
 
+# todo: add tests for this function
+def parse_tokens_for_block_statement(tokens: Tuple[Token, ...]) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a WhileStatement or some
+    other block statement.
+    """
+
+    initial_token: Token = tokens[0]
+
+    if initial_token.token_type == WHILE_TOKEN_TYPE:
+        node_result_for_while_statement: NodeResult
+        node_result_for_while_statement = parse_tokens_for_while_statement(tokens)
+
+        if isinstance(node_result_for_while_statement, NodeFailure):
+            return report_error_in_parser(initial_token.token_type)
+
+        assert isinstance(node_result_for_while_statement.node, WhileStatement)
+        
+        block_statement = BlockStatement(node_result_for_while_statement.node)
+        return NodeSuccess(node_result_for_while_statement.tokens, block_statement)
+
+    return report_error_in_parser("placeholder")
+
+
+# another todo: move parse for block stmt body below while loop
 # todo: create a type called Tokens, alias it to Tuple[Token, ...] and replace
 # all instances in this file w/ it
 def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResult:
@@ -640,6 +689,7 @@ def parse_tokens_for_block_statement_body(tokens: Tuple[Token, ...]) -> NodeResu
                        node_result_for_statement_list.node)
 
 
+# TODO: add two tests for parenthesis; one for left, one for right.
 def parse_tokens_for_while_statement(tokens: Tuple[Token, ...]) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement object

@@ -4,7 +4,7 @@ This module contains methods for transpiling source to source
 
 from typing import Union
 from java_to_python_transpiler.java_to_python import (
-    ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
+    ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, InlineStatement, StatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
     LexerFailure, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens_for_comparison_expression,
@@ -47,7 +47,9 @@ Node = Union[
     ComparisonExpression, ExpressionNode, TermNode, FactorNode,
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement, VariableIncrement,
-    InlineStatement, WhileStatement,
+    InlineStatement,
+    WhileStatement,
+    BlockStatement,
     StatementList,
 
     ArithmeticOperator, ComparisonOperator
@@ -122,15 +124,19 @@ def format_ast(indent_level: int, node: Node | None):
             print_output("-> inline_stmt")
             format_ast_with_extra_indent(statement)
 
-        case StatementList(statement, additional_statement_list):
-            print_output("-> stmt_list")
-            format_ast_with_extra_indent(statement)
-            format_ast_with_extra_indent(additional_statement_list)
-
         case WhileStatement(comparison_expression, statement_list):
             print_output("-> while_stmt")
             format_ast_with_extra_indent(comparison_expression)
             format_ast_with_extra_indent(statement_list)
+
+        case BlockStatement(statement):
+            print_output("-> block_stmt")
+            format_ast_with_extra_indent(statement)
+
+        case StatementList(statement, additional_statement_list):
+            print_output("-> stmt_list")
+            format_ast_with_extra_indent(statement)
+            format_ast_with_extra_indent(additional_statement_list)
 
         case _:
             OPERATOR_TYPES: tuple = (ArithmeticOperator, ComparisonOperator)
