@@ -744,8 +744,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
     
     if current_token.token_type == RETURN_TOKEN_TYPE:
         
-        node_result_for_return_statement: NodeResult = \
-                parse_tokens_for_return_statement(tokens)
+        node_result_for_return_statement: NodeResult
+        node_result_for_return_statement = parse_tokens_for_return_statement(tokens)
 
         if isinstance(node_result_for_return_statement, NodeFailure):
             return node_result_for_return_statement
@@ -756,8 +756,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
         if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
             return report_error_in_parser(expected_semicolon_token.token_type)
 
-        tokens_with_semicolon_removed: Tokens = \
-                node_result_for_return_statement.tokens[1:]
+        tokens_with_semicolon_removed: Tokens
+        tokens_with_semicolon_removed = node_result_for_return_statement.tokens[1:]
 
         inline_statement = InlineStatement(node_result_for_return_statement.node)
         return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
@@ -782,9 +782,9 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
 
         if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
             return report_error_in_parser(expected_semicolon_token.token_type)
-       
-        tokens_with_semicolon_removed: Tokens = \
-                node_result_for_initialization.tokens[1:]
+
+        tokens_with_semicolon_removed: Tokens
+        tokens_with_semicolon_removed = node_result_for_initialization.tokens[1:]
  
         inline_statement = InlineStatement(node_result_for_initialization.node)
         return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
@@ -803,8 +803,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
         )
 
         if all(conditions_for_variable_increment):
-            node_result_for_increment: NodeResult = \
-                    parse_tokens_for_variable_increment(tokens)
+            node_result_for_increment: NodeResult
+            node_result_for_increment = parse_tokens_for_variable_increment(tokens)
 
             if isinstance(node_result_for_increment, NodeFailure):
                 return node_result_for_increment
@@ -815,8 +815,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
             if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
                 return report_error_in_parser(expected_semicolon_token.token_type)
 
-            tokens_with_semicolon_removed: Tokens = \
-                    node_result_for_increment.tokens[1:]
+            tokens_with_semicolon_removed: Tokens
+            tokens_with_semicolon_removed = node_result_for_increment.tokens[1:]
 
             inline_statement = InlineStatement(node_result_for_increment.node)
 
@@ -867,8 +867,10 @@ def parse_tokens_for_variable_increment(tokens: Tokens) -> NodeResult:
 
         return NodeSuccess(tokens_with_increment_removed, variable_increment)
 
-    node_result_for_expression: NodeResult = \
-                parse_tokens_for_comparison_expression(tokens_with_increment_removed)
+    node_result_for_expression: NodeResult
+    node_result_for_expression = parse_tokens_for_comparison_expression(
+        tokens_with_increment_removed
+    )
 
     if isinstance(node_result_for_expression, NodeFailure):
         return node_result_for_expression
