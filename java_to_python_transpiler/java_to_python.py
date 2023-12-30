@@ -531,7 +531,7 @@ class BlockStatement:
     `statement` is represented by some curly brace statement like WhileStatement
     """
 
-    statement: WhileStatement
+    statement: WhileStatement | IfStatement
 
 
 @dataclass
@@ -599,8 +599,8 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
         empty_statement_list = StatementList()
         return NodeSuccess(tokens, empty_statement_list)
 
-    BLOCK_STATEMENT_KEYWORDS: Tuple[TokenType] = (
-        WHILE_TOKEN_TYPE,
+    BLOCK_STATEMENT_KEYWORDS: Tuple[TokenType, ...] = (
+        WHILE_TOKEN_TYPE, IF_TOKEN_TYPE,
     )
     
     node_result_for_initial_statement: NodeResult = (
@@ -667,7 +667,20 @@ def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
         block_statement = BlockStatement(node_result_for_while_statement.node)
         return NodeSuccess(node_result_for_while_statement.tokens, block_statement)
 
-    return report_error_in_parser("placeholder")
+    elif initial_token.token_type == IF_TOKEN_TYPE:
+        node_result_for_if_statement: NodeResult
+        node_result_for_if_statement = parse_tokens_for_if_statement(tokens)
+
+        if isinstance(node_result_for_if_statement, NodeFailure):
+            return report_error_in_parser(initial_token.token_type)
+
+        assert isinstance(node_result_for_if_statement.node, IfStatement)
+
+        block_statement = BlockStatement(node_result_for_if_statement.node)
+        return NodeSuccess(node_result_for_if_statement.tokens, block_statement)
+
+    # This should be unreachable; maybe restructure the code to be more elegant
+    assert False
 
 
 def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:

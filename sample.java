@@ -1,4 +1,4 @@
-while (true) {
+if (true) {
     return x;
-}
 
+}
