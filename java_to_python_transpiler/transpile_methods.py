@@ -48,7 +48,7 @@ Node = Union[
     MethodCall, ArgumentList,
     VariableInitialization, ReturnStatement, VariableIncrement,
     InlineStatement,
-    WhileStatement,
+    WhileStatement, IfStatement,
     BlockStatement,
     StatementList,
 
