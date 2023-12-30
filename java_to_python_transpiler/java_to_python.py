@@ -260,7 +260,7 @@ class NodeSuccess:
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
         InlineStatement,
-        WhileStatement,
+        WhileStatement, IfStatement,
         BlockStatement,
         StatementList,
     ]
@@ -492,6 +492,22 @@ class InlineStatement:
 
 
 @dataclass
+class IfStatement:
+    """
+    Represents an if statement.
+    
+    `comparison_expression` is represented by a ComparisonExpression; this is
+    the condition of the if statement.
+
+    `statement_list` is represented by a StatementList; this is the body of the
+    if statement.
+    """
+
+    comparison_expression: ComparisonExpression
+    statement_list: StatementList
+
+
+@dataclass
 class WhileStatement:
     """
     Represents a while loop.
@@ -630,6 +646,7 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
 
 
 # todo: add tests for this function
+# im gonna wait on adding tests till i create if stmts
 def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement or some
@@ -689,7 +706,42 @@ def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
     return NodeSuccess(node_result_for_block_statement.tokens, while_statement)
 
 
-# TODO add some tests for this
+def parse_tokens_for_if_statement(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct an IfStatement object.
+    """
+
+    tokens_with_keyword_removed: Tokens = tokens[1:]
+
+    node_result_for_comp_expression_with_paren: NodeResult
+    node_result_for_comp_expression_with_paren = parse_tokens_for_expression_in_paren(
+        tokens_with_keyword_removed
+    )
+
+    if isinstance(node_result_for_comp_expression_with_paren, NodeFailure):
+        return node_result_for_comp_expression_with_paren
+
+    assert isinstance(node_result_for_comp_expression_with_paren.node,
+                      ComparisonExpression)
+
+    node_result_for_block_statement: NodeResult
+    node_result_for_block_statement = parse_tokens_for_block_statement_body(
+        node_result_for_comp_expression_with_paren.tokens
+    )
+
+    if isinstance(node_result_for_block_statement, NodeFailure):
+        return node_result_for_block_statement
+
+    assert isinstance(node_result_for_block_statement.node, StatementList)
+
+    if_statement = IfStatement(
+        node_result_for_comp_expression_with_paren.node,
+        node_result_for_block_statement.node
+    )
+
+    return NodeSuccess(node_result_for_block_statement.tokens, if_statement)
+
+
 def parse_tokens_for_expression_in_paren(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a ComparisonExpression object,
