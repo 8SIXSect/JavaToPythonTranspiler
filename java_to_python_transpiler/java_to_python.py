@@ -647,6 +647,10 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
 
 # todo: add tests for this function
 # im gonna wait on adding tests till i create if stmts
+# todo: make it so you can nest stmts
+# todo: make it so you can make stmts next to eachother
+# todo: add else and else if clauses to if (probably do this first; this ez)
+
 def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a WhileStatement or some
@@ -700,6 +704,8 @@ def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
 
     assert isinstance(node_result_for_comp_expression_with_paren.node,
                       ComparisonExpression)
+
+    #breakpoint()
 
     node_result_for_block_statement: NodeResult
     node_result_for_block_statement = parse_tokens_for_block_statement_body(
@@ -920,9 +926,12 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
     
     if expected_semicolon_token.token_type != SEMI_COLON_TOKEN_TYPE:
         return report_error_in_parser(expected_semicolon_token.token_type)
- 
+
+    tokens_with_semicolon_removed: Tokens
+    tokens_with_semicolon_removed = node_result_for_expression.tokens[1:]
+
     inline_statement = InlineStatement(node_result_for_expression.node)
-    return NodeSuccess(node_result_for_expression.tokens, inline_statement)
+    return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
 
 
 def parse_tokens_for_variable_increment(tokens: Tokens) -> NodeResult:
