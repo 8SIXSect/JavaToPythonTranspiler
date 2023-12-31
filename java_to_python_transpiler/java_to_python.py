@@ -505,6 +505,8 @@ class IfStatement:
 
     comparison_expression: ComparisonExpression
     statement_list: StatementList
+    additional_if_statement: Optional[IfStatement] = None
+    else_clause: Optional[StatementList] = None
 
 
 @dataclass
@@ -647,8 +649,6 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
 
 # todo: add tests for this function
 # im gonna wait on adding tests till i create if stmts
-# todo: make it so you can nest stmts
-# todo: make it so you can make stmts next to eachother
 # todo: add else and else if clauses to if (probably do this first; this ez)
 
 def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
