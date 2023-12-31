@@ -1,21 +1,32 @@
 import random
-from types import NotImplementedType
-from typing import List, Tuple
+from typing import Tuple
 
 from java_to_python_transpiler.java_to_python import (
-    CHAR_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE, DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE,
-    END_OF_FILE_TOKEN_TYPE, EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER, EXCLAMATION_TOKEN_TYPE, FALSE_TOKEN_TYPE,
-    FLOAT_LITERAL_TOKEN_TYPE, GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, IF_TOKEN_TYPE, INT_TOKEN_TYPE,
-    LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
-    LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, LONG_TOKEN_TYPE, MINUS_TOKEN_TYPE,
-    MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RETURN_TOKEN_TYPE, RIGHT_BRACKET_TOKEN_TYPE,
-    RIGHT_CURLY_BRACE_TOKEN_TYPE, RIGHT_PARENTHESIS_TOKEN_TYPE,
-    SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE, SINGLE_LINE_COMMENT_TOKEN_TYPE,
-    STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE, WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression, ComparisonOperator,
-    ExpressionNode, FactorNode, IfStatement, InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure, NodeResult, NodeSuccess,
-    ParserFailure, ReturnStatement, TermNode, Token, LexerResult, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens,
-    parse_tokens_for_argument_list, parse_tokens_for_block_statement_body, parse_tokens_for_comparison_expression, parse_tokens_for_expression, parse_tokens_for_expression_in_paren, parse_tokens_for_factor, parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_statement_list,
-    parse_tokens_for_method_call, parse_tokens_for_return_statement, parse_tokens_for_term, parse_tokens_for_variable_increment, parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
+    CHAR_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE,
+    DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE,
+    EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
+    EXCLAMATION_TOKEN_TYPE, FALSE_TOKEN_TYPE, FLOAT_LITERAL_TOKEN_TYPE,
+    GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, IF_TOKEN_TYPE,
+    INT_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
+    LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, LONG_TOKEN_TYPE,
+    MINUS_TOKEN_TYPE, MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RETURN_TOKEN_TYPE,
+    RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE,
+    RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE,
+    SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
+    WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression,
+    ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
+    InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure,
+    NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
+    LexerResult, VariableIncrement, VariableInitialization, WhileStatement,
+    parse_tokens, parse_tokens_for_argument_list,
+    parse_tokens_for_block_statement_body,
+    parse_tokens_for_comparison_expression, parse_tokens_for_expression,
+    parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
+    parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
+    parse_tokens_for_statement_list, parse_tokens_for_method_call,
+    parse_tokens_for_return_statement, parse_tokens_for_term,
+    parse_tokens_for_variable_increment,
+    parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
     report_error_for_lexer, scan_and_tokenize_input, ParserResult
 )
 
@@ -345,8 +356,9 @@ def test_parser_can_generate_correct_ast_for_single_argument_list():
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
 
-    argument_list = ArgumentList(expression)
+    argument_list = ArgumentList(comparison_expression)
     
     expected_output_tokens: Tuple[Token, Token] = (
         right_parenthesis_token, end_of_file_token
@@ -376,9 +388,10 @@ def test_parser_can_generate_correct_ast_for_multiple_argument_list():
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
 
-    additional_argument_list = ArgumentList(expression)
-    argument_list = ArgumentList(expression, additional_argument_list)
+    additional_argument_list = ArgumentList(comparison_expression)
+    argument_list = ArgumentList(comparison_expression, additional_argument_list)
     
     expected_output_tokens: Tuple[Token, Token] = (
         right_parenthesis_token, end_of_file_token
@@ -475,8 +488,9 @@ def test_parser_can_generate_correct_ast_for_single_argument_method_call():
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
 
-    argument_list = ArgumentList(expression)
+    argument_list = ArgumentList(comparison_expression)
     method_call = MethodCall(identifier_token.value, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
@@ -505,9 +519,10 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
 
-    additional_argument_list = ArgumentList(expression)
-    argument_list = ArgumentList(expression, additional_argument_list)
+    additional_argument_list = ArgumentList(comparison_expression)
+    argument_list = ArgumentList(comparison_expression, additional_argument_list)
     method_call = MethodCall(identifier_token.value, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)

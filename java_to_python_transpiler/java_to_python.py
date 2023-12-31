@@ -422,14 +422,14 @@ class ArgumentList:
     """
     Represents a list of arguments.
 
-    `argument` is represented by an expression node.
+    `argument` is represented by an comparisn expression node.
 
     `additonal_argument_list` represents additional arguments. This
     field defaults to None; when it is None, it represents a method being called
     with a singular argument.
     """
 
-    argument: Optional[ExpressionNode] = None
+    argument: Optional[ComparisonExpression] = None
     additional_argument_list: Optional[ArgumentList] = None
 
 
@@ -1316,28 +1316,29 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
         argument_list = ArgumentList()
         return NodeSuccess(tokens, argument_list)
 
-    node_result_expression: NodeResult = parse_tokens_for_expression(tokens)
+    node_result_comp_expression: NodeResult
+    node_result_comp_expression = parse_tokens_for_comparison_expression(tokens)
 
-    if isinstance(node_result_expression, NodeFailure):
-        return node_result_expression
+    if isinstance(node_result_comp_expression, NodeFailure):
+        return node_result_comp_expression
 
     NEXT_EXPECTED_TOKEN_TYPES: Tuple[TokenType, TokenType] = (
         COMMA_TOKEN_TYPE,
         RIGHT_PARENTHESIS_TOKEN_TYPE
     )
 
-    next_token: Token = node_result_expression.tokens[0]
+    next_token: Token = node_result_comp_expression.tokens[0]
     if next_token.token_type not in NEXT_EXPECTED_TOKEN_TYPES:
         return report_error_in_parser(next_token.token_type)
 
-    assert isinstance(node_result_expression.node, ExpressionNode)
+    assert isinstance(node_result_comp_expression.node, ComparisonExpression)
 
     if next_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
-        argument_list = ArgumentList(node_result_expression.node)
-        return NodeSuccess(node_result_expression.tokens, argument_list)
+        argument_list = ArgumentList(node_result_comp_expression.node)
+        return NodeSuccess(node_result_comp_expression.tokens, argument_list)
 
     # The purpose of this code is to delete comma from tokens
-    tokens_after_deleting_comma: Tokens = node_result_expression.tokens[1:]
+    tokens_after_deleting_comma: Tokens = node_result_comp_expression.tokens[1:]
 
     node_result_additional_argument_list: NodeResult = \
             parse_tokens_for_argument_list(tokens_after_deleting_comma)
@@ -1348,7 +1349,7 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
     assert isinstance(node_result_additional_argument_list.node, ArgumentList)
 
     argument_list = ArgumentList(
-        node_result_expression.node,
+        node_result_comp_expression.node,
         node_result_additional_argument_list.node
     )
 
