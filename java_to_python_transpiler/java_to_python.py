@@ -1058,7 +1058,7 @@ def parse_tokens_for_comparison_expression(tokens: Tokens) -> NodeResult:
 
     current_token: Token = node_result_for_expression.tokens[0]
     if current_token.token_type in (RIGHT_PARENTHESIS_TOKEN_TYPE,
-                                    SEMI_COLON_TOKEN_TYPE):
+                                    SEMI_COLON_TOKEN_TYPE, COMMA_TOKEN_TYPE):
         
         comparison_expression = ComparisonExpression(node_result_for_expression.node)
         return NodeSuccess(node_result_for_expression.tokens, comparison_expression)
@@ -1315,6 +1315,8 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
     if current_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
         argument_list = ArgumentList()
         return NodeSuccess(tokens, argument_list)
+
+    #breakpoint()
 
     node_result_comp_expression: NodeResult
     node_result_comp_expression = parse_tokens_for_comparison_expression(tokens)
