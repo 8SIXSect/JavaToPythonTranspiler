@@ -3,7 +3,7 @@ from typing import Tuple
 
 from java_to_python_transpiler.java_to_python import (
     CHAR_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE,
-    DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE,
+    DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, ELSE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE,
     EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
     EXCLAMATION_TOKEN_TYPE, FALSE_TOKEN_TYPE, FLOAT_LITERAL_TOKEN_TYPE,
     GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, IF_TOKEN_TYPE,
@@ -17,7 +17,7 @@ from java_to_python_transpiler.java_to_python import (
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
     InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
-    LexerResult, VariableIncrement, VariableInitialization, WhileStatement,
+    LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
     parse_tokens, parse_tokens_for_argument_list,
     parse_tokens_for_block_statement_body,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
@@ -48,8 +48,14 @@ semi_colon_token = Token(SEMI_COLON_TOKEN_TYPE, ";")
 equals_token = Token(EQUALS_TOKEN_TYPE, "equals")
 
 
+
+true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
+false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+
+
 while_token = Token(WHILE_TOKEN_TYPE, "WHILE")
 if_token = Token(IF_TOKEN_TYPE, "IF")
+else_token = Token(ELSE_TOKEN_TYPE, "ELSE")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -101,7 +107,7 @@ def test_lexer_can_generate_token_for_grouping_characters():
     left_bracket_token = Token(LEFT_BRACKET_TOKEN_TYPE, "[")
     right_bracket_token = Token(RIGHT_BRACKET_TOKEN_TYPE, "]")
 
-    expected_output: Tuple[Token, ...] = (
+    expected_output: Tokens = (
         left_parenthesis_token, right_parenthesis_token,
         left_curly_braces_token, right_curly_braces_token,
         left_bracket_token, right_bracket_token,
@@ -124,7 +130,7 @@ def test_lexer_can_generate_tokens_for_punctuation_characters():
     semi_colon_token = Token(SEMI_COLON_TOKEN_TYPE, ";")
     comma_token = Token(COMMA_TOKEN_TYPE, ",")
 
-    expected_output: Tuple[Token, ...] = (
+    expected_output: Tokens = (
         semi_colon_token, comma_token, comma_token, semi_colon_token,
         end_of_file_token
     )
@@ -146,7 +152,7 @@ def test_lexer_can_generate_tokens_for_comparison_operators():
     greater_than_token = Token(GREATER_THAN_TOKEN_TYPE, ">")
     equals_token = Token(EQUALS_TOKEN_TYPE, "=")
 
-    expected_output: Tuple[Token, ...] = (
+    expected_output: Tokens = (
         equals_token, greater_than_token, equals_token, less_than_token,
         equals_token,
         end_of_file_token
@@ -170,7 +176,7 @@ def test_lexer_can_generate_tokens_for_arithmetic_operators():
     multiply_token = Token(MULTIPLY_TOKEN_TYPE, "*")
     divide_token = Token(DIVIDE_TOKEN_TYPE, "/")
 
-    expected_output: Tuple[Token, ...] = (
+    expected_output: Tokens = (
         plus_token, plus_token, divide_token, multiply_token, minus_token,
         divide_token,
         end_of_file_token
@@ -245,7 +251,7 @@ def test_lexer_can_generate_tokens_for_identifiers():
     second_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sixth")
     third_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sector")
 
-    expected_output: Tuple[Token, ...] = (
+    expected_output: Tokens = (
         first_identifier_token, second_identifier_token, third_identifier_token,
         end_of_file_token
     )
@@ -299,7 +305,7 @@ def test_lexer_can_generate_proper_keyword_tokens():
     short_token = Token(SHORT_TOKEN_TYPE, "short")
     while_token = Token(WHILE_TOKEN_TYPE, "while")
 
-    expected_output: Tuple[Token, ...] = (
+    expected_output: Tokens = (
         true_token, short_token, while_token,
         end_of_file_token
     )
@@ -379,7 +385,7 @@ def test_parser_can_generate_correct_ast_for_multiple_argument_list():
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         decimal_literal_token, comma_token, decimal_literal_token,
         right_parenthesis_token,
         end_of_file_token
@@ -411,7 +417,7 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         decimal_literal_token, comma_token, decimal_literal_token,
         decimal_literal_token, right_parenthesis_token,
         end_of_file_token
@@ -510,7 +516,7 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         identifier_token, left_parenthesis_token, decimal_literal_token,
         comma_token, decimal_literal_token, right_parenthesis_token,
         end_of_file_token
@@ -682,7 +688,7 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
  
     decimal_literal_token: Token = generate_number_token_with_random_value() 
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         decimal_literal_token, multiply_token, decimal_literal_token,
         divide_token, decimal_literal_token,
         end_of_file_token
@@ -816,7 +822,6 @@ def test_parser_can_generate_correct_ast_for_simple_comparison_expression():
     additional expression.
     """
 
-    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
     tokens: Tuple[Token, Token, Token] = (
         true_token, right_parenthesis_token,
         end_of_file_token
@@ -845,7 +850,7 @@ def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "Lookatme")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         identifier_token, multiply_token, decimal_literal_token,
         right_parenthesis_token,
         end_of_file_token
@@ -877,11 +882,9 @@ def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
     given an input with an operator and an additional expression.
     """
 
-    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
-    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
     exclamation_token = Token(EXCLAMATION_TOKEN_TYPE, "EXCLAMATION")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         true_token, exclamation_token, equals_token, false_token,
         right_parenthesis_token,
         end_of_file_token
@@ -918,7 +921,7 @@ def test_parser_can_generate_correct_error_for_complex_comparison_expression():
     decimal_literal_token: Token = generate_number_token_with_random_value()
     less_than_token = Token(LESS_THAN_TOKEN_TYPE, "<")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         decimal_literal_token, less_than_token, plus_token,
         end_of_file_token
     )
@@ -938,9 +941,7 @@ def test_parser_can_produce_error_for_comp_expression_with_no_left_paren():
     parenthesis.
     """
 
-    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
-
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         true_token, right_parenthesis_token,
         end_of_file_token
     )
@@ -960,9 +961,7 @@ def test_parser_can_produce_error_for_comp_expression_with_no_right_paren():
     parenthesis.
     """
 
-    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
-
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         left_parenthesis_token, false_token,
         end_of_file_token
     )
@@ -981,8 +980,7 @@ def test_parser_can_generate_correct_ast_for_if_statement_with_empty_body():
     the tokens when provided with an if statement without a body.
     """
  
-    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         if_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, right_curly_brace_token,
         end_of_file_token
@@ -1011,7 +1009,7 @@ def test_parser_can_generate_error_for_if_statement_with_faulty_condition():
     condition.
     """
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         if_token, left_parenthesis_token, minus_token, right_parenthesis_token,
         left_curly_brace_token, right_curly_brace_token,
         end_of_file_token
@@ -1031,9 +1029,8 @@ def test_parser_can_generate_correct_ast_for_if_statement_with_non_empty_body():
     parse the tokens when provided with a if with a non-empty body/
     """
 
-    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
     return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         if_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, return_token, false_token, semi_colon_token,
         right_curly_brace_token,
@@ -1065,10 +1062,9 @@ def test_parser_can_generate_correct_error_for_if_statement_with_faulty_body():
     body.
     """
 
-    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "variable")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         if_token, left_parenthesis_token, true_token, right_parenthesis_token,
         left_curly_brace_token, identifier_token, minus_token, divide_token,
         semi_colon_token, right_curly_brace_token,
@@ -1083,6 +1079,230 @@ def test_parser_can_generate_correct_error_for_if_statement_with_faulty_body():
     assert expected_output == node_result
 
 
+def test_parser_can_generate_correct_ast_for_if_else_if_statement():
+    """
+    This test checks if the function `parse_tokens_for_if_statement` can parse
+    the tokens when provided with an if statement with an else if clause.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "y")
+
+    tokens: Tokens = (
+        if_token, left_parenthesis_token, true_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        else_token, if_token, left_parenthesis_token, true_token, equals_token,
+        equals_token, false_token, right_parenthesis_token, left_curly_brace_token,
+        identifier_token, plus_token, plus_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+    
+    true_factor = FactorNode(true_token.value)
+    true_term = TermNode(true_factor)
+    true_expression = ExpressionNode(true_term)
+    true_comp_expression = ComparisonExpression(true_expression)
+
+    if_statement_statement_list = StatementList()
+
+    false_factor = FactorNode(false_token.value)
+    false_term = TermNode(false_factor)
+    false_expression = ExpressionNode(false_term)
+    else_if_comp_expression = ComparisonExpression(
+        true_expression,
+        ComparisonOperator.BOOLEAN_EQUAL,
+        false_expression
+    )
+
+    increment_factor = FactorNode("1")
+    increment_term = TermNode(increment_factor)
+    increment_expression = ExpressionNode(increment_term)
+    increment_comp_expression = ComparisonExpression(increment_expression)
+
+    variable_increment = VariableIncrement(identifier_token.value,
+                                           increment_comp_expression)
+
+    inline_statement = InlineStatement(variable_increment)
+    else_if_statement_list = StatementList(inline_statement)
+
+    else_if_statement = IfStatement(
+        else_if_comp_expression,
+        else_if_statement_list
+    )
+
+    if_statement = IfStatement(
+        true_comp_expression,
+        if_statement_statement_list,
+        additional_if_statement=else_if_statement
+    )
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, if_statement)
+
+    node_result: NodeResult = parse_tokens_for_if_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_correct_error_for_faulty_if_else_if_statement():
+    """
+    This test checks if the function `parse_tokens_for_if_statement` can
+    produce the correct error for a faulty input that fails its else if
+    statement.
+    """
+
+    tokens: Tokens = (
+        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        else_token, if_token, left_parenthesis_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        RIGHT_PARENTHESIS_TOKEN_TYPE
+    )
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_if_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_if_else_statement():
+    """
+    This test checks if the function `parse_tokens_for_if_statement` can parse
+    the tokens when provided with an if statement with an else clause.
+    """
+
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tokens = (
+        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, return_token, semi_colon_token,
+        right_curly_brace_token,
+        else_token, left_curly_brace_token, return_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    false_factor = FactorNode(false_token.value)
+    false_term = TermNode(false_factor)
+    false_expression = ExpressionNode(false_term)
+    if_statement_comp_expression = ComparisonExpression(false_expression)
+
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    if_statement = IfStatement(
+        if_statement_comp_expression,
+        statement_list,
+        else_clause=statement_list
+    )
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, if_statement)
+    
+    node_result: NodeResult = parse_tokens_for_if_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_correct_error_for_fauly_if_else_statement():
+    """
+    This test checks if the function `parse_tokens_for_if_statement` can
+    produce the correct error for a faulty input that fails its else statement.
+    """
+
+    tokens: Tokens = (
+        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        else_token, left_curly_brace_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(SEMI_COLON_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_if_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_if_else_if_else_statement():
+    """
+    This test checks if the function `parse_tokens_for_if_statement` can parse
+    the tokens when provided with an if statement with an else if clause and
+    an else clause.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "y")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+
+    tokens: Tokens = (
+        if_token, left_parenthesis_token, true_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        else_token, if_token, left_parenthesis_token, true_token, equals_token,
+        equals_token, false_token, right_parenthesis_token, left_curly_brace_token,
+        identifier_token, plus_token, plus_token, semi_colon_token,
+        right_curly_brace_token,
+        else_token, left_curly_brace_token, return_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+    
+    true_factor = FactorNode(true_token.value)
+    true_term = TermNode(true_factor)
+    true_expression = ExpressionNode(true_term)
+    true_comp_expression = ComparisonExpression(true_expression)
+
+    if_statement_statement_list = StatementList()
+
+    false_factor = FactorNode(false_token.value)
+    false_term = TermNode(false_factor)
+    false_expression = ExpressionNode(false_term)
+    else_if_comp_expression = ComparisonExpression(
+        true_expression,
+        ComparisonOperator.BOOLEAN_EQUAL,
+        false_expression
+    )
+
+    increment_factor = FactorNode("1")
+    increment_term = TermNode(increment_factor)
+    increment_expression = ExpressionNode(increment_term)
+    increment_comp_expression = ComparisonExpression(increment_expression)
+
+    variable_increment = VariableIncrement(identifier_token.value,
+                                           increment_comp_expression)
+
+    inline_statement = InlineStatement(variable_increment)
+    else_if_statement_list = StatementList(inline_statement)
+
+    else_if_statement = IfStatement(
+        else_if_comp_expression,
+        else_if_statement_list
+    )
+
+    return_statement = ReturnStatement()
+    return_inline_statement = InlineStatement(return_statement)
+    else_statement = StatementList(return_inline_statement)
+
+
+    if_statement = IfStatement(
+        true_comp_expression,
+        if_statement_statement_list,
+        else_clause=else_statement,
+        additional_if_statement=else_if_statement
+    )
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, if_statement)
+
+    node_result: NodeResult = parse_tokens_for_if_statement(tokens)
+
+    assert expected_output == node_result
+
+
 def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
     """
     This test checks if the function `parse_tokens_for_while_statement` can
@@ -1090,7 +1310,7 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
     """
 
     false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         while_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, right_curly_brace_token,
         end_of_file_token
@@ -1119,7 +1339,7 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condi
     condition.
     """
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         while_token, left_parenthesis_token, minus_token, right_parenthesis_token,
         left_curly_brace_token, right_curly_brace_token,
         end_of_file_token
@@ -1141,7 +1361,7 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body
  
     false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
     return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         while_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, return_token, semi_colon_token,
         right_curly_brace_token,
@@ -1176,7 +1396,7 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body(
     true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "variable")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         while_token, left_parenthesis_token, true_token, right_parenthesis_token,
         left_curly_brace_token, identifier_token, minus_token, divide_token,
         semi_colon_token, right_curly_brace_token,
@@ -1201,7 +1421,7 @@ def test_parser_can_generate_correct_ast_for_block_statement_body():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         left_curly_brace_token, variable_type_token, identifier_token,
         equals_token, decimal_literal_token, semi_colon_token,
         right_curly_brace_token,
@@ -1238,7 +1458,7 @@ def test_parser_can_produce_error_for_block_statement_without_left_brace():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         variable_type_token, identifier_token,
         equals_token, decimal_literal_token, semi_colon_token,
         right_curly_brace_token,
@@ -1266,7 +1486,7 @@ def test_parser_can_produce_error_for_block_statement_without_right_brace():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         left_curly_brace_token, variable_type_token, identifier_token,
         equals_token, decimal_literal_token, semi_colon_token,
         end_of_file_token
@@ -1305,7 +1525,7 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement()
     decimal_literal_token: Token = generate_number_token_with_random_value()
     return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         return_token, decimal_literal_token, semi_colon_token,
         end_of_file_token
     )
@@ -1334,7 +1554,7 @@ def test_parser_can_produce_error_for_statement_list_that_fails_initial_statemen
     """
 
     return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tuple[Token, ...] = (return_token, return_token, end_of_file_token)
+    tokens: Tokens = (return_token, return_token, end_of_file_token)
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
     expected_output = NodeFailure(error_message)
@@ -1355,7 +1575,7 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     decimal_literal_token: Token = generate_number_token_with_random_value()
     return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         variable_type, identifier_token, equals_token, decimal_literal_token,
         semi_colon_token,
         return_token, identifier_token, semi_colon_token,
@@ -1402,7 +1622,7 @@ def test_parser_can_produce_error_for_statement_list_that_fails_additional_state
     decimal_literal_token: Token = generate_number_token_with_random_value()
     return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         variable_type, identifier_token, equals_token, decimal_literal_token,
         semi_colon_token,
         return_token, equals_token, semi_colon_token,
@@ -1456,7 +1676,7 @@ def test_parser_can_generate_correct_ast_for_initialization_with_semicolon():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yolo")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         variable_type_token, identifier_token, equals_token,
         decimal_literal_token, semi_colon_token,
         end_of_file_token
@@ -1490,7 +1710,7 @@ def test_parser_can_generate_correct_error_for_statement_that_expects_semicolon(
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yolo")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         variable_type_token, identifier_token, equals_token,
         decimal_literal_token, divide_token, decimal_literal_token,
         end_of_file_token
@@ -1515,7 +1735,7 @@ def test_parser_can_generate_correct_ast_for_variable_initialization():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_var")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         variable_type_token, identifier_token, equals_token,
         decimal_literal_token, semi_colon_token,
         end_of_file_token
@@ -1617,7 +1837,7 @@ def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
     return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         return_statement_token, decimal_literal_token, plus_token,
         decimal_literal_token, semi_colon_token,
         end_of_file_token
@@ -1688,7 +1908,7 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
     """
 
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yoworld")
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         identifier_token, plus_token, plus_token, semi_colon_token,
         end_of_file_token
     )
@@ -1702,7 +1922,7 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
 
     variable_increment = VariableIncrement(identifier_token.value, comp_expression)
     
-    expected_output_tokens: Tuple[Token, ...] = (semi_colon_token, end_of_file_token)
+    expected_output_tokens: Tokens = (semi_colon_token, end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, variable_increment)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
@@ -1718,7 +1938,7 @@ def test_parser_can_generate_correct_ast_for_increment_with_expression():
 
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "yoworld")
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         identifier_token, plus_token, equals_token, decimal_literal_token,
         semi_colon_token,
         end_of_file_token
@@ -1731,7 +1951,7 @@ def test_parser_can_generate_correct_ast_for_increment_with_expression():
 
     variable_increment = VariableIncrement(identifier_token.value, comp_expression)
     
-    expected_output_tokens: Tuple[Token, ...] = (semi_colon_token, end_of_file_token)
+    expected_output_tokens: Tokens = (semi_colon_token, end_of_file_token)
     expected_output = NodeSuccess(expected_output_tokens, variable_increment)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
@@ -1749,7 +1969,7 @@ def test_parser_can_generate_correct_error_given_bad_expression_to_increment():
     identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "x")
     decimal_literal_token: Token =  generate_number_token_with_random_value()
 
-    tokens: Tuple[Token, ...] = (
+    tokens: Tokens = (
         identifier_token, plus_token, equals_token, decimal_literal_token,
         plus_token,
         end_of_file_token
