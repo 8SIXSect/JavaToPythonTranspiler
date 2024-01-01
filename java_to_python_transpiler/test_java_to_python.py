@@ -1278,20 +1278,19 @@ def test_parser_can_generate_correct_ast_for_if_else_if_else_statement():
     inline_statement = InlineStatement(variable_increment)
     else_if_statement_list = StatementList(inline_statement)
 
-    else_if_statement = IfStatement(
-        else_if_comp_expression,
-        else_if_statement_list
-    )
-
     return_statement = ReturnStatement()
     return_inline_statement = InlineStatement(return_statement)
     else_statement = StatementList(return_inline_statement)
 
+    else_if_statement = IfStatement(
+        else_if_comp_expression,
+        else_if_statement_list,
+        else_clause=else_statement,
+    )
 
     if_statement = IfStatement(
         true_comp_expression,
         if_statement_statement_list,
-        else_clause=else_statement,
         additional_if_statement=else_if_statement
     )
 

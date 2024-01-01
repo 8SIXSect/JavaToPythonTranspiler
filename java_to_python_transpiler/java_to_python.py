@@ -753,14 +753,68 @@ def parse_tokens_for_if_statement(tokens: Tokens) -> NodeResult:
 
     assert isinstance(node_result_for_block_statement.node, StatementList)
 
-    # Implement else if / else here
+    possible_else_token: Token = node_result_for_block_statement.tokens[0]
+    if possible_else_token.token_type != ELSE_TOKEN_TYPE:
+        
+        simple_if_statement = IfStatement(
+            node_result_for_comp_expression_with_paren.node,
+            node_result_for_block_statement.node
+        )
 
-    if_statement = IfStatement(
-        node_result_for_comp_expression_with_paren.node,
-        node_result_for_block_statement.node
+        return NodeSuccess(
+            node_result_for_block_statement.tokens,
+            simple_if_statement
+        )
+
+    tokens_with_else_keyword_removed: Tokens
+    tokens_with_else_keyword_removed = node_result_for_block_statement.tokens[1:]
+
+    possible_if_token: Token = tokens_with_else_keyword_removed[0]
+    if possible_if_token.token_type == IF_TOKEN_TYPE:
+
+        node_result_for_additional_if_statement: NodeResult
+        node_result_for_additional_if_statement = parse_tokens_for_if_statement(
+            tokens_with_else_keyword_removed
+        )
+
+        if isinstance(node_result_for_additional_if_statement, NodeFailure):
+            return node_result_for_additional_if_statement
+
+        assert isinstance(node_result_for_additional_if_statement.node, IfStatement)
+
+        complex_if_statement = IfStatement(
+            node_result_for_comp_expression_with_paren.node,
+            node_result_for_block_statement.node,
+            additional_if_statement=node_result_for_additional_if_statement.node
+        )
+
+        # You shouldn't have to parse for else clause here (i dont think)
+
+        return NodeSuccess(
+            node_result_for_additional_if_statement.tokens,
+            complex_if_statement
+        )
+
+    node_result_for_else_block_statement: NodeResult
+    node_result_for_else_block_statement = parse_tokens_for_block_statement_body(
+        tokens_with_else_keyword_removed
     )
 
-    return NodeSuccess(node_result_for_block_statement.tokens, if_statement)
+    if isinstance(node_result_for_else_block_statement, NodeFailure):
+        return node_result_for_else_block_statement
+
+    assert isinstance(node_result_for_else_block_statement.node, StatementList)
+
+    if_else_statement = IfStatement(
+        node_result_for_comp_expression_with_paren.node,
+        node_result_for_block_statement.node,
+        else_clause=node_result_for_else_block_statement.node
+    )
+
+    return NodeSuccess(
+        node_result_for_else_block_statement.tokens,
+        if_else_statement
+    )
 
 
 def parse_tokens_for_expression_in_paren(tokens: Tokens) -> NodeResult:
