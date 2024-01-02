@@ -327,650 +327,156 @@ def generate_number_token_with_random_value() -> Token:
     return Token(DECIMAL_LITERAL_TOKEN_TYPE, token_value)
 
 
-def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
+def test_parser_can_generate_correct_error_given_faulty_input():
     """
-    This test checks that the parser can correctly generate an ArgumentList object
-    using the `parse_tokens_for_argument_list` function when given an input
-    without an arguments supplied.
+    This test checks the parser's entrypoint function `parse_tokens`
+    to see if it can generate the correct error output given a faulty input
     """
-
-    tokens: Tuple[Token, Token] = (right_parenthesis_token, end_of_file_token)
-
-    argument_list = ArgumentList() 
-    expected_output = NodeSuccess(tokens, argument_list)
-
-    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_single_argument_list():
-    """
-    This test checks that the parser can correctly generate an ArgumentList object
-    using the `parse_tokens_for_argument_list` function when given an input
-    of a singular argument.
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token, Token] = (
-        decimal_literal_token,
-        right_parenthesis_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-
-    argument_list = ArgumentList(comparison_expression)
-    
-    expected_output_tokens: Tuple[Token, Token] = (
-        right_parenthesis_token, end_of_file_token
-    )
-    expected_output = NodeSuccess(expected_output_tokens, argument_list)
-
-    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_multiple_argument_list():
-    """
-    This test checks that the parser can correctly generate an ArgumentList object
-    using the `parse_tokens_for_argument_list` function when given an input
-    of multiple arguments.
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tokens = (
-        decimal_literal_token, comma_token, decimal_literal_token,
-        right_parenthesis_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-
-    additional_argument_list = ArgumentList(comparison_expression)
-    argument_list = ArgumentList(comparison_expression, additional_argument_list)
-    
-    expected_output_tokens: Tuple[Token, Token] = (
-        right_parenthesis_token, end_of_file_token
-    )
-    expected_output = NodeSuccess(expected_output_tokens, argument_list)
-
-    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesis_or_comma():
-    """
-    This test checks that the parser can correctly generate a NodeFailure object
-    when supplied a faulty input that omits either a comma or a parenthesis.
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tokens = (
-        decimal_literal_token, comma_token, decimal_literal_token,
-        decimal_literal_token, right_parenthesis_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DECIMAL_LITERAL_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_no_argument_method_call():
-    """
-    This test checks that the parser can correctly generate a MethodCall object
-    using the `parse_tokens_for_method_call` function.
-    """
- 
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "func")
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token, left_parenthesis_token, right_parenthesis_token,
-        end_of_file_token
-    )
-
-    argument_list = ArgumentList()
-    method_call = MethodCall(identifier_token.value, argument_list)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, method_call)
-
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_error_for_method_call_when_expecting_parenthesis():
-    """
-    This test checks if the function `parse_tokens_for_method_call` returns the
-    correct NodeFailure object when given an input that has a syntax error.
-    """
-
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "hlelo")
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token, left_parenthesis_token, plus_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_single_argument_method_call():
-    """
-    This test checks if the function `parse_tokens_for_method_call` returns the
-    correct MethodCall object when given a single argument.
-    """
-
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token, Token, Token, Token] = (
-        identifier_token, left_parenthesis_token, decimal_literal_token,
-        right_parenthesis_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-
-    argument_list = ArgumentList(comparison_expression)
-    method_call = MethodCall(identifier_token.value, argument_list)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, method_call)
-
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call():
-    """
-    This test checks if the function `parse_tokens_for_method_call` returns the
-    correct MethodCall object when given a tuple of multiple arguments as input.
-    """
-
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tokens = (
-        identifier_token, left_parenthesis_token, decimal_literal_token,
-        comma_token, decimal_literal_token, right_parenthesis_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-
-    additional_argument_list = ArgumentList(comparison_expression)
-    argument_list = ArgumentList(comparison_expression, additional_argument_list)
-    method_call = MethodCall(identifier_token.value, argument_list)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, method_call)
-
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_single_factor():
-    """
-    This test checks if the function `parse_tokens_for_factor` returns the
-    correct FactorNode object.
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
-
-    factor_node = FactorNode(decimal_literal_token.value)
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens,
-                                               factor_node)
-
-    node_output: NodeResult = parse_tokens_for_factor(tokens)
-
-    assert expected_output == node_output 
-
-
-def test_parser_can_generate_correct_error_for_factor():
-    """
-    This test checks if the function `parse_tokens_for_factor` returns the
-    correct NodeFailure object.
-    """
-
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
 
     tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
 
-    node_result: NodeResult = parse_tokens_for_factor(tokens)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output = ParserFailure(error_message)
+
+    parser_result: ParserResult = parse_tokens(tokens)
+
+    assert expected_output == parser_result
+
+
+def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements():
+    """
+    This test checks if the function `parse_tokens_for_inline_statement_list`
+    can correctly parse the tokens when provided with no statements.
+    """
+
+    tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
+    
+    inline_statement_list = StatementList()
+    expected_output = NodeSuccess(tokens, inline_statement_list)
+
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_simple_term():
+def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement():
     """
-    This test checks if the parser can successfully generate an ast when given
-    a single term. This test specifically checks the `parse_tokens_for_term`
-    function.
+    This test checks if the function `parse_tokens_for_inline_statement_list`
+    can corretly parse the tokens when provided with a singular statement.
     """
-
-
+    
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
-
-    factor_node = FactorNode(decimal_literal_token.value)
-    term_node = TermNode(factor_node)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, term_node)
-
-    node_output: NodeResult = parse_tokens_for_term(tokens)
-
-    assert expected_output == node_output 
-
-
-def test_parser_can_generate_correct_ast_for_multiply_term():
-    """
-    This test checks if the parser can successfully generate an ast when given
-    a term like "86*2" or "12*9"; this test specifically checks the
-    `parse_tokens_for_term` function, 
-    """
-
-    first_decimal_literal_token: Token = generate_number_token_with_random_value()
-    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        first_decimal_literal_token, multiply_token, second_decimal_literal_token,
-        end_of_file_token
-    )
-
-    single_factor = FactorNode(first_decimal_literal_token.value)
-    
-    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
-    additional_term = TermNode(factor_for_additional_term)
-
-    term_node = TermNode(single_factor, ArithmeticOperator.MULTIPLY, additional_term)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, term_node)
-
-    node_output: NodeResult = parse_tokens_for_term(tokens)
-
-    assert expected_output == node_output
-
-
-def test_parser_can_generate_correct_ast_for_divide_term():
-    """
-    This test checks if the parser can successfully generate an ast when given
-    a term like "86/2" or "12/9"; this test specifically checks the
-    `parse_tokens_for_term` function, 
-    """
-
-    first_decimal_literal_token: Token = generate_number_token_with_random_value() 
-    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        first_decimal_literal_token, divide_token, second_decimal_literal_token,
-        end_of_file_token
-    )
-
-    single_factor = FactorNode(first_decimal_literal_token.value)
-    
-    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
-    additional_term = TermNode(factor_for_additional_term)
-
-    term_node = TermNode(single_factor, ArithmeticOperator.DIVIDE,
-                                   additional_term)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, term_node)
-
-    node_output: NodeResult = parse_tokens_for_term(tokens)
-
-    assert expected_output == node_output
-
-
-def test_parser_can_generate_correct_error_for_complex_term():
-    """
-    This test checks if the parser can successfully generate an error when given
-    a syntax error kind of term like "5//" or "5*"
-    """
-
-    first_decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        first_decimal_literal_token, divide_token, divide_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_output: NodeResult = parse_tokens_for_term(tokens)
-
-    assert expected_output == node_output 
-
-
-def test_parser_can_generate_correct_ast_for_multiple_terms():
-    """
-    This test checks that the parser can properly generate an AST for multiple
-    terms at once
-    """
- 
-    decimal_literal_token: Token = generate_number_token_with_random_value() 
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
 
     tokens: Tokens = (
-        decimal_literal_token, multiply_token, decimal_literal_token,
-        divide_token, decimal_literal_token,
-        end_of_file_token
-    )
-
-    first_factor = FactorNode(decimal_literal_token.value)
-    second_factor = FactorNode(decimal_literal_token.value)
-    third_factor = FactorNode(decimal_literal_token.value)
-    
-    additional_term_of_additional_term = TermNode(third_factor)
-    additional_term = TermNode(second_factor, ArithmeticOperator.DIVIDE,
-                               additional_term_of_additional_term)
-    
-    term = TermNode(first_factor, ArithmeticOperator.MULTIPLY,
-                              additional_term)
-
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, term)
-
-    node_result: NodeResult = parse_tokens_for_term(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_simple_expression():
-    """
-    This test checks if the parser can properly generate an AST for a simple
-    expression with a singular term and that term has a singular factor.
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value() 
-    
-    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
-
-    factor_node = FactorNode(decimal_literal_token.value)
-    term_node = TermNode(factor_node)
-    expression_node = ExpressionNode(term_node)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, expression_node)
-
-    node_result: NodeResult = parse_tokens_for_expression(tokens)
-
-    assert expected_output == node_result 
-
-
-def test_parser_can_generate_correct_ast_for_expression_with_one_term():
-    """
-    This test checks if the parser can properly generate an AST for a simple
-    expression with a singular term but multiple factors
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, multiply_token, decimal_literal_token,
-        end_of_file_token
-    )
-
-    single_factor = FactorNode(decimal_literal_token.value)
-    multiply_operator = ArithmeticOperator.MULTIPLY
-    
-    factor_for_additional_term = FactorNode(decimal_literal_token.value)
-    additional_term = TermNode(factor_for_additional_term)
-
-    term_node = TermNode(single_factor, multiply_operator, additional_term)
-
-    expression_node = ExpressionNode(term_node)
-    
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, expression_node)
-
-    node_result: NodeResult = parse_tokens_for_expression(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_complex_expression():
-    """
-    This test checks that the parser can correctly generate an AST for a
-    complex expression like "5+5" or "3-3"
-    """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, plus_token, decimal_literal_token,
+        return_token, decimal_literal_token, semi_colon_token,
         end_of_file_token
     )
 
     factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
-    additional_expression = ExpressionNode(term)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+    return_statement = ReturnStatement(comparison_expression)
 
-    expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
+    inline_statement = InlineStatement(return_statement)
+    inline_statement_list = StatementList(inline_statement)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, expression)
+    expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
 
-    node_result: NodeResult = parse_tokens_for_expression(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_error_for_complex_expression():
+def test_parser_can_produce_error_for_statement_list_that_fails_initial_statement():
     """
-    This test checks that the parser can correctly generate an error for a
-    complex expression with an error.
+    This test checks if the function `parse_tokens_for_inline_statement_list`
+    can produce an error because of failure of the initial statement.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, plus_token, minus_token,
-        end_of_file_token
-    )
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tokens = (return_token, return_token, end_of_file_token)
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
     expected_output = NodeFailure(error_message)
 
-    node_result: NodeResult = parse_tokens_for_expression(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_simple_comparison_expression():
+def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     """
-    This test checks if the function `parse_tokens_for_comparison_expression`
-    can correctly parse the tokens and construct a ComparisonExpression object
-    given an input that has a singular expression without an operator or
-    additional expression.
+    This test checks if the function `parse_tokens_for_inline_statement_list`
+    can produce the correct ast for a statement list with multiple statements.
     """
 
-    tokens: Tuple[Token, Token, Token] = (
-        true_token, right_parenthesis_token,
+    variable_type = Token(CHAR_TOKEN_TYPE, "CHAR")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sat")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+
+    tokens: Tokens = (
+        variable_type, identifier_token, equals_token, decimal_literal_token,
+        semi_colon_token,
+        return_token, identifier_token, semi_colon_token,
+        right_curly_brace_token,
         end_of_file_token
     )
 
-    factor = FactorNode(true_token.value)
+    factor = FactorNode(decimal_literal_token.value)
     term = TermNode(factor)
     expression = ExpressionNode(term)
     comparison_expression = ComparisonExpression(expression)
+    variable_increment = VariableInitialization(identifier_token.value,
+                                                comparison_expression)
 
-    expected_output_tokens: Tuple[Token, Token] = tokens[1:]
-    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+    return_factor = FactorNode(identifier_token.value)
+    return_term = TermNode(return_factor)
+    return_expression = ExpressionNode(return_term)
+    return_comparison_expression = ComparisonExpression(return_expression)
+    return_statement = ReturnStatement(return_comparison_expression)
 
-    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+    initial_inline_statement = InlineStatement(variable_increment)
+    additional_inline_statement = InlineStatement(return_statement)
+    additional_statement_list = StatementList(additional_inline_statement)
 
+    inline_statement_list = StatementList(initial_inline_statement,
+                                                additional_statement_list)
+
+    expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
+
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
+    
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
+def test_parser_can_produce_error_for_statement_list_that_fails_additional_statement():
     """
-    This test checks if the function `parse_tokens_for_comparison_expression`
-    can correctly parse the tokenbs and construct a ComparisonExpression object
-    given an input with one expression that may have multiple factors and terms.
+    This test checks if the function `parse_tokens_for_inline_statement_list`
+    can produce an error because of failure of the additional statement.
     """
 
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "Lookatme")
+    variable_type = Token(CHAR_TOKEN_TYPE, "CHAR")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sat")
     decimal_literal_token: Token = generate_number_token_with_random_value()
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
 
     tokens: Tokens = (
-        identifier_token, multiply_token, decimal_literal_token,
-        right_parenthesis_token,
+        variable_type, identifier_token, equals_token, decimal_literal_token,
+        semi_colon_token,
+        return_token, equals_token, semi_colon_token,
         end_of_file_token
     )
 
-    factor = FactorNode(identifier_token.value)
-
-    factor_for_additional_term = FactorNode(decimal_literal_token.value)
-    additional_term = TermNode(factor_for_additional_term)
-    
-    term = TermNode(factor, ArithmeticOperator.MULTIPLY, additional_term)
-    expression = ExpressionNode(term)
-
-    comparison_expression = ComparisonExpression(expression)
-
-    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
-                                                   end_of_file_token)
-    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
-
-    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
-    """
-    This test checks if the function `parse_tokens_for_comparison_expression`
-    can correctly parse the tokens and construct a ComparisonExpression object
-    given an input with an operator and an additional expression.
-    """
-
-    exclamation_token = Token(EXCLAMATION_TOKEN_TYPE, "EXCLAMATION")
-
-    tokens: Tokens = (
-        true_token, exclamation_token, equals_token, false_token,
-        right_parenthesis_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(true_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-
-    additional_factor = FactorNode(false_token.value)
-    additional_term = TermNode(additional_factor)
-    additional_expression = ExpressionNode(additional_term)
-
-    comparison_expression = ComparisonExpression(expression,
-                                                 ComparisonOperator.NOT_EQUAL,
-                                                 additional_expression)
-    
-    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
-                                                   end_of_file_token)
-    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
-
-    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_error_for_complex_comparison_expression():
-    """
-    This test checks if the function `parse_tokens_for_comparison_expression`
-    can correctly generate an error for a complex expression with a syntax error
-    """
-    
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    less_than_token = Token(LESS_THAN_TOKEN_TYPE, "<")
-
-    tokens: Tokens = (
-        decimal_literal_token, less_than_token, plus_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(EQUALS_TOKEN_TYPE)
     expected_output = NodeFailure(error_message)
 
-    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
 
-    assert expected_output == node_result
-
-
-def test_parser_can_produce_error_for_comp_expression_with_no_left_paren():
-    """
-    This test checks if the function `parse_tokens_for_expression_in_paren` can
-    parse the tokens when provided with a comparison expression with no left
-    parenthesis.
-    """
-
-    tokens: Tokens = (
-        true_token, right_parenthesis_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TRUE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
-    
-    assert expected_output == node_result
-
-
-def test_parser_can_produce_error_for_comp_expression_with_no_right_paren():
-    """
-    This test checks if the function `parse_tokens_for_expression_in_paren` can
-    parse the tokens when provided with a comparison expression with no right
-    parenthesis.
-    """
-
-    tokens: Tokens = (
-        left_parenthesis_token, false_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
-    
     assert expected_output == node_result
 
 
@@ -1019,6 +525,114 @@ def test_parser_can_generate_correct_ast_for_block_statement():
     expected_output = NodeSuccess(expected_output_tokens, block_statement)
 
     node_result: NodeResult = parse_tokens_for_block_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    parse the tokens when provided with a while loop without a body.
+    """
+
+    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+    tokens: Tokens = (
+        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(false_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
+    
+    statement_list = StatementList()
+
+    while_statement = WhileStatement(comp_expression, statement_list)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, while_statement)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condition():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    produce the correct error for a while statement with a syntax error in its
+    condition.
+    """
+
+    tokens: Tokens = (
+        while_token, left_parenthesis_token, minus_token, right_parenthesis_token,
+        left_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body():
+    """
+    This test checks if the function `parse_tokens_for_while_statement` can
+    parse the tokens when provided with a while with a non-empty body/
+    """
+ 
+    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tokens = (
+        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
+        left_curly_brace_token, return_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(false_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comp_expression = ComparisonExpression(expression)
+    
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    while_statement = WhileStatement(comp_expression, statement_list)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, while_statement)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
+
+    assert expected_output == node_result
+
+   
+def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body():
+    """
+    This test checks if the function `parse_tokens_for_while_staement` can
+    produce the correct error for a while statement with a syntax error in its
+    body.
+    """
+
+    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "variable")
+
+    tokens: Tokens = (
+        while_token, left_parenthesis_token, true_token, right_parenthesis_token,
+        left_curly_brace_token, identifier_token, minus_token, divide_token,
+        semi_colon_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
 
     assert expected_output == node_result
 
@@ -1351,114 +965,6 @@ def test_parser_can_generate_correct_ast_for_if_else_if_else_statement():
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
-    """
-    This test checks if the function `parse_tokens_for_while_statement` can
-    parse the tokens when provided with a while loop without a body.
-    """
-
-    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
-    tokens: Tokens = (
-        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(false_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
-    
-    statement_list = StatementList()
-
-    while_statement = WhileStatement(comp_expression, statement_list)
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, while_statement)
-
-    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condition():
-    """
-    This test checks if the function `parse_tokens_for_while_statement` can
-    produce the correct error for a while statement with a syntax error in its
-    condition.
-    """
-
-    tokens: Tokens = (
-        while_token, left_parenthesis_token, minus_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body():
-    """
-    This test checks if the function `parse_tokens_for_while_statement` can
-    parse the tokens when provided with a while with a non-empty body/
-    """
- 
-    false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
-    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tokens = (
-        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, return_token, semi_colon_token,
-        right_curly_brace_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(false_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
-    
-    return_statement = ReturnStatement()
-    inline_statement = InlineStatement(return_statement)
-    statement_list = StatementList(inline_statement)
-
-    while_statement = WhileStatement(comp_expression, statement_list)
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, while_statement)
-
-    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
-
-    assert expected_output == node_result
-
-   
-def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body():
-    """
-    This test checks if the function `parse_tokens_for_while_staement` can
-    produce the correct error for a while statement with a syntax error in its
-    body.
-    """
-
-    true_token = Token(TRUE_TOKEN_TYPE, "TRUE")
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "variable")
-
-    tokens: Tokens = (
-        while_token, left_parenthesis_token, true_token, right_parenthesis_token,
-        left_curly_brace_token, identifier_token, minus_token, divide_token,
-        semi_colon_token, right_curly_brace_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_while_statement(tokens)
-
-    assert expected_output == node_result
-
-
 def test_parser_can_generate_correct_ast_for_block_statement_body():
     """
     This test checks if the function `parse_tokens_for_block_statement_body`
@@ -1522,7 +1028,6 @@ def test_parser_can_produce_error_for_block_statement_without_left_brace():
     assert expected_output == node_result
     
 
-
 def test_parser_can_produce_error_for_block_statement_without_right_brace():
     """
     This test checks if the function `parse_tokens_for_block_statement_body`
@@ -1545,143 +1050,6 @@ def test_parser_can_produce_error_for_block_statement_without_right_brace():
 
     node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
     
-    assert expected_output == node_result
-    
-
-def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements():
-    """
-    This test checks if the function `parse_tokens_for_inline_statement_list`
-    can correctly parse the tokens when provided with no statements.
-    """
-
-    tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
-    
-    inline_statement_list = StatementList()
-    expected_output = NodeSuccess(tokens, inline_statement_list)
-
-    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement():
-    """
-    This test checks if the function `parse_tokens_for_inline_statement_list`
-    can corretly parse the tokens when provided with a singular statement.
-    """
-    
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-
-    tokens: Tokens = (
-        return_token, decimal_literal_token, semi_colon_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-    return_statement = ReturnStatement(comparison_expression)
-
-    inline_statement = InlineStatement(return_statement)
-    inline_statement_list = StatementList(inline_statement)
-
-    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
-
-    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_produce_error_for_statement_list_that_fails_initial_statement():
-    """
-    This test checks if the function `parse_tokens_for_inline_statement_list`
-    can produce an error because of failure of the initial statement.
-    """
-
-    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tokens = (return_token, return_token, end_of_file_token)
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
-    """
-    This test checks if the function `parse_tokens_for_inline_statement_list`
-    can produce the correct ast for a statement list with multiple statements.
-    """
-
-    variable_type = Token(CHAR_TOKEN_TYPE, "CHAR")
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sat")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-
-    tokens: Tokens = (
-        variable_type, identifier_token, equals_token, decimal_literal_token,
-        semi_colon_token,
-        return_token, identifier_token, semi_colon_token,
-        right_curly_brace_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-    variable_increment = VariableInitialization(identifier_token.value,
-                                                comparison_expression)
-
-    return_factor = FactorNode(identifier_token.value)
-    return_term = TermNode(return_factor)
-    return_expression = ExpressionNode(return_term)
-    return_comparison_expression = ComparisonExpression(return_expression)
-    return_statement = ReturnStatement(return_comparison_expression)
-
-    initial_inline_statement = InlineStatement(variable_increment)
-    additional_inline_statement = InlineStatement(return_statement)
-    additional_statement_list = StatementList(additional_inline_statement)
-
-    inline_statement_list = StatementList(initial_inline_statement,
-                                                additional_statement_list)
-
-    expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
-
-    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
-    
-    assert expected_output == node_result
-
-
-def test_parser_can_produce_error_for_statement_list_that_fails_additional_statement():
-    """
-    This test checks if the function `parse_tokens_for_inline_statement_list`
-    can produce an error because of failure of the additional statement.
-    """
-
-    variable_type = Token(CHAR_TOKEN_TYPE, "CHAR")
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sat")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-
-    tokens: Tokens = (
-        variable_type, identifier_token, equals_token, decimal_literal_token,
-        semi_colon_token,
-        return_token, equals_token, semi_colon_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(EQUALS_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_statement_list(tokens)
-
     assert expected_output == node_result
 
 
@@ -1772,181 +1140,6 @@ def test_parser_can_generate_correct_error_for_statement_that_expects_semicolon(
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_variable_initialization():
-    """
-    This test checks that the parser can correctly generate a
-    VariableInitialization object using the
-    `parse_tokens_for_variable_initilization` function
-    """
-
-    variable_type_token = Token(INT_TOKEN_TYPE, "INT")
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_var")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tokens = (
-        variable_type_token, identifier_token, equals_token,
-        decimal_literal_token, semi_colon_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression);
-    
-    variable_intialization = VariableInitialization(identifier_token.value,
-                                                    comparison_expression)
-
-    expected_output_tokens: Tuple[Token, Token] = (
-        semi_colon_token, end_of_file_token
-    )
-    expected_output = NodeSuccess(expected_output_tokens, variable_intialization)
-
-    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_return_correct_error_for_initialization_when_expects_equals():
-    """
-    This test checks that the parser's function
-    `parse_tokens_for_variable_initialization` can return the correct NodeFailure
-    object when given a tuple of tokens that omits the equals sign. 
-    """
-
-    variable_type_token = Token(INT_TOKEN_TYPE, "INT")
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_error_prone_var")
-
-    tokens: Tuple[Token, Token, Token] = (
-        variable_type_token, identifier_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_return_correct_error_for_initialization_when_expects_expression():
-    """
-    This test checks the function `parse_tokens_for_variable_initialization`
-    can return the correct NodeFailure object when given a list of tokens
-    that omits an expression (which is required).
-    """
-
-    variable_type_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
-    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "anju")
-
-    tokens: Tuple[Token, Token, Token, Token] = (
-        variable_type_token, identifier_token, equals_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_empty_return_statement():
-    """
-    This test checks that the function `parse_tokens_for_return_statement`
-    can return the correct ReturnStatement object when given an empty return
-    statement (i.e. returning without an expression provided)
-    """
-
-    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    tokens: Tuple[Token, Token, Token] = (
-        return_statement_token, semi_colon_token,
-        end_of_file_token
-    )
-
-    return_statement = ReturnStatement()
-    expected_output_tokens: Tuple[Token, Token] = tokens[1:]
-    expected_output = NodeSuccess(expected_output_tokens, return_statement)
-
-    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
-    """
-    This test checks that the function `parse_tokens_for_return_Statement`
-    can return the correct ReturnStatement object when given an expression that
-    is not empty for the return statement
-    """
-
-    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-
-    tokens: Tokens = (
-        return_statement_token, decimal_literal_token, plus_token,
-        decimal_literal_token, semi_colon_token,
-        end_of_file_token
-    )
-
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-
-    additional_expression = ExpressionNode(term)
-    expression = ExpressionNode(term, ArithmeticOperator.PLUS,
-                                additional_expression)
-    comparison_expression = ComparisonExpression(expression)
-
-    return_statement = ReturnStatement(comparison_expression)
-
-    expected_output_tokens: Tuple[Token, Token] = (semi_colon_token,
-                                                   end_of_file_token)
-    expected_output = NodeSuccess(expected_output_tokens, return_statement)
-
-    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parse_can_generate_correct_error_given_invalid_expression_to_return():
-    """
-    This test cehcks that the function `parse_tokens_for_return_statement` can
-    return the correct error when given an invalid expression to return.
-    """
-    
-    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
-
-    tokens: Tuple[Token, Token, Token] = (
-        return_statement_token, return_statement_token,
-        end_of_file_token
-    )
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
-    expected_output = NodeFailure(error_message)
-
-    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
-
-    assert expected_output == node_result
-
-
-def test_parser_can_generate_correct_error_given_faulty_input():
-    """
-    This test checks the parser's entrypoint function `parse_tokens`
-    to see if it can generate the correct error output given a faulty input
-    """
-
-    tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
-    expected_output = ParserFailure(error_message)
-
-    parser_result: ParserResult = parse_tokens(tokens)
-
-    assert expected_output == parser_result
-
-
 def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
     """
     This test checks that the parser can correctly generate an ast for
@@ -2028,5 +1221,810 @@ def test_parser_can_generate_correct_error_given_bad_expression_to_increment():
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
     
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_empty_return_statement():
+    """
+    This test checks that the function `parse_tokens_for_return_statement`
+    can return the correct ReturnStatement object when given an empty return
+    statement (i.e. returning without an expression provided)
+    """
+
+    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    tokens: Tuple[Token, Token, Token] = (
+        return_statement_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    return_statement = ReturnStatement()
+    expected_output_tokens: Tuple[Token, Token] = tokens[1:]
+    expected_output = NodeSuccess(expected_output_tokens, return_statement)
+
+    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
+    """
+    This test checks that the function `parse_tokens_for_return_Statement`
+    can return the correct ReturnStatement object when given an expression that
+    is not empty for the return statement
+    """
+
+    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        return_statement_token, decimal_literal_token, plus_token,
+        decimal_literal_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+
+    additional_expression = ExpressionNode(term)
+    expression = ExpressionNode(term, ArithmeticOperator.PLUS,
+                                additional_expression)
+    comparison_expression = ComparisonExpression(expression)
+
+    return_statement = ReturnStatement(comparison_expression)
+
+    expected_output_tokens: Tuple[Token, Token] = (semi_colon_token,
+                                                   end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, return_statement)
+
+    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parse_can_generate_correct_error_given_invalid_expression_to_return():
+    """
+    This test cehcks that the function `parse_tokens_for_return_statement` can
+    return the correct error when given an invalid expression to return.
+    """
+    
+    return_statement_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+
+    tokens: Tuple[Token, Token, Token] = (
+        return_statement_token, return_statement_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RETURN_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_return_statement(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_variable_initialization():
+    """
+    This test checks that the parser can correctly generate a
+    VariableInitialization object using the
+    `parse_tokens_for_variable_initilization` function
+    """
+
+    variable_type_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_var")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        variable_type_token, identifier_token, equals_token,
+        decimal_literal_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression);
+    
+    variable_intialization = VariableInitialization(identifier_token.value,
+                                                    comparison_expression)
+
+    expected_output_tokens: Tuple[Token, Token] = (
+        semi_colon_token, end_of_file_token
+    )
+    expected_output = NodeSuccess(expected_output_tokens, variable_intialization)
+
+    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_return_correct_error_for_initialization_when_expects_equals():
+    """
+    This test checks that the parser's function
+    `parse_tokens_for_variable_initialization` can return the correct NodeFailure
+    object when given a tuple of tokens that omits the equals sign. 
+    """
+
+    variable_type_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "my_error_prone_var")
+
+    tokens: Tuple[Token, Token, Token] = (
+        variable_type_token, identifier_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_return_correct_error_for_initialization_when_expects_expression():
+    """
+    This test checks the function `parse_tokens_for_variable_initialization`
+    can return the correct NodeFailure object when given a list of tokens
+    that omits an expression (which is required).
+    """
+
+    variable_type_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "anju")
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        variable_type_token, identifier_token, equals_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_simple_comparison_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly parse the tokens and construct a ComparisonExpression object
+    given an input that has a singular expression without an operator or
+    additional expression.
+    """
+
+    tokens: Tuple[Token, Token, Token] = (
+        true_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(true_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+
+    expected_output_tokens: Tuple[Token, Token] = tokens[1:]
+    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly parse the tokenbs and construct a ComparisonExpression object
+    given an input with one expression that may have multiple factors and terms.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "Lookatme")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        identifier_token, multiply_token, decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(identifier_token.value)
+
+    factor_for_additional_term = FactorNode(decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
+    
+    term = TermNode(factor, ArithmeticOperator.MULTIPLY, additional_term)
+    expression = ExpressionNode(term)
+
+    comparison_expression = ComparisonExpression(expression)
+
+    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
+                                                   end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly parse the tokens and construct a ComparisonExpression object
+    given an input with an operator and an additional expression.
+    """
+
+    exclamation_token = Token(EXCLAMATION_TOKEN_TYPE, "EXCLAMATION")
+
+    tokens: Tokens = (
+        true_token, exclamation_token, equals_token, false_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(true_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+
+    additional_factor = FactorNode(false_token.value)
+    additional_term = TermNode(additional_factor)
+    additional_expression = ExpressionNode(additional_term)
+
+    comparison_expression = ComparisonExpression(expression,
+                                                 ComparisonOperator.NOT_EQUAL,
+                                                 additional_expression)
+    
+    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
+                                                   end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_complex_comparison_expression():
+    """
+    This test checks if the function `parse_tokens_for_comparison_expression`
+    can correctly generate an error for a complex expression with a syntax error
+    """
+    
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    less_than_token = Token(LESS_THAN_TOKEN_TYPE, "<")
+
+    tokens: Tokens = (
+        decimal_literal_token, less_than_token, plus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_comp_expression_with_no_left_paren():
+    """
+    This test checks if the function `parse_tokens_for_expression_in_paren` can
+    parse the tokens when provided with a comparison expression with no left
+    parenthesis.
+    """
+
+    tokens: Tokens = (
+        true_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TRUE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
+    
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_comp_expression_with_no_right_paren():
+    """
+    This test checks if the function `parse_tokens_for_expression_in_paren` can
+    parse the tokens when provided with a comparison expression with no right
+    parenthesis.
+    """
+
+    tokens: Tokens = (
+        left_parenthesis_token, false_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
+    
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_simple_expression():
+    """
+    This test checks if the parser can properly generate an AST for a simple
+    expression with a singular term and that term has a singular factor.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value() 
+    
+    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+
+    factor_node = FactorNode(decimal_literal_token.value)
+    term_node = TermNode(factor_node)
+    expression_node = ExpressionNode(term_node)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result 
+
+
+def test_parser_can_generate_correct_ast_for_expression_with_one_term():
+    """
+    This test checks if the parser can properly generate an AST for a simple
+    expression with a singular term but multiple factors
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        decimal_literal_token, multiply_token, decimal_literal_token,
+        end_of_file_token
+    )
+
+    single_factor = FactorNode(decimal_literal_token.value)
+    multiply_operator = ArithmeticOperator.MULTIPLY
+    
+    factor_for_additional_term = FactorNode(decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
+
+    term_node = TermNode(single_factor, multiply_operator, additional_term)
+
+    expression_node = ExpressionNode(term_node)
+    
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, expression_node)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_complex_expression():
+    """
+    This test checks that the parser can correctly generate an AST for a
+    complex expression like "5+5" or "3-3"
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        decimal_literal_token, plus_token, decimal_literal_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    additional_expression = ExpressionNode(term)
+
+    expression = ExpressionNode(term, ArithmeticOperator.PLUS, additional_expression)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, expression)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_complex_expression():
+    """
+    This test checks that the parser can correctly generate an error for a
+    complex expression with an error.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    tokens: Tuple[Token, Token, Token, Token] = (
+        decimal_literal_token, plus_token, minus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(MINUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_expression(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_simple_term():
+    """
+    This test checks if the parser can successfully generate an ast when given
+    a single term. This test specifically checks the `parse_tokens_for_term`
+    function.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+
+    factor_node = FactorNode(decimal_literal_token.value)
+    term_node = TermNode(factor_node)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, term_node)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_multiply_term():
+    """
+    This test checks if the parser can successfully generate an ast when given
+    a term like "86*2" or "12*9"; this test specifically checks the
+    `parse_tokens_for_term` function, 
+    """
+
+    first_decimal_literal_token: Token = generate_number_token_with_random_value()
+    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        first_decimal_literal_token, multiply_token, second_decimal_literal_token,
+        end_of_file_token
+    )
+
+    single_factor = FactorNode(first_decimal_literal_token.value)
+    
+    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
+
+    term_node = TermNode(single_factor, ArithmeticOperator.MULTIPLY, additional_term)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, term_node)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_output
+
+
+def test_parser_can_generate_correct_ast_for_divide_term():
+    """
+    This test checks if the parser can successfully generate an ast when given
+    a term like "86/2" or "12/9"; this test specifically checks the
+    `parse_tokens_for_term` function, 
+    """
+
+    first_decimal_literal_token: Token = generate_number_token_with_random_value() 
+    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        first_decimal_literal_token, divide_token, second_decimal_literal_token,
+        end_of_file_token
+    )
+
+    single_factor = FactorNode(first_decimal_literal_token.value)
+    
+    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
+    additional_term = TermNode(factor_for_additional_term)
+
+    term_node = TermNode(single_factor, ArithmeticOperator.DIVIDE,
+                                   additional_term)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, term_node)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_output
+
+
+def test_parser_can_generate_correct_error_for_complex_term():
+    """
+    This test checks if the parser can successfully generate an error when given
+    a syntax error kind of term like "5//" or "5*"
+    """
+
+    first_decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        first_decimal_literal_token, divide_token, divide_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DIVIDE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_output: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_multiple_terms():
+    """
+    This test checks that the parser can properly generate an AST for multiple
+    terms at once
+    """
+ 
+    decimal_literal_token: Token = generate_number_token_with_random_value() 
+
+    tokens: Tokens = (
+        decimal_literal_token, multiply_token, decimal_literal_token,
+        divide_token, decimal_literal_token,
+        end_of_file_token
+    )
+
+    first_factor = FactorNode(decimal_literal_token.value)
+    second_factor = FactorNode(decimal_literal_token.value)
+    third_factor = FactorNode(decimal_literal_token.value)
+    
+    additional_term_of_additional_term = TermNode(third_factor)
+    additional_term = TermNode(second_factor, ArithmeticOperator.DIVIDE,
+                               additional_term_of_additional_term)
+    
+    term = TermNode(first_factor, ArithmeticOperator.MULTIPLY,
+                              additional_term)
+
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, term)
+
+    node_result: NodeResult = parse_tokens_for_term(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_factor():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct FactorNode object.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+
+    factor_node = FactorNode(decimal_literal_token.value)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens,
+                                               factor_node)
+
+    node_output: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_error_for_factor():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct NodeFailure object.
+    """
+
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
+
+    node_result: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_no_argument_method_call():
+    """
+    This test checks that the parser can correctly generate a MethodCall object
+    using the `parse_tokens_for_method_call` function.
+    """
+ 
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "func")
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        identifier_token, left_parenthesis_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    argument_list = ArgumentList()
+    method_call = MethodCall(identifier_token.value, argument_list)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_call)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_method_call_when_expecting_parenthesis():
+    """
+    This test checks if the function `parse_tokens_for_method_call` returns the
+    correct NodeFailure object when given an input that has a syntax error.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "hlelo")
+
+    tokens: Tuple[Token, Token, Token, Token] = (
+        identifier_token, left_parenthesis_token, plus_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(PLUS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_argument_method_call():
+    """
+    This test checks if the function `parse_tokens_for_method_call` returns the
+    correct MethodCall object when given a single argument.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token, Token, Token] = (
+        identifier_token, left_parenthesis_token, decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+
+    argument_list = ArgumentList(comparison_expression)
+    method_call = MethodCall(identifier_token.value, argument_list)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_call)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call():
+    """
+    This test checks if the function `parse_tokens_for_method_call` returns the
+    correct MethodCall object when given a tuple of multiple arguments as input.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "raiden")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        identifier_token, left_parenthesis_token, decimal_literal_token,
+        comma_token, decimal_literal_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+
+    additional_argument_list = ArgumentList(comparison_expression)
+    argument_list = ArgumentList(comparison_expression, additional_argument_list)
+    method_call = MethodCall(identifier_token.value, argument_list)
+
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_call)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
+    """
+    This test checks that the parser can correctly generate an ArgumentList object
+    using the `parse_tokens_for_argument_list` function when given an input
+    without an arguments supplied.
+    """
+
+    tokens: Tuple[Token, Token] = (right_parenthesis_token, end_of_file_token)
+
+    argument_list = ArgumentList() 
+    expected_output = NodeSuccess(tokens, argument_list)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_argument_list():
+    """
+    This test checks that the parser can correctly generate an ArgumentList object
+    using the `parse_tokens_for_argument_list` function when given an input
+    of a singular argument.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tuple[Token, Token, Token] = (
+        decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+
+    argument_list = ArgumentList(comparison_expression)
+    
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_parenthesis_token, end_of_file_token
+    )
+    expected_output = NodeSuccess(expected_output_tokens, argument_list)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_multiple_argument_list():
+    """
+    This test checks that the parser can correctly generate an ArgumentList object
+    using the `parse_tokens_for_argument_list` function when given an input
+    of multiple arguments.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        decimal_literal_token, comma_token, decimal_literal_token,
+        right_parenthesis_token,
+        end_of_file_token
+    )
+
+    factor = FactorNode(decimal_literal_token.value)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    comparison_expression = ComparisonExpression(expression)
+
+    additional_argument_list = ArgumentList(comparison_expression)
+    argument_list = ArgumentList(comparison_expression, additional_argument_list)
+    
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_parenthesis_token, end_of_file_token
+    )
+    expected_output = NodeSuccess(expected_output_tokens, argument_list)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesis_or_comma():
+    """
+    This test checks that the parser can correctly generate a NodeFailure object
+    when supplied a faulty input that omits either a comma or a parenthesis.
+    """
+
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        decimal_literal_token, comma_token, decimal_literal_token,
+        decimal_literal_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(DECIMAL_LITERAL_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_argument_list(tokens)
+
     assert expected_output == node_result
 

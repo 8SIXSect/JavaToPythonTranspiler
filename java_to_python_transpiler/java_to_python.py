@@ -1408,8 +1408,6 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
         argument_list = ArgumentList()
         return NodeSuccess(tokens, argument_list)
 
-    #breakpoint()
-
     node_result_comp_expression: NodeResult
     node_result_comp_expression = parse_tokens_for_comparison_expression(tokens)
 
