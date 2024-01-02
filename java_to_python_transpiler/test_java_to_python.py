@@ -384,6 +384,24 @@ def test_parser_can_generate_correct_ast_for_single_parameter_list():
     assert expected_output == node_result
 
 
+def test_parser_can_produce_error_when_parameter_without_type():
+    """
+    This test checks that the parser can correctly generate a NodeFailure
+    object using the `parse_tokens_for_parameter_list` function when given
+    an input the omits the variable type for a parameter
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "apl")
+    tokens: Tokens = (identifier_token, right_parenthesis_token, end_of_file_token)
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(IDENTIFIER_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
+
+    assert expected_output == node_result
+
+
 def test_parser_can_generate_correct_ast_for_multiple_parameter_list():   
     """
     This test checks that the parser can correctly generate an ParameterList
