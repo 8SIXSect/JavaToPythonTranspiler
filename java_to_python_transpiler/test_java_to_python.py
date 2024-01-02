@@ -13,12 +13,12 @@ from java_to_python_transpiler.java_to_python import (
     RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE,
     RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE,
     SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
-    WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, ComparisonExpression,
+    WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression,
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
     InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
-    parse_tokens, parse_tokens_for_argument_list,
+    parse_tokens, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
@@ -971,6 +971,55 @@ def test_parser_can_produce_error_for_comp_expression_with_no_right_paren():
 
     node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
     
+    assert expected_output == node_result
+
+
+# The structure of block_statement is in need of change, but that is a problem
+# for tomorrow
+def test_parser_can_generate_correct_ast_for_block_statement():
+    """
+    This test checks if the function `parse_tokens_for_block_statement` can
+    parse the tokens when provided with tokens containing a block statement.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "PROLOG")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        while_token, left_parenthesis_token, identifier_token,
+        right_parenthesis_token, left_curly_brace_token,
+        identifier_token, plus_token, equals_token, decimal_literal_token,
+        semi_colon_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    while_condition_factor = FactorNode(identifier_token.value)
+    while_condition_term = TermNode(while_condition_factor)
+    while_condition_expression = ExpressionNode(while_condition_term)
+    while_condition_comp_expression = ComparisonExpression(
+        while_condition_expression
+    )
+
+    increment_factor = FactorNode(decimal_literal_token.value)
+    increment_term = TermNode(increment_factor)
+    increment_expression = ExpressionNode(increment_term)
+    increment_comp_expression = ComparisonExpression(increment_expression)
+
+    variable_increment = VariableIncrement(identifier_token.value,
+                                           increment_comp_expression)
+    inline_statement = InlineStatement(variable_increment)
+    statement_list = StatementList(inline_statement)
+    
+    while_statement = WhileStatement(while_condition_comp_expression,
+                                     statement_list)
+    
+    block_statement = BlockStatement(while_statement)
+
+    expected_output_tokens: Tokens = (end_of_file_token,) 
+    expected_output = NodeSuccess(expected_output_tokens, block_statement)
+
+    node_result: NodeResult = parse_tokens_for_block_statement(tokens)
+
     assert expected_output == node_result
 
 

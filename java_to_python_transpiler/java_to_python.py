@@ -649,7 +649,6 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
 
 # todo: add tests for this function
 # im gonna wait on adding tests till i create if stmts
-# todo: add support for else if - else clauses in format ast (and ensure that they work)
 
 def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     """
