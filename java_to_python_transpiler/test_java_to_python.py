@@ -15,14 +15,14 @@ from java_to_python_transpiler.java_to_python import (
     SINGLE_LINE_COMMENT_TOKEN_TYPE, STATIC_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
     WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression,
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
-    InlineStatement, NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
+    InlineStatement, MethodDeclaration, NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
     parse_tokens, parse_tokens_for_access_modifier_list, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
-    parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_parameter_list,
+    parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_method_declaration, parse_tokens_for_parameter_list,
     parse_tokens_for_statement_list, parse_tokens_for_method_call,
     parse_tokens_for_return_statement, parse_tokens_for_term,
     parse_tokens_for_variable_increment,
@@ -346,6 +346,238 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
+
+
+def test_parser_can_generate_correct_ast_for_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct ast when given a valid input for a method
+    declaration.
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "pascal")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, return_type_token, method_identifier_token,
+        left_parenthesis_token, return_type_token, parameter_identifier,
+        right_parenthesis_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    parameter_list = ParameterList(parameter_identifier.value)
+    
+    return_factor = FactorNode(decimal_literal_token.value)
+    return_term = TermNode(return_factor)
+    return_expression = ExpressionNode(return_term)
+    return_comp_expression = ComparisonExpression(return_expression)
+    return_statement = ReturnStatement(return_comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    method_declaration = MethodDeclaration(
+        method_identifier_token.value,
+        parameter_list,
+        statement_list
+    )
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_declaration)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_no_access_modifiers_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct error when given no access modifier when one is
+    expected for a method declaration
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "pascal")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        return_type_token, return_token, method_identifier_token,
+        left_parenthesis_token, return_type_token, parameter_identifier,
+        right_parenthesis_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        return_type_token.token_type
+    )
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct error when given no return type in a method
+    declaration.
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "pascal")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, method_identifier_token,
+        left_parenthesis_token, return_type_token, parameter_identifier,
+        right_parenthesis_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        IDENTIFIER_TOKEN_TYPE
+    )
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_no_identifier_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct error when given no identifier in a method
+    declaration.
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, return_type_token, left_parenthesis_token,
+        return_type_token, parameter_identifier, right_parenthesis_token,
+        left_curly_brace_token, return_token, decimal_literal_token,
+        semi_colon_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        LEFT_PARENTHESIS_TOKEN_TYPE
+    )
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+
+def test_parser_can_produce_error_for_no_left_paren_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct error when given left/opening parenthesis in a
+    method declaration.
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "pascal")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, return_type_token, method_identifier_token,
+        return_type_token, parameter_identifier, right_parenthesis_token,
+        left_curly_brace_token, return_token, decimal_literal_token,
+        semi_colon_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        return_type_token.token_type
+    )
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct error when parameter list fails.
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "pascal")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, return_type_token, method_identifier_token,
+        left_parenthesis_token, parameter_identifier, right_parenthesis_token,
+        left_curly_brace_token, return_token, decimal_literal_token,
+        semi_colon_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        IDENTIFIER_TOKEN_TYPE
+    )
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+# I don't think you have to check for right paren; parameters should check 4 it
+def test_parser_can_produce_error_for_no_block_statement_body_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct error when given no block statement body in a
+    method declaration.
+    """
+
+    return_type_token = Token(SHORT_TOKEN_TYPE, "SHORT")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "pascal")
+    parameter_identifier = Token(IDENTIFIER_TOKEN_TYPE, "cpp")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, return_type_token, method_identifier_token,
+        left_parenthesis_token, return_type_token, parameter_identifier,
+        right_parenthesis_token, left_curly_brace_token, return_token,
+        decimal_literal_token, semi_colon_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_produce_error_for_no_access_modifiers_given():

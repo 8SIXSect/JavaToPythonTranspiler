@@ -265,7 +265,8 @@ class NodeSuccess:
         WhileStatement, IfStatement,
         BlockStatement,
         StatementList,
-        ParameterList 
+        ParameterList,
+        MethodDeclaration
     ]
 
 
@@ -592,7 +593,7 @@ class MethodDeclaration:
     """
 
     identifier: str
-
+    parameter_list: ParameterList
     statement_list: StatementList
 
 
@@ -632,6 +633,14 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
     INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
     BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
 )
+
+
+def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a MethodDeclaration object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
