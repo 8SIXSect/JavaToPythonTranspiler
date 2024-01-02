@@ -610,18 +610,18 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     return NodeFailure(error_message)
 
 
-ParserResult = StatementList | ParserFailure
+ParserResult = MethodDeclaration | ParserFailure
 
 
 def parse_tokens(tokens: Tokens) -> ParserResult:
     """ This function's purpose is to be the entrypoint for the parser """
 
-    root_node_result: NodeResult = parse_tokens_for_statement_list(tokens)
+    root_node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
 
     if isinstance(root_node_result, NodeFailure):
         return ParserFailure(root_node_result.error_message)
 
-    assert isinstance(root_node_result.node, StatementList)
+    assert isinstance(root_node_result.node, MethodDeclaration)
 
     return root_node_result.node
 
@@ -635,9 +635,6 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 )
 
 
-# TODO: add support for method dec in format ast
-# TODO: also change parse_tokens to support method_declaration just so i can test
-# out it w/ format ast
 def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a MethodDeclaration object.
