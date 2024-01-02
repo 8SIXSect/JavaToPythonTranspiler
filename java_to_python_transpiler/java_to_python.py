@@ -256,6 +256,8 @@ class NodeSuccess:
     tokens: Tokens
  
     node: Union[
+        NoNode,
+
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
         MethodCall, ArgumentList,
         VariableInitialization, ReturnStatement, VariableIncrement,
@@ -263,7 +265,7 @@ class NodeSuccess:
         WhileStatement, IfStatement,
         BlockStatement,
         StatementList,
-        ParameterList
+        ParameterList 
     ]
 
 
@@ -276,6 +278,14 @@ class NodeFailure:
     """
 
     error_message: str
+
+
+@dataclass
+class NoNode:
+    """
+    Some aspects of Java don't need to be represented in Python; however, I
+    want to still check for syntax, so this node is used for that case.
+    """
 
 
 class ComparisonOperator(Enum):
@@ -624,8 +634,39 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 )
 
 
+def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to verify that there is at least 1
+    access modifier, and then to parse through all the access modifiers.
+    """
+
+    ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
+        PUBLIC_TOKEN_TYPE, PRIVATE_TOKEN_TYPE, STATIC_TOKEN_TYPE
+    )
+
+    expected_access_modifier: Token = tokens[0]
+    if expected_access_modifier.token_type not in ACCESS_MODIFIER_TYPES:
+        return report_error_in_parser(expected_access_modifier.token_type)
+
+    # Mutable data sucks but it's the best solution here without crazy recursion
+    tokens_as_list: List[Token] = list(tokens)
+
+    current_token: Token = tokens_as_list[0]
+
+    # The initial access modifier should be deleted from here
+    # 0 is used because you keep deleting the 0th index
+    while current_token.token_type in ACCESS_MODIFIER_TYPES:
+        del tokens_as_list[0]
+        
+        current_token = tokens_as_list[0]
+
+    tokens_as_tuple: Tokens = tuple(tokens_as_list)
+    no_node = NoNode()
+
+    return NodeSuccess(tokens_as_tuple, no_node)   
+
+
 # TODO: Enhance the documentation of the ALL THESE functions
-# todo: add tests for expecting variable types; dw its just failures    
 def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a ParameterList object.

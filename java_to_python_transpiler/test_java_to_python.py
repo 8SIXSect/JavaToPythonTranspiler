@@ -9,16 +9,16 @@ from java_to_python_transpiler.java_to_python import (
     GREATER_THAN_TOKEN_TYPE, IDENTIFIER_TOKEN_TYPE, IF_TOKEN_TYPE,
     INT_TOKEN_TYPE, LEFT_BRACKET_TOKEN_TYPE, LEFT_CURLY_BRACE_TOKEN_TYPE,
     LEFT_PARENTHESIS_TOKEN_TYPE, LESS_THAN_TOKEN_TYPE, LONG_TOKEN_TYPE,
-    MINUS_TOKEN_TYPE, MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, RETURN_TOKEN_TYPE,
+    MINUS_TOKEN_TYPE, MULTIPLY_TOKEN_TYPE, PLUS_TOKEN_TYPE, PRIVATE_TOKEN_TYPE, PUBLIC_TOKEN_TYPE, RETURN_TOKEN_TYPE,
     RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE,
     RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE,
-    SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
+    SINGLE_LINE_COMMENT_TOKEN_TYPE, STATIC_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
     WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression,
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
-    InlineStatement, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
+    InlineStatement, NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
-    parse_tokens, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
+    parse_tokens, parse_tokens_for_access_modifier_list, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
@@ -56,6 +56,11 @@ false_token = Token(FALSE_TOKEN_TYPE, "FALSE")
 while_token = Token(WHILE_TOKEN_TYPE, "WHILE")
 if_token = Token(IF_TOKEN_TYPE, "IF")
 else_token = Token(ELSE_TOKEN_TYPE, "ELSE")
+
+
+public_token = Token(PUBLIC_TOKEN_TYPE, "PUBLIC")
+private_token = Token(PRIVATE_TOKEN_TYPE, "PRIVATE")
+static_token = Token(STATIC_TOKEN_TYPE, "STATIC")
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -341,6 +346,74 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
+
+
+def test_parser_can_produce_error_for_no_access_modifiers_given():
+    """
+    This test checks if the function `parse_tokens_for_access_modifier_list`
+    can generate the correct error when given no access modifier when one is
+    expected.
+    """
+
+    int_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "turing")
+
+    tokens: Tokens = (int_token, identifier_token, end_of_file_token)
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(INT_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
+    
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_output_for_a_single_access_modifier():
+    """
+    This test checks if the function `parse_tokens_for_access_modifier_list`
+    can generate the correct output when given one access modifer.
+    """
+
+    int_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "forth")
+
+    tokens: Tokens = (
+        public_token, int_token, identifier_token,
+        end_of_file_token
+    )
+
+    no_node = NoNode()
+    expected_output_tokens: Tokens = (int_token, identifier_token,
+                                      end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, no_node)
+
+    node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_output_for_multiple_access_modifiers():
+    """
+    This test checks if the function `parse_tokens_for_access_modifier` can
+    generate the correct output when given multiple access modifiers
+    """
+
+    char_token = Token(CHAR_TOKEN_TYPE, "CHAR")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "porth")
+
+    tokens: Tokens = (
+        public_token, static_token, char_token, identifier_token,
+        end_of_file_token
+    )
+
+    no_node = NoNode()
+    expected_output_tokens: Tokens = (char_token, identifier_token,
+                                      end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, no_node)
+
+    node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_parameter_list_with_no_parameters():
