@@ -15,14 +15,14 @@ from java_to_python_transpiler.java_to_python import (
     SINGLE_LINE_COMMENT_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
     WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression,
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
-    InlineStatement, StatementList, LexerFailure, MethodCall, NodeFailure,
+    InlineStatement, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
     parse_tokens, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
-    parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
+    parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_parameter_list,
     parse_tokens_for_statement_list, parse_tokens_for_method_call,
     parse_tokens_for_return_statement, parse_tokens_for_term,
     parse_tokens_for_variable_increment,
@@ -341,6 +341,95 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
+
+
+def test_parser_can_generate_correct_ast_for_parameter_list_with_no_parameters():
+    """
+    This test checks if the function `parse_tokens_for_parameter_list` can
+    correctly parse the tokens when provided with no parameters.
+    """
+
+    tokens: Tokens = (right_parenthesis_token, end_of_file_token)
+
+    parameter_list = ParameterList()
+    expected_output = NodeSuccess(tokens, parameter_list)
+
+    node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_parameter_list():
+    """
+    This test checks that the parser can correctly generate an ParameterList
+    object using the `parse_tokens_for_parameter_list` function when given an
+    input of a singular parameter.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "ada")
+    double_token = Token(DOUBLE_TOKEN_TYPE, "DOUBLE")
+    
+    tokens: Tokens = (
+        double_token, identifier_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    parameter_list = ParameterList(identifier_token.value)
+
+    expected_output_tokens: Tokens = (right_parenthesis_token, end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, parameter_list)
+
+    node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_multiple_parameter_list():   
+    """
+    This test checks that the parser can correctly generate an ParameterList
+    object using the `parse_tokens_for_parameter_list` function when given an
+    input of multiple parameters.
+    """
+
+    int_token = Token(INT_TOKEN_TYPE, "INT")
+    first_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "logtalk")
+    second_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "datalog")
+
+    tokens: Tokens = (
+        int_token, first_identifier_token, comma_token,
+        int_token, second_identifier_token, right_parenthesis_token,
+        end_of_file_token
+    )
+
+    additional_parameter_list = ParameterList(second_identifier_token.value)
+    parameter_list = ParameterList(first_identifier_token.value,
+                                   additional_parameter_list)
+
+    expected_output_tokens: Tokens = (right_parenthesis_token, end_of_file_token)
+    expected_output = NodeSuccess(expected_output_tokens, parameter_list)
+
+    node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_when_parameter_list_expects_parenthesis_or_comma():
+    """
+    This test checks that the parser can correctly generate a NodeFailure object
+    when supplied a faulty input that omits either a comma or a parenthesis.
+    """
+
+    char_token = Token(CHAR_TOKEN_TYPE, "char")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "cabal")
+
+    tokens: Tokens = (char_token, identifier_token, end_of_file_token)
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements():

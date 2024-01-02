@@ -263,6 +263,7 @@ class NodeSuccess:
         WhileStatement, IfStatement,
         BlockStatement,
         StatementList,
+        ParameterList
     ]
 
 
@@ -557,14 +558,14 @@ class ParameterList:
     """
     Represents the parameters of a method.
 
-    `identifier` represents the name of the parameter.
+    `identifier` (optional) represents the name of the parameter.
 
     `additional_parameter_list` (optional) represents additional parameters
     kind of chained together.
     """
 
-    identifier: str
-    additional_parameter_list: ParameterList
+    identifier: Optional[str] = None
+    additional_parameter_list: Optional[ParameterList] = None
 
 
 # TODO: you could keep track of the return type, parameters, etc. for typehint
