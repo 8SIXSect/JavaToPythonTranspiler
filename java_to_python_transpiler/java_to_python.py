@@ -640,7 +640,66 @@ def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
     Parses a tuple of tokens in order to construct a MethodDeclaration object.
     """
 
-    NotImplemented
+    node_result_for_access_modifier_list: NodeResult
+    node_result_for_access_modifier_list = parse_tokens_for_access_modifier_list(
+        tokens
+    )
+
+    if isinstance(node_result_for_access_modifier_list, NodeFailure):
+        return node_result_for_access_modifier_list
+
+    expected_variable_type_token: Token
+    expected_variable_type_token = node_result_for_access_modifier_list.tokens[0]
+
+    if expected_variable_type_token.token_type not in VARIABLE_TYPES:
+        return report_error_in_parser(expected_variable_type_token.token_type)
+
+    tokens_with_return_type_removed: Tokens
+    tokens_with_return_type_removed = node_result_for_access_modifier_list.tokens[1:]
+
+    expected_identifier_token: Token = tokens_with_return_type_removed[0]
+    if expected_identifier_token.token_type != IDENTIFIER_TOKEN_TYPE:
+        return report_error_in_parser(expected_identifier_token.token_type)
+
+    tokens_with_identifier_removed: Tokens = tokens_with_return_type_removed[1:]
+
+    expected_left_paren_token: Token = tokens_with_identifier_removed[0]
+    if expected_left_paren_token.token_type != LEFT_PARENTHESIS_TOKEN_TYPE:
+        return report_error_in_parser(expected_left_paren_token.token_type)
+
+    tokens_with_left_paren_removed: Tokens = tokens_with_identifier_removed[1:]
+
+    node_result_for_parameter_list: NodeResult = parse_tokens_for_parameter_list(
+        tokens_with_left_paren_removed
+    )
+    
+    if isinstance(node_result_for_parameter_list, NodeFailure):
+        return node_result_for_parameter_list
+
+    assert isinstance(node_result_for_parameter_list.node, ParameterList)
+
+    # Parameter list should check for right paren (fingers crossed)
+    tokens_with_right_paren_removed: Tokens
+    tokens_with_right_paren_removed = node_result_for_parameter_list.tokens[1:]
+
+    node_result_for_block_statement_body: NodeResult
+    node_result_for_block_statement_body = parse_tokens_for_block_statement_body(
+        tokens_with_right_paren_removed
+    )
+
+    if isinstance(node_result_for_block_statement_body, NodeFailure):
+        return node_result_for_block_statement_body
+
+    assert isinstance(node_result_for_block_statement_body.node, StatementList)
+
+    method_declaration = MethodDeclaration(
+        expected_identifier_token.value,
+        node_result_for_parameter_list.node,
+        node_result_for_block_statement_body.node
+    )
+
+    return NodeSuccess(node_result_for_block_statement_body.tokens,
+                       method_declaration)
 
 
 def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
