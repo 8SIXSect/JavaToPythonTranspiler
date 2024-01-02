@@ -635,6 +635,9 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 )
 
 
+# TODO: add support for method dec in format ast
+# TODO: also change parse_tokens to support method_declaration just so i can test
+# out it w/ format ast
 def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a MethodDeclaration object.
