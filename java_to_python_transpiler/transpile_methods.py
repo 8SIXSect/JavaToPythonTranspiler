@@ -129,10 +129,23 @@ def format_ast(indent_level: int, node: Node | None):
             format_ast_with_extra_indent(comparison_expression)
             format_ast_with_extra_indent(statement_list)
 
-        case IfStatement(comparison_expression, statement_list):
+        case IfStatement(comparison_expression, statement_list,
+                         else_if_statement, else_statement_list):
+            
             print_output("-> if_stmt")
             format_ast_with_extra_indent(comparison_expression)
             format_ast_with_extra_indent(statement_list)
+            
+            if else_if_statement is not None:
+                print_output("-> else_if_stmt")
+                format_ast_with_extra_indent(else_if_statement.comparison_expression)
+                format_ast_with_extra_indent(else_if_statement.statement_list)
+                format_ast_with_extra_indent(else_if_statement.additional_if_statement)
+                format_ast_with_extra_indent(else_if_statement.else_clause)
+
+            if else_statement_list is not None:
+                print_output("-> else_stmt")
+                format_ast_with_extra_indent(else_statement_list)
 
         case BlockStatement(statement):
             print_output("-> block_stmt")

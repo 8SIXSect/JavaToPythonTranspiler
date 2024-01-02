@@ -649,7 +649,7 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
 
 # todo: add tests for this function
 # im gonna wait on adding tests till i create if stmts
-# todo: add else and else if clauses to if (probably do this first; this ez)
+# todo: add support for else if - else clauses in format ast (and ensure that they work)
 
 def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     """
@@ -704,8 +704,6 @@ def parse_tokens_for_while_statement(tokens: Tokens) -> NodeResult:
 
     assert isinstance(node_result_for_comp_expression_with_paren.node,
                       ComparisonExpression)
-
-    #breakpoint()
 
     node_result_for_block_statement: NodeResult
     node_result_for_block_statement = parse_tokens_for_block_statement_body(
