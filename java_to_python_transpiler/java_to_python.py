@@ -624,13 +624,59 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 )
 
 
-# TODO: Enhance the documentation of the parser's functions
+# TODO: Enhance the documentation of the ALL THESE functions
+# todo: add tests for expecting variable types; dw its just failures    
 def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a ParameterList object.
     """
 
-    NotImplemented
+    initial_token: Token = tokens[0]
+
+    if initial_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
+        parameter_list = ParameterList()
+        return NodeSuccess(tokens, parameter_list)
+
+    if initial_token.token_type not in VARIABLE_TYPES:
+        return report_error_in_parser(initial_token.token_type)
+
+    tokens_with_type_removed: Tokens = tokens[1:]
+
+    expected_identifier_token: Token = tokens_with_type_removed[0]
+    if expected_identifier_token.token_type != IDENTIFIER_TOKEN_TYPE:
+        return report_error_in_parser(expected_identifier_token.token_type)
+
+    tokens_with_identifier_removed: Tokens = tokens_with_type_removed[1:]
+
+    EXPECTED_TYPES: Tuple[TokenType, TokenType] = (COMMA_TOKEN_TYPE,
+                                                   RIGHT_PARENTHESIS_TOKEN_TYPE)
+
+    expected_comma_or_paren_token: Token = tokens_with_identifier_removed[0]
+    if expected_comma_or_paren_token.token_type not in EXPECTED_TYPES:
+        return report_error_in_parser(expected_comma_or_paren_token.token_type)
+
+    if expected_comma_or_paren_token.token_type == RIGHT_PARENTHESIS_TOKEN_TYPE:
+        parameter_list = ParameterList(expected_identifier_token.value)
+        return NodeSuccess(tokens_with_identifier_removed, parameter_list)
+
+    tokens_with_comma_removed: Tokens = tokens_with_identifier_removed[1:]
+
+    node_result_for_additional_parameter_list: NodeResult
+    node_result_for_additional_parameter_list = parse_tokens_for_parameter_list(
+        tokens_with_comma_removed
+    )
+
+    if isinstance(node_result_for_additional_parameter_list, NodeFailure):
+        return node_result_for_additional_parameter_list
+
+    assert isinstance(node_result_for_additional_parameter_list.node,
+                      ParameterList)
+
+    parameter_list = ParameterList(expected_identifier_token.value,
+                                   node_result_for_additional_parameter_list.node)
+
+    return NodeSuccess(node_result_for_additional_parameter_list.tokens,
+                       parameter_list)
 
 
 def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
