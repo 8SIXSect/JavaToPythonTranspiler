@@ -552,6 +552,39 @@ class StatementList:
     additional_statement_list: Optional[StatementList] = None
 
 
+@dataclass
+class ParameterList:
+    """
+    Represents the parameters of a method.
+
+    `identifier` represents the name of the parameter.
+
+    `additional_parameter_list` (optional) represents additional parameters
+    kind of chained together.
+    """
+
+    identifier: str
+    additional_parameter_list: ParameterList
+
+
+# TODO: you could keep track of the return type, parameters, etc. for typehint
+@dataclass
+class MethodDeclaration:
+    """
+    Represents a method being declared.
+
+    `identifier` represents the name of the method
+
+    `parameter_list` represents the parameters of the method
+
+    `statement_list` represents the body of the method
+    """
+
+    identifier: str
+
+    statement_list: StatementList
+
+
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
 
 
@@ -588,6 +621,15 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
     INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
     BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
 )
+
+
+# TODO: Enhance the documentation of the parser's functions
+def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a ParameterList object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
@@ -646,9 +688,6 @@ def parse_tokens_for_statement_list(tokens: Tokens) -> NodeResult:
 
     return NodeSuccess(result_for_additional_statement_list.tokens, statement_list)
 
-
-# todo: add tests for this function
-# im gonna wait on adding tests till i create if stmts
 
 def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
     """
