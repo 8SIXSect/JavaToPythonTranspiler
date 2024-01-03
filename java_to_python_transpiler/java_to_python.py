@@ -600,7 +600,11 @@ class MethodDeclaration:
 @dataclass
 class MethodDeclarationList:
     """
-    Represents a list of methods being declared
+    Represents a list of methods being declared.
+
+    `method_declaration` (optional) represents the initial method declaration
+    `additional_method_declaration_list` (optional) can chain more method
+    declarations together
     """
 
     method_declaration: Optional[MethodDeclaration] = None
@@ -650,9 +654,14 @@ def parse_tokens(tokens: Tokens) -> ParserResult:
 # TODO: Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
 # HOwever, that may only apply to statements but no if expr reaches semi, it stops
 NodeResult = NodeSuccess | NodeFailure
+
 VARIABLE_TYPES: Tuple[TokenType, ...] = (
     INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
     BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
+)
+
+ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
+    PUBLIC_TOKEN_TYPE, PRIVATE_TOKEN_TYPE, STATIC_TOKEN_TYPE
 )
 
 
@@ -662,7 +671,52 @@ def parse_tokens_for_method_declaration_list(tokens: Tokens) -> NodeResult:
     object.
     """
 
-    NotImplemented
+    initial_token: Token = tokens[0]
+    if initial_token.token_type == RIGHT_CURLY_BRACE_TOKEN_TYPE:
+
+        method_declaration_list = MethodDeclarationList()
+        return NodeSuccess(tokens, method_declaration_list)
+
+    node_result_for_method_declaration: NodeResult
+    node_result_for_method_declaration = parse_tokens_for_method_declaration(
+        tokens
+    )
+
+    if isinstance(node_result_for_method_declaration, NodeFailure):
+        return node_result_for_method_declaration
+
+    assert isinstance(node_result_for_method_declaration.node, MethodDeclaration)
+
+    current_token: Token = node_result_for_method_declaration.tokens[0]
+    if current_token.token_type not in ACCESS_MODIFIER_TYPES:
+        
+        method_declaration_list = MethodDeclarationList(
+            node_result_for_method_declaration.node
+        )
+
+        return NodeSuccess(node_result_for_method_declaration.tokens,
+                           method_declaration_list)
+
+    node_result_for_another_method_dec_list: NodeResult
+    node_result_for_another_method_dec_list = parse_tokens_for_method_declaration_list(
+        node_result_for_method_declaration.tokens
+    )
+
+    if isinstance(node_result_for_another_method_dec_list, NodeFailure):
+        return node_result_for_another_method_dec_list
+
+    assert isinstance(node_result_for_another_method_dec_list.node,
+                      MethodDeclarationList)
+
+    method_declaration_list = MethodDeclarationList(
+        node_result_for_method_declaration.node,
+        node_result_for_another_method_dec_list.node
+    )
+
+    return NodeSuccess(
+        node_result_for_another_method_dec_list.tokens,
+        method_declaration_list
+    )
 
 
 def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
@@ -737,10 +791,6 @@ def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
     Parses a tuple of tokens in order to verify that there is at least 1
     access modifier, and then to parse through all the access modifiers.
     """
-
-    ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
-        PUBLIC_TOKEN_TYPE, PRIVATE_TOKEN_TYPE, STATIC_TOKEN_TYPE
-    )
 
     expected_access_modifier: Token = tokens[0]
     if expected_access_modifier.token_type not in ACCESS_MODIFIER_TYPES:
