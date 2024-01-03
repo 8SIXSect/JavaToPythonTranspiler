@@ -5,7 +5,7 @@ This module contains methods for transpiling source to source
 from typing import Union
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression, ComparisonOperator,
-    ExpressionNode, FactorNode, IfStatement, InlineStatement, MethodDeclaration, ParameterList, StatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
+    ExpressionNode, FactorNode, IfStatement, InlineStatement, MethodDeclaration, MethodDeclarationList, ParameterList, StatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
     LexerFailure, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens_for_comparison_expression,
     scan_and_tokenize_input,
@@ -166,6 +166,11 @@ def format_ast(indent_level: int, node: Node | None):
             print_output(identifier, True)
             format_ast_with_extra_indent(parameter_list)
             format_ast_with_extra_indent(statement_list)
+
+        case MethodDeclarationList(method_declaration, additional_method_dec_list):
+            print_output("-> method_dec_list")
+            format_ast_with_extra_indent(method_declaration)
+            format_ast_with_extra_indent(additional_method_dec_list)
 
         case _:
             OPERATOR_TYPES: tuple = (ArithmeticOperator, ComparisonOperator)
