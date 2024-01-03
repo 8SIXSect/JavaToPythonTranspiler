@@ -15,14 +15,14 @@ from java_to_python_transpiler.java_to_python import (
     SINGLE_LINE_COMMENT_TOKEN_TYPE, STATIC_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
     WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression,
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
-    InlineStatement, MethodDeclaration, NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
+    InlineStatement, MethodDeclaration, MethodDeclarationList, NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
     parse_tokens, parse_tokens_for_access_modifier_list, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
-    parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_method_declaration, parse_tokens_for_parameter_list,
+    parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_method_declaration, parse_tokens_for_method_declaration_list, parse_tokens_for_parameter_list,
     parse_tokens_for_statement_list, parse_tokens_for_method_call,
     parse_tokens_for_return_statement, parse_tokens_for_term,
     parse_tokens_for_variable_increment,
@@ -346,6 +346,178 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
+
+
+def test_parser_can_generate_correct_ast_for_method_dec_list_with_no_methods():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration_list`
+    can correctly parse the tokens when provided with no methods.
+    """
+
+    tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
+    
+    method_declaration_list = MethodDeclarationList()
+    expected_output = NodeSuccess(tokens, method_declaration_list)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_method_dec_list_with_one_method():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration_list`
+    can corretly parse the tokens when provided with a singular method.
+    """
+
+    int_token = Token(INT_TOKEN_TYPE, "INT")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "factor")
+
+    tokens: Tokens = (
+        private_token, int_token, identifier_token, left_parenthesis_token,
+        right_parenthesis_token, left_curly_brace_token, right_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    parameter_list = ParameterList()
+    statement_list = StatementList()
+
+    method_declaration = MethodDeclaration(
+        identifier_token.value,
+        parameter_list,
+        statement_list
+    )
+
+    method_declaration_list = MethodDeclarationList(method_declaration)
+
+    expected_output_tokens: Tuple[Token, Token] = (right_curly_brace_token,
+                                                   end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_declaration_list)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_method_dec_list_that_fails_initial_method():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration_list`
+    can produce an error because of failure of the initial method.
+    """
+
+    int_token = Token(INT_TOKEN_TYPE, "INT")
+
+    tokens: Tokens = (
+        private_token, int_token, left_parenthesis_token,
+        right_parenthesis_token, left_curly_brace_token, right_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(LEFT_PARENTHESIS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_ast_for_method_dec_list_with_multiple_methods():
+    """
+    This test checks if the function `parse_tokens_for_method_dec_list`
+    can produce the correct ast for a method declaration list with multiple
+    methods.
+    """
+
+    variable_type = Token(CHAR_TOKEN_TYPE, "CHAR")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sat")
+    another_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "Jhu")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+
+    tokens: Tokens = (
+        static_token, variable_type, identifier_token, left_parenthesis_token,
+        right_parenthesis_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        public_token, variable_type, another_identifier_token,
+        left_parenthesis_token, right_parenthesis_token, left_curly_brace_token,
+        right_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    parameter_list = ParameterList()
+
+    return_factor = FactorNode(decimal_literal_token.value)
+    return_term = TermNode(return_factor)
+    return_expression = ExpressionNode(return_term)
+    return_comparison_expression = ComparisonExpression(return_expression)
+    return_statement = ReturnStatement(return_comparison_expression)
+
+    inline_statement = InlineStatement(return_statement)
+
+    first_statement_list = StatementList(inline_statement)
+    second_statement_list = StatementList()
+
+    additional_method_declaration = MethodDeclaration(
+        another_identifier_token.value,
+        parameter_list, second_statement_list
+    )
+    additional_method_declaration_list = MethodDeclarationList(
+        additional_method_declaration
+    )
+
+    method_declaration = MethodDeclaration(
+        identifier_token.value,
+        parameter_list,
+        first_statement_list
+    )
+
+    method_declaration_list = MethodDeclarationList(
+        method_declaration,
+        additional_method_declaration_list
+    )
+
+    expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_declaration_list)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
+    
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_method_dec_list_that_fails_additional_method():
+    """
+    This test checks if the function `parse_tokens_for_method_dec_list`
+    can produce an error because of failure of the additional method.
+    """
+
+    variable_type = Token(CHAR_TOKEN_TYPE, "CHAR")
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "sat")
+    another_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "Jhu")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+
+    tokens: Tokens = (
+        static_token, variable_type, identifier_token, left_parenthesis_token,
+        right_parenthesis_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        public_token, variable_type, another_identifier_token,
+        left_parenthesis_token, left_curly_brace_token,
+        right_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(LEFT_CURLY_BRACE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
+
+    assert expected_output == node_result
 
 
 def test_parser_can_generate_correct_ast_for_method_declaration():

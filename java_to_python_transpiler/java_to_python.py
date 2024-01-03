@@ -266,7 +266,7 @@ class NodeSuccess:
         BlockStatement,
         StatementList,
         ParameterList,
-        MethodDeclaration
+        MethodDeclaration, MethodDeclarationList
     ]
 
 
@@ -597,6 +597,27 @@ class MethodDeclaration:
     statement_list: StatementList
 
 
+@dataclass
+class MethodDeclarationList:
+    """
+    Represents a list of methods being declared
+    """
+
+    method_declaration: Optional[MethodDeclaration] = None
+    additional_method_declaration_list: Optional[MethodDeclarationList] = None
+
+
+@dataclass
+class ClassDeclaration:
+    """
+    Represents a class being declared.
+
+    `identifier` represents the name of the class
+
+    `method_list` represents a list of method declarations
+    """
+
+
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
 
 
@@ -633,6 +654,15 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
     INT_TOKEN_TYPE, CHAR_TOKEN_TYPE, SHORT_TOKEN_TYPE, LONG_TOKEN_TYPE,
     BYTE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, BOOLEAN_TOKEN_TYPE, FLOAT_TOKEN_TYPE
 )
+
+
+def parse_tokens_for_method_declaration_list(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a MethodDeclarationList
+    object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
