@@ -674,7 +674,59 @@ def parse_tokens_for_class_declaration(tokens: Tokens) -> NodeResult:
     Parses a tuple of tokens in order to construct a ClassDeclaration object.
     """
 
-    NotImplemented
+    node_result_for_access_modifier_list: NodeResult
+    node_result_for_access_modifier_list = parse_tokens_for_access_modifier_list(
+        tokens
+    )
+
+    if isinstance(node_result_for_access_modifier_list, NodeFailure):
+        return node_result_for_access_modifier_list
+
+    expected_class_token: Token = node_result_for_access_modifier_list.tokens[0]
+    if expected_class_token.token_type != CLASS_TOKEN_TYPE:
+        return report_error_in_parser(expected_class_token.token_type)
+
+    tokens_with_class_token_removed: Tokens
+    tokens_with_class_token_removed = node_result_for_access_modifier_list.tokens[1:]
+
+    expected_identifier_token: Token = tokens_with_class_token_removed[0]
+    if expected_identifier_token.token_type != IDENTIFIER_TOKEN_TYPE:
+        return report_error_in_parser(expected_identifier_token.token_type)
+
+    tokens_with_identifier_removed: Tokens = tokens_with_class_token_removed[1:]
+
+    expected_left_brace_token: Token = tokens_with_identifier_removed[0]
+    if expected_left_brace_token.token_type != LEFT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_left_brace_token.token_type)
+
+    tokens_with_left_brace_removed: Tokens = tokens_with_identifier_removed[1:]
+
+    node_result_for_method_dec_list: NodeResult
+    node_result_for_method_dec_list = parse_tokens_for_method_declaration_list(
+        tokens_with_left_brace_removed
+    )
+
+    if isinstance(node_result_for_method_dec_list, NodeFailure):
+        return node_result_for_method_dec_list
+
+    assert isinstance(node_result_for_method_dec_list.node, MethodDeclarationList)
+
+    expected_right_brace_token: Token = node_result_for_method_dec_list.tokens[0]
+    if expected_right_brace_token.token_type != RIGHT_CURLY_BRACE_TOKEN_TYPE:
+        return report_error_in_parser(expected_right_brace_token.token_type)
+
+    tokens_with_right_brace_removed: Tokens
+    tokens_with_right_brace_removed = node_result_for_method_dec_list.tokens[1:]
+
+    class_declaration = ClassDeclaration(
+        expected_identifier_token.value,
+        node_result_for_method_dec_list.node
+    )
+
+    # Right now, you shouldn't really have to return tokens but once comments
+    # and that stuff is added, this part will be matter b/c there will b stuff
+    # after the class is declared
+    return NodeSuccess(tokens_with_right_brace_removed, class_declaration)
 
 
 def parse_tokens_for_method_declaration_list(tokens: Tokens) -> NodeResult:

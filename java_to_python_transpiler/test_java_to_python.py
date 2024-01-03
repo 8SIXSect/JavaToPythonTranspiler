@@ -364,7 +364,8 @@ def test_parser_can_generate_correct_ast_for_class_declaration():
     tokens: Tokens = (
         private_token, class_token, class_identifier_token,
         left_curly_brace_token,
-        public_token, int_token, method_identifier_token, left_curly_brace_token,
+        public_token, int_token, method_identifier_token, left_parenthesis_token,
+        right_parenthesis_token, left_curly_brace_token,
         return_token, decimal_literal_token, semi_colon_token,
         right_curly_brace_token, right_curly_brace_token,
         end_of_file_token
@@ -493,6 +494,31 @@ def test_parser_can_produce_error_for_class_dec_when_error_occurs_method_dec_lis
 
     tokens: Tokens = (
         public_token, class_token, identifier_token, left_curly_brace_token,
+        while_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(WHILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+
+
+def test_parser_can_produce_error_for_class_dec_when_right_brace_omitted():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when the right/closing curly brace is omitted.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "shinnei")
+
+    tokens: Tokens = (
+        public_token, class_token, identifier_token, left_curly_brace_token,
         end_of_file_token
     )
 
@@ -502,13 +528,6 @@ def test_parser_can_produce_error_for_class_dec_when_error_occurs_method_dec_lis
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
 
     assert expected_output == node_result
-
-
-def test_parser_can_produce_error_for_class_dec_when_right_brace_omitted():
-    """
-    This test checks if the function `parse_tokens_for_class_declaration`
-    can produce an error when the right/closing curly brace is omitted.
-    """
 
 
 def test_parser_can_generate_correct_ast_for_method_dec_list_with_no_methods():
