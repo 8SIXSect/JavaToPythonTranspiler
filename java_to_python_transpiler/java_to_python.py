@@ -266,7 +266,8 @@ class NodeSuccess:
         BlockStatement,
         StatementList,
         ParameterList,
-        MethodDeclaration, MethodDeclarationList
+        MethodDeclaration, MethodDeclarationList,
+        ClassDeclaration
     ]
 
 
@@ -618,8 +619,11 @@ class ClassDeclaration:
 
     `identifier` represents the name of the class
 
-    `method_list` represents a list of method declarations
+    `method_list` (optional) represents a list of method declarations
     """
+
+    identifier: str
+    method_list: Optional[MethodDeclarationList] = None
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -635,7 +639,7 @@ def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
     return NodeFailure(error_message)
 
 
-ParserResult = MethodDeclaration | ParserFailure
+ParserResult = ClassDeclaration | ParserFailure
 
 
 def parse_tokens(tokens: Tokens) -> ParserResult:
@@ -663,6 +667,14 @@ VARIABLE_TYPES: Tuple[TokenType, ...] = (
 ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
     PUBLIC_TOKEN_TYPE, PRIVATE_TOKEN_TYPE, STATIC_TOKEN_TYPE
 )
+
+
+def parse_tokens_for_class_declaration(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a ClassDeclaration object.
+    """
+
+    NotImplemented
 
 
 def parse_tokens_for_method_declaration_list(tokens: Tokens) -> NodeResult:

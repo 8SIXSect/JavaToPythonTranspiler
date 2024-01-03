@@ -2,7 +2,7 @@ import random
 from typing import Tuple
 
 from java_to_python_transpiler.java_to_python import (
-    CHAR_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE,
+    CHAR_TOKEN_TYPE, CLASS_TOKEN_TYPE, COMMA_TOKEN_TYPE, DECIMAL_LITERAL_TOKEN_TYPE,
     DIVIDE_TOKEN_TYPE, DOUBLE_TOKEN_TYPE, ELSE_TOKEN_TYPE, END_OF_FILE_TOKEN_TYPE,
     EQUALS_TOKEN_TYPE, ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER,
     EXCLAMATION_TOKEN_TYPE, FALSE_TOKEN_TYPE, FLOAT_LITERAL_TOKEN_TYPE,
@@ -13,13 +13,13 @@ from java_to_python_transpiler.java_to_python import (
     RIGHT_BRACKET_TOKEN_TYPE, RIGHT_CURLY_BRACE_TOKEN_TYPE,
     RIGHT_PARENTHESIS_TOKEN_TYPE, SEMI_COLON_TOKEN_TYPE, SHORT_TOKEN_TYPE,
     SINGLE_LINE_COMMENT_TOKEN_TYPE, STATIC_TOKEN_TYPE, STRING_LITERAL_TOKEN_TYPE, TRUE_TOKEN_TYPE,
-    WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ComparisonExpression,
+    WHILE_TOKEN_TYPE, ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration, ComparisonExpression,
     ComparisonOperator, ExpressionNode, FactorNode, IfStatement,
     InlineStatement, MethodDeclaration, MethodDeclarationList, NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization, WhileStatement,
     parse_tokens, parse_tokens_for_access_modifier_list, parse_tokens_for_argument_list, parse_tokens_for_block_statement,
-    parse_tokens_for_block_statement_body,
+    parse_tokens_for_block_statement_body, parse_tokens_for_class_declaration,
     parse_tokens_for_comparison_expression, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
     parse_tokens_for_if_statement, parse_tokens_for_inline_statement, parse_tokens_for_method_declaration, parse_tokens_for_method_declaration_list, parse_tokens_for_parameter_list,
@@ -58,6 +58,7 @@ if_token = Token(IF_TOKEN_TYPE, "IF")
 else_token = Token(ELSE_TOKEN_TYPE, "ELSE")
 
 
+class_token = Token(CLASS_TOKEN_TYPE, "CLASS")
 public_token = Token(PUBLIC_TOKEN_TYPE, "PUBLIC")
 private_token = Token(PRIVATE_TOKEN_TYPE, "PRIVATE")
 static_token = Token(STATIC_TOKEN_TYPE, "STATIC")
@@ -346,6 +347,168 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     parser_result: ParserResult = parse_tokens(tokens)
 
     assert expected_output == parser_result
+
+
+def test_parser_can_generate_correct_ast_for_class_declaration():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can correctly parse the tokens when provided with a valid input
+    """
+
+    class_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "abra")
+    method_identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "cadabra")
+    return_token = Token(RETURN_TOKEN_TYPE, "RETURN")
+    int_token = Token(INT_TOKEN_TYPE, "INT")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        private_token, class_token, class_identifier_token,
+        left_curly_brace_token,
+        public_token, int_token, method_identifier_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    return_factor = FactorNode(decimal_literal_token.value)
+    return_term = TermNode(return_factor)
+    return_expression = ExpressionNode(return_term)
+    return_comp_expression = ComparisonExpression(return_expression)
+
+    return_statement = ReturnStatement(return_comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    parameter_list = ParameterList()
+
+    method_declaration = MethodDeclaration(
+        method_identifier_token.value, parameter_list, statement_list
+    )
+    method_declaration_list = MethodDeclarationList(method_declaration)
+    class_declaration = ClassDeclaration(
+        class_identifier_token.value,
+        method_declaration_list
+    )
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, class_declaration)
+
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_class_dec_when_access_modifier_omitted():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when the access modifier(s) of a class are omitted.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "shinnei")
+
+    tokens: Tokens = (
+        class_token, identifier_token, left_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(CLASS_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_class_dec_when_class_keyword_omitted():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when the class keyword is omitted.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "shinnei")
+
+    tokens: Tokens = (
+        public_token, identifier_token, left_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(IDENTIFIER_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_class_dec_when_identifier_omitted():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when the identifier is omitted.
+    """
+
+    tokens: Tokens = (
+        public_token, class_token, left_curly_brace_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(LEFT_CURLY_BRACE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_class_dec_when_left_brace_omitted():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when the left/opening curly brace is omitted.
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "shinnei")
+
+    tokens: Tokens = (
+        public_token, class_token, identifier_token, right_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(RIGHT_CURLY_BRACE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_class_dec_when_error_occurs_method_dec_list():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when an error occurs in method_declaration_list
+    """
+
+    identifier_token = Token(IDENTIFIER_TOKEN_TYPE, "shinnei")
+
+    tokens: Tokens = (
+        public_token, class_token, identifier_token, left_curly_brace_token,
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(END_OF_FILE_TOKEN_TYPE)
+    expected_output = NodeFailure(error_message)
+    
+    node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_error_for_class_dec_when_right_brace_omitted():
+    """
+    This test checks if the function `parse_tokens_for_class_declaration`
+    can produce an error when the right/closing curly brace is omitted.
+    """
 
 
 def test_parser_can_generate_correct_ast_for_method_dec_list_with_no_methods():
