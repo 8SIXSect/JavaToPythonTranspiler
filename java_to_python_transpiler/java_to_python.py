@@ -187,6 +187,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
             r"false": FALSE_TOKEN_TYPE,
             r"null": NULL_TOKEN_TYPE,
             r"public": PUBLIC_TOKEN_TYPE,
+            r"private": PRIVATE_TOKEN_TYPE,
             r"void": VOID_TOKEN_TYPE,
             r"static": STATIC_TOKEN_TYPE,
             r"byte": BYTE_TOKEN_TYPE,
@@ -645,12 +646,12 @@ ParserResult = ClassDeclaration | ParserFailure
 def parse_tokens(tokens: Tokens) -> ParserResult:
     """ This function's purpose is to be the entrypoint for the parser """
 
-    root_node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+    root_node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
 
     if isinstance(root_node_result, NodeFailure):
         return ParserFailure(root_node_result.error_message)
 
-    assert isinstance(root_node_result.node, MethodDeclaration)
+    assert isinstance(root_node_result.node, ClassDeclaration)
 
     return root_node_result.node
 
@@ -734,6 +735,8 @@ def parse_tokens_for_method_declaration_list(tokens: Tokens) -> NodeResult:
     Parses a tuple of tokens in order to construct a MethodDeclarationList
     object.
     """
+
+    #breakpoint()
 
     initial_token: Token = tokens[0]
     if initial_token.token_type == RIGHT_CURLY_BRACE_TOKEN_TYPE:
