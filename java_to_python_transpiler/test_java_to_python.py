@@ -42,7 +42,6 @@ equals_token = Token(TokenType.EQUALS, "equals")
 
 true_token = Token(TokenType.TRUE, "TRUE")
 false_token = Token(TokenType.FALSE, "FALSE")
-
 return_token = Token(TokenType.RETURN, "RETURN")
 while_token = Token(TokenType.WHILE, "WHILE")
 if_token = Token(TokenType.IF, "IF")
@@ -347,7 +346,6 @@ def test_parser_can_generate_correct_ast_for_class_declaration():
 
     class_identifier_token = Token(TokenType.IDENTIFIER, "abra")
     method_identifier_token = Token(TokenType.IDENTIFIER, "cadabra")
-    return_token = Token(TokenType.RETURN, "RETURN")
     int_token = Token(TokenType.INT, "INT")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
@@ -497,8 +495,6 @@ def test_parser_can_produce_error_for_class_dec_when_error_occurs_method_dec_lis
     assert expected_output == node_result
 
 
-
-
 def test_parser_can_produce_error_for_class_dec_when_right_brace_omitted():
     """
     This test checks if the function `parse_tokens_for_class_declaration`
@@ -606,7 +602,6 @@ def test_parser_can_produce_ast_for_method_dec_list_with_multiple_methods():
     identifier_token = Token(TokenType.IDENTIFIER, "sat")
     another_identifier_token = Token(TokenType.IDENTIFIER, "Jhu")
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(TokenType.RETURN, "RETURN")
 
     tokens: Tokens = (
         static_token, variable_type, identifier_token, left_parenthesis_token,
@@ -670,7 +665,6 @@ def test_parser_can_produce_error_for_method_dec_list_that_fails_additional_meth
     identifier_token = Token(TokenType.IDENTIFIER, "sat")
     another_identifier_token = Token(TokenType.IDENTIFIER, "Jhu")
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(TokenType.RETURN, "RETURN")
 
     tokens: Tokens = (
         static_token, variable_type, identifier_token, left_parenthesis_token,
@@ -702,7 +696,6 @@ def test_parser_can_generate_correct_ast_for_method_declaration():
     return_type_token = Token(TokenType.SHORT, "SHORT")
     method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -748,7 +741,6 @@ def test_parser_can_produce_error_for_no_access_modifiers_in_method_declaration(
     return_type_token = Token(TokenType.SHORT, "SHORT")
     method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -780,7 +772,6 @@ def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
     return_type_token = Token(TokenType.SHORT, "SHORT")
     method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -811,7 +802,6 @@ def test_parser_can_produce_error_for_no_identifier_in_method_declaration():
 
     return_type_token = Token(TokenType.SHORT, "SHORT")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -843,7 +833,6 @@ def test_parser_can_produce_error_for_no_left_paren_in_method_declaration():
     return_type_token = Token(TokenType.SHORT, "SHORT")
     method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -873,7 +862,6 @@ def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaratio
     return_type_token = Token(TokenType.SHORT, "SHORT")
     method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -905,7 +893,6 @@ def test_parser_can_produce_error_for_no_block_statement_body_in_method_declarat
     return_type_token = Token(TokenType.SHORT, "SHORT")
     method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
     parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    return_token = Token(TokenType.RETURN, "RETURN")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -1122,7 +1109,6 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement()
     """
     
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(TokenType.RETURN, "RETURN")
 
     tokens: Tokens = (
         return_token, decimal_literal_token, semi_colon_token,
@@ -1152,7 +1138,6 @@ def test_parser_can_produce_error_for_statement_list_that_fails_initial_statemen
     can produce an error because of failure of the initial statement.
     """
 
-    return_token = Token(TokenType.RETURN, "RETURN")
     tokens: Tokens = (return_token, return_token, end_of_file_token)
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RETURN)
@@ -1172,7 +1157,6 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     variable_type = Token(TokenType.CHAR, "CHAR")
     identifier_token = Token(TokenType.IDENTIFIER, "sat")
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(TokenType.RETURN, "RETURN")
 
     tokens: Tokens = (
         variable_type, identifier_token, equals_token, decimal_literal_token,
@@ -1219,7 +1203,6 @@ def test_parser_can_produce_error_for_statement_list_that_fails_additional_state
     variable_type = Token(TokenType.CHAR, "CHAR")
     identifier_token = Token(TokenType.IDENTIFIER, "sat")
     decimal_literal_token: Token = generate_number_token_with_random_value()
-    return_token = Token(TokenType.RETURN, "RETURN")
 
     tokens: Tokens = (
         variable_type, identifier_token, equals_token, decimal_literal_token,
@@ -1342,7 +1325,6 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body
     """
  
     false_token = Token(TokenType.FALSE, "FALSE")
-    return_token = Token(TokenType.RETURN, "RETURN")
     tokens: Tokens = (
         while_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, return_token, semi_colon_token,
@@ -1448,7 +1430,6 @@ def test_parser_can_generate_correct_ast_for_if_statement_with_non_empty_body():
     parse the tokens when provided with a if with a non-empty body/
     """
 
-    return_token = Token(TokenType.RETURN, "RETURN")
     tokens: Tokens = (
         if_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, return_token, false_token, semi_colon_token,
@@ -1593,7 +1574,6 @@ def test_parser_can_generate_correct_ast_for_if_else_statement():
     the tokens when provided with an if statement with an else clause.
     """
 
-    return_token = Token(TokenType.RETURN, "RETURN")
     tokens: Tokens = (
         if_token, left_parenthesis_token, false_token, right_parenthesis_token,
         left_curly_brace_token, return_token, semi_colon_token,
@@ -1656,7 +1636,6 @@ def test_parser_can_generate_correct_ast_for_if_else_if_else_statement():
     """
 
     identifier_token = Token(TokenType.IDENTIFIER, "y")
-    return_token = Token(TokenType.RETURN, "RETURN")
 
     tokens: Tokens = (
         if_token, left_parenthesis_token, true_token, right_parenthesis_token,
@@ -1820,7 +1799,6 @@ def test_parser_can_generate_correct_ast_for_return_statement_with_semicolon():
     cares about is if you have a semicolon after it.
     """
 
-    return_token = Token(TokenType.RETURN, "RETURN")
     tokens: Tuple[Token, Token, Token] = (
         return_token, semi_colon_token,
         end_of_file_token
