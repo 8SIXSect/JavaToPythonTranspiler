@@ -419,12 +419,11 @@ class MethodCall:
 
     identifier represents the name of the method being called.
 
-    argument_list represents the list of arguments supplied to the method. It
-    defaults to None; None represents called a method with no arguments. 
+    argument_list represents the list of arguments supplied to the method.
     """
     
     identifier: str
-    argument_list: Optional[ArgumentList] = None
+    argument_list: ArgumentList 
 
 
 @dataclass
@@ -1742,4 +1741,109 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
     )
 
     return NodeSuccess(node_result_additional_argument_list.tokens, argument_list)
+
+
+Node = Union[
+    ComparisonExpression, ExpressionNode, TermNode, FactorNode,
+    MethodCall, ArgumentList,
+    VariableInitialization, ReturnStatement, VariableIncrement,
+    InlineStatement,
+    WhileStatement, IfStatement,
+    BlockStatement,
+    StatementList,
+    ParameterList,
+    MethodDeclaration, MethodDeclarationList,
+    ClassDeclaration,
+
+    ArithmeticOperator, ComparisonOperator
+]
+
+
+def emit_ast_into_output(node: Node, current_output: str = "") -> str:
+    """
+    This is the entrypoint for the emitter.
+
+    This function's purpose is to emit an output (string) based on the abstract
+    syntax tree inputted into the function (through the parameter `node`).
+    """
+
+    OPENED_PARENTHESIS = "("
+    CLOSED_PARENTHESIS = ")"
+    COMMA = ","
+    SPACE = " "
+
+    match node:
+        case ClassDeclaration(identifier, method_declaration_list):
+            pass
+        case MethodDeclarationList(method_declaration, additional_method_dec_list):
+            pass
+        case MethodDeclaration(identifier, parameter_list, statement_list):
+            pass
+        case ParameterList(identifier, additional_parameter_list):
+            pass
+        case StatementList(statement, additional_statement_list):
+            pass
+        case BlockStatement(statement):
+            pass
+        case IfStatement(comparison_expression, statement_list,
+                         else_if_statement, else_statement_list):
+            pass
+        case WhileStatement(comparison_expression, statement_list):
+            pass
+        case InlineStatement(statement):
+            pass
+        case VariableIncrement(identifier, expression):
+            pass
+        case VariableInitialization(identifier, expression):
+            pass
+        case ReturnStatement(expression):
+            pass
+        case ComparisonExpression(expression, operator, additional_expression):
+            pass
+        case ExpressionNode(single_term_node, operator, additional_expression_node):
+            pass
+        case TermNode(single_factor_node, operator, additional_term_node):
+            pass
+        
+        case FactorNode(number_or_identifier, None):
+            return number_or_identifier            
+
+        case FactorNode("", method_call) if method_call is not None:
+            return emit_ast_into_output(method_call)
+
+        case MethodCall(identifier, argument_list):
+            result_for_argument_list: str = emit_ast_into_output(argument_list)
+
+            return (
+                identifier + OPENED_PARENTHESIS + result_for_argument_list +
+                CLOSED_PARENTHESIS
+            )
+
+        case ArgumentList(None, _):
+            return ""
+
+        case ArgumentList(argument, None) if argument is not None:
+            return emit_ast_into_output(argument)
+
+        case ArgumentList(argument, additional_argument_list):
+
+            # Assertions are cleaner than a verbose guard clause
+            assert argument is not None
+            assert additional_argument_list is not None
+
+            result_for_argument: str = emit_ast_into_output(argument)
+            result_for_additional_argument_list: str = emit_ast_into_output(
+                additional_argument_list
+            )
+
+            return (
+                result_for_argument + COMMA + SPACE +
+                result_for_additional_argument_list
+            )
+
+        case _:
+            OPERATOR_TYPES: tuple = (ArithmeticOperator, ComparisonOperator)
+            if isinstance(node, OPERATOR_TYPES):
+                print_output(node.value, True)
+
 

@@ -2,14 +2,13 @@
 This module contains methods for transpiling source to source
 """
 
-from typing import Union
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, IfStatement, InlineStatement, MethodDeclaration, MethodDeclarationList, ParameterList, StatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableIncrement, VariableInitialization, WhileStatement, parse_tokens_for_comparison_expression,
+    LexerFailure, VariableIncrement, VariableInitialization, WhileStatement,
     scan_and_tokenize_input,
-    parse_tokens
+    parse_tokens, Node
 )
 
 
@@ -41,20 +40,6 @@ def parse_file_and_print_ast(file_name: str):
 
     test_parser(contents)
     
-
-
-Node = Union[
-    ComparisonExpression, ExpressionNode, TermNode, FactorNode,
-    MethodCall, ArgumentList,
-    VariableInitialization, ReturnStatement, VariableIncrement,
-    InlineStatement,
-    WhileStatement, IfStatement,
-    BlockStatement,
-    StatementList,
-
-    ArithmeticOperator, ComparisonOperator
-]
-
 
 def format_ast(indent_level: int, node: Node | None):
 
