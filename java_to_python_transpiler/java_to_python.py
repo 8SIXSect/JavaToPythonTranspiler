@@ -315,9 +315,9 @@ class ComparisonExpression:
 
     `first_expression` is represented by an ExpressionNode
 
-    `operator` is represented by a ComparisonOperator
+    `operator` (optional) is represented by a ComparisonOperator
     
-    `second_expression` is represented by an ExpressionNode
+    `second_expression` (optional) is represented by an ExpressionNode
     """
 
     expression: ExpressionNode
@@ -615,11 +615,11 @@ class ClassDeclaration:
 
     `identifier` represents the name of the class
 
-    `method_list` (optional) represents a list of method declarations
+    `method_list` represents a list of method declarations
     """
 
     identifier: str
-    method_list: Optional[MethodDeclarationList] = None
+    method_list: MethodDeclarationList 
 
 
 ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
@@ -1759,7 +1759,7 @@ Node = Union[
 ]
 
 
-def emit_ast_into_output(node: Node, current_output: str = "") -> str:
+def emit_ast_into_output(node: Node) -> str:
     """
     This is the entrypoint for the emitter.
 
@@ -1769,41 +1769,219 @@ def emit_ast_into_output(node: Node, current_output: str = "") -> str:
 
     OPENED_PARENTHESIS = "("
     CLOSED_PARENTHESIS = ")"
+    COLON = ":"
     COMMA = ","
     SPACE = " "
+    NEW_LINE = "\n"
+    EQUALS = "="
+    PLUS = "+"
+   
+    WHILE_KEYWORD = "while"
+    RETURN_KEYWORD = "return"
+    IF_KEYWORD = "if"
+    ELSE_KEYWORD = "else"
+    DEF_KEYWORD = "def"
+    CLASS_KEYWORD = "class"
 
+    # Todo: add indentation management
     match node:
         case ClassDeclaration(identifier, method_declaration_list):
-            pass
+            result_for_method_dec_list: str = emit_ast_into_output(
+                method_declaration_list
+            )
+
+            return (
+                CLASS_KEYWORD + SPACE + identifier + COLON + NEW_LINE
+                + result_for_method_dec_list
+            )
+
+        case MethodDeclarationList(None, None):
+            # Possibly return a newline?
+            return ""
+
+        case MethodDeclarationList(method_declaration, None):
+            assert method_declaration is not None
+            return emit_ast_into_output(method_declaration)
+
         case MethodDeclarationList(method_declaration, additional_method_dec_list):
-            pass
+            assert method_declaration is not None
+            assert additional_method_dec_list is not None
+
+            result_for_method_dec: str = emit_ast_into_output(method_declaration)
+            result_for_additional_method_dec_list: str = emit_ast_into_output(
+                additional_method_dec_list
+            )
+
+            return result_for_method_dec + result_for_additional_method_dec_list
+
         case MethodDeclaration(identifier, parameter_list, statement_list):
-            pass
+            result_for_parameter_list: str = emit_ast_into_output(parameter_list)
+            result_for_statement_list: str = emit_ast_into_output(statement_list)
+
+            return (
+                DEF_KEYWORD + SPACE + identifier + OPENED_PARENTHESIS
+                + result_for_parameter_list + CLOSED_PARENTHESIS + COLON +
+                NEW_LINE + result_for_statement_list
+            )
+        
+        case ParameterList(None, None):
+            return ""
+
+        case ParameterList(identifier, None):
+            assert identifier is not None 
+            return identifier
+
         case ParameterList(identifier, additional_parameter_list):
-            pass
+            assert identifier is not None
+            assert additional_parameter_list is not None
+
+            result_for_additional_parameter_list: str = emit_ast_into_output(
+                additional_parameter_list
+            )
+
+            return (
+                identifier + COMMA + SPACE +
+                result_for_additional_parameter_list 
+            )
+
+        case StatementList(None, None):
+            return ""
+
+        case StatementList(statement, None):
+            assert statement is not None
+            return emit_ast_into_output(statement)
+
         case StatementList(statement, additional_statement_list):
-            pass
+            assert statement is not None
+            assert additional_statement_list is not None
+
+            result_for_statement: str = emit_ast_into_output(statement)
+            result_for_additional_statement_list: str = emit_ast_into_output(
+                additional_statement_list
+            )
+
+            return result_for_statement + result_for_additional_statement_list
+            
+
         case BlockStatement(statement):
-            pass
+            return emit_ast_into_output(statement)
+       
+        # buddy there's an error here
         case IfStatement(comparison_expression, statement_list,
-                         else_if_statement, else_statement_list):
-            pass
+                         else_if_statement, else_statement):
+
+            result_for_comp_expression: str = emit_ast_into_output(
+                comparison_expression
+            )
+
+            result_for_statement_list: str = emit_ast_into_output(statement_list)
+
+            result_for_else_if_statement: str = (
+                "" if else_if_statement is None
+                else "el" + emit_ast_into_output(else_if_statement) 
+            )
+
+            result_for_else_statement: str = (
+                "" if else_statement is None
+                else ELSE_KEYWORD + COLON + NEW_LINE +
+                emit_ast_into_output(else_statement) 
+            )
+
+            return (
+                IF_KEYWORD + SPACE + result_for_comp_expression + COLON
+                + NEW_LINE + result_for_statement_list
+                + result_for_else_if_statement + result_for_else_statement
+            )
+
         case WhileStatement(comparison_expression, statement_list):
-            pass
+            result_for_comp_expression: str = emit_ast_into_output(
+                comparison_expression
+            )
+
+            result_for_statement_list: str = emit_ast_into_output(statement_list)
+
+            return (
+                WHILE_KEYWORD + SPACE + result_for_comp_expression + COLON
+                + NEW_LINE + result_for_statement_list
+            )
+        
         case InlineStatement(statement):
-            pass
+            return emit_ast_into_output(statement) + NEW_LINE
+
         case VariableIncrement(identifier, expression):
-            pass
+            result_for_expression: str = emit_ast_into_output(expression)
+
+            return (
+                identifier + SPACE + PLUS + EQUALS + SPACE +
+                result_for_expression
+            )
+        
         case VariableInitialization(identifier, expression):
-            pass
-        case ReturnStatement(expression):
-            pass
+            result_for_expression: str = emit_ast_into_output(expression)
+
+            return identifier + SPACE + EQUALS + SPACE + result_for_expression
+
+        case ReturnStatement(None):
+            return RETURN_KEYWORD
+
+        case ReturnStatement(expression) if expression is not None:
+            result_for_expression: str = emit_ast_into_output(expression)
+
+            return RETURN_KEYWORD + SPACE + result_for_expression
+
+        case ComparisonExpression(expression, None, None):
+            return emit_ast_into_output(expression)
+
         case ComparisonExpression(expression, operator, additional_expression):
-            pass
+            assert operator is not None
+            assert additional_expression is not None
+
+            result_for_expression: str = emit_ast_into_output(expression)
+            result_for_operator: str = emit_ast_into_output(operator)
+            result_for_additional_expression: str = emit_ast_into_output(
+                additional_expression
+            )
+
+            return (
+                result_for_expression + result_for_operator +
+                result_for_additional_expression
+            )
+
+        case ExpressionNode(single_term_node, None, None):
+            return emit_ast_into_output(single_term_node)
+
         case ExpressionNode(single_term_node, operator, additional_expression_node):
-            pass
+            assert operator is not None
+            assert additional_expression_node is not None
+
+            result_for_single_factor: str = emit_ast_into_output(single_term_node)
+            result_for_operator: str = emit_ast_into_output(operator)
+            result_for_additional_term: str = emit_ast_into_output(
+                additional_expression_node
+            )
+
+            return (
+                result_for_single_factor + result_for_operator +
+                result_for_additional_term
+            )
+
+        case TermNode(single_factor_node, None, None):
+            return emit_ast_into_output(single_factor_node)
+
         case TermNode(single_factor_node, operator, additional_term_node):
-            pass
+            assert operator is not None
+            assert additional_term_node is not None
+
+            result_for_single_factor: str = emit_ast_into_output(single_factor_node)
+            result_for_operator: str = emit_ast_into_output(operator)
+            result_for_additional_term: str = emit_ast_into_output(
+                additional_term_node
+            )
+
+            return (
+                result_for_single_factor + result_for_operator +
+                result_for_additional_term
+            )
         
         case FactorNode(number_or_identifier, None):
             return number_or_identifier            
@@ -1841,9 +2019,12 @@ def emit_ast_into_output(node: Node, current_output: str = "") -> str:
                 result_for_additional_argument_list
             )
 
+
         case _:
             OPERATOR_TYPES: tuple = (ArithmeticOperator, ComparisonOperator)
             if isinstance(node, OPERATOR_TYPES):
-                print_output(node.value, True)
+                return node.value
 
+            # This should be unreachable
+            assert False
 

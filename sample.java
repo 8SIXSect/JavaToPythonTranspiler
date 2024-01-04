@@ -6,6 +6,14 @@ public class Main {
     
     private int add(int a, int b) {
         int c = a + b;
+
+        if (c < 3) {
+            
+        } else if (true) {
+            pritn();
+        } else {
+            false;
+        }
         return c;
     }
 }

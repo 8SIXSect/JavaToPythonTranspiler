@@ -6,13 +6,32 @@ from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration, ComparisonExpression, ComparisonOperator,
     ExpressionNode, FactorNode, IfStatement, InlineStatement, MethodDeclaration, MethodDeclarationList, ParameterList, StatementList, LexerResult, MethodCall, NodeFailure, NodeResult, 
     ParserFailure, ParserResult, ReturnStatement, TermNode,
-    LexerFailure, VariableIncrement, VariableInitialization, WhileStatement,
+    LexerFailure, VariableIncrement, VariableInitialization, WhileStatement, emit_ast_into_output,
     scan_and_tokenize_input,
     parse_tokens, Node
 )
 
 
 PROMPT = ">>> "
+
+
+def java_to_python(user_input: str):
+    lexer_result: LexerResult = scan_and_tokenize_input(user_input)
+
+    if isinstance(lexer_result, LexerFailure):
+        print(lexer_result.error_message)
+        return
+
+    assert isinstance(lexer_result, tuple)
+
+    parser_result: ParserResult = parse_tokens(lexer_result)
+
+    if isinstance(parser_result, ParserFailure):
+        print(parser_result.error_messasge)
+        return
+
+    emitter_result: str = emit_ast_into_output(parser_result)
+    print(emitter_result)
 
 
 def test_parser(user_input: str): 
@@ -38,7 +57,7 @@ def parse_file_and_print_ast(file_name: str):
     with open(file_name, "r") as file_to_lex:
         contents: str = file_to_lex.read()
 
-    test_parser(contents)
+    java_to_python(contents)
     
 
 def format_ast(indent_level: int, node: Node | None):
