@@ -8,7 +8,7 @@ from java_to_python_transpiler.java_to_python import (
     NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization,
-    WhileStatement, TokenType,
+    WhileStatement, TokenType, emit_ast_into_output,
     parse_tokens, parse_tokens_for_access_modifier_list,
     parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body, parse_tokens_for_class_declaration,
@@ -320,6 +320,22 @@ def generate_number_token_with_random_value() -> Token:
     token_value = str(random_number)
 
     return Token(TokenType.DECIMAL_LITERAL, token_value)
+
+
+def generate_single_comp_expression(number_or_id: str) -> ComparisonExpression:
+    """
+    This is a helper function that generates a ComparisonExpression object with
+    a single term, and a single expression using `number_or_id.`
+
+    `number_or_id` is an abbreviation for number_or_identifier found in
+    FactorNode's parameters.
+    """
+
+    factor = FactorNode(number_or_id)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    
+    return ComparisonExpression(expression)
 
 
 def test_parser_can_generate_correct_error_given_faulty_input():
@@ -2760,4 +2776,62 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     node_result: NodeResult = parse_tokens_for_argument_list(tokens)
 
     assert expected_output == node_result
+
+
+def test_emitter_can_produce_correct_output_for_argument_list_with_no_arguments():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an ArgumentList object which contains no arguments
+    (i.e., it's first parameter is None).
+    """
+
+    emitter_input = ArgumentList()
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = ""
+    
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_singular_argument_argument_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an ArgumentList object which contains a singular argument.
+    """
+
+    NUMBER = "86"
+    argument_comp_expression: ComparisonExpression
+    argument_comp_expression = generate_single_comp_expression(NUMBER)
+    emitter_input = ArgumentList(argument_comp_expression)
+    
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    
+    expected_output = NUMBER
+    
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_multiple_argument_argument_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an ArgumentList object which contains multiple arguments.
+    """
+
+    IDENTIFIER = "eightysixsu"
+    additional_argument_comp_expression: ComparisonExpression
+    additional_argument_comp_expression = generate_single_comp_expression(
+        IDENTIFIER
+    )
+    additional_argument_list = ArgumentList(additional_argument_comp_expression)
+
+    NUMBER = "85"
+    argument_comp_expression: ComparisonExpression
+    argument_comp_expression = generate_single_comp_expression(NUMBER)
+    emitter_input = ArgumentList(argument_comp_expression,
+                                 additional_argument_list)
+
+    emitter_result: str = emit_ast_into_output(emitter_input) 
+
+    expected_output = f"{NUMBER}, {IDENTIFIER}" 
+
+    assert expected_output == emitter_result
 

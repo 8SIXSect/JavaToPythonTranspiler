@@ -1786,7 +1786,10 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
 
     def with_indent(output: str) -> str:
         return indent_level * "    " + output
- 
+
+
+    # Write a lot of tests for this. I know it's not fun but write some tests.
+    # Then refactor this awful code. Hopefully have that done by Jan 7th
     match node:
         case ClassDeclaration(identifier, method_declaration_list):
             next_indent_level = indent_level + 1
@@ -1880,7 +1883,6 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
                                                              indent_level)
             return (result_for_statement)
        
-        # buddy there's an error here
         case IfStatement(comparison_expression, statement_list,
                          else_if_statement, else_statement):
             
