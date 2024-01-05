@@ -2778,6 +2778,44 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_factor_node_with_no_method_call():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a FactorNode object with a number_or_identifier field and NOT a method_call
+    field.
+    """
+
+    NUMBER = "86"
+    emitter_input = FactorNode(NUMBER)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    
+    expected_output = NUMBER
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_factor_node_with_a_method_call():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a FactorNode object with a method_call field and NOT a number_or_identifier
+    field.
+    """
+
+    NUMBER = "86"
+    argument_comp_expression: ComparisonExpression
+    argument_comp_expression = generate_single_comp_expression(NUMBER)
+    argument_list = ArgumentList(argument_comp_expression)
+
+    IDENTIFIER = "vladilena"
+    method_call = MethodCall(IDENTIFIER, argument_list)
+    emitter_input = FactorNode(method_call=method_call)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    
+    expected_output = f"{IDENTIFIER}({NUMBER})"
+
+    assert expected_output == emitter_result
+
 
 def test_emitter_can_produce_correct_output_for_method_call():
     """
