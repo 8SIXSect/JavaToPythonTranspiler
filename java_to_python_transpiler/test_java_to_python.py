@@ -2778,6 +2778,24 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+
+def test_emitter_can_produce_correct_output_for_method_call():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a MethodCall object.
+    """
+
+    IDENTIFIER = "shinnei"
+    argument_list = ArgumentList()
+    emitter_input = MethodCall(IDENTIFIER, argument_list)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"{IDENTIFIER}()"
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_argument_list_with_no_arguments():
     """
     This test checks that the emitter can produce the correct output when given
@@ -2834,4 +2852,7 @@ def test_emitter_can_produce_correct_output_for_multiple_argument_argument_list(
     expected_output = f"{NUMBER}, {IDENTIFIER}" 
 
     assert expected_output == emitter_result
+
+
+# TODO: Implement tests for ArithmeticOperator and ComparisonOperator
 
