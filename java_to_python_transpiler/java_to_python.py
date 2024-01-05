@@ -1759,7 +1759,7 @@ Node = Union[
 ]
 
 
-def emit_ast_into_output(node: Node) -> str:
+def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
     """
     This is the entrypoint for the emitter.
 
@@ -1783,11 +1783,15 @@ def emit_ast_into_output(node: Node) -> str:
     DEF_KEYWORD = "def"
     CLASS_KEYWORD = "class"
 
-    # Todo: add indentation management
+
+    def with_indent(output: str) -> str:
+        return indent_level * "    " + output
+ 
     match node:
         case ClassDeclaration(identifier, method_declaration_list):
+            next_indent_level = indent_level + 1
             result_for_method_dec_list: str = emit_ast_into_output(
-                method_declaration_list
+                method_declaration_list, next_indent_level
             )
 
             return (
@@ -1801,24 +1805,29 @@ def emit_ast_into_output(node: Node) -> str:
 
         case MethodDeclarationList(method_declaration, None):
             assert method_declaration is not None
-            return emit_ast_into_output(method_declaration)
+            return emit_ast_into_output(method_declaration, indent_level)
 
         case MethodDeclarationList(method_declaration, additional_method_dec_list):
             assert method_declaration is not None
             assert additional_method_dec_list is not None
 
-            result_for_method_dec: str = emit_ast_into_output(method_declaration)
+            result_for_method_dec: str = emit_ast_into_output(method_declaration,
+                                                              indent_level)
             result_for_additional_method_dec_list: str = emit_ast_into_output(
-                additional_method_dec_list
+                additional_method_dec_list, indent_level
             )
 
             return result_for_method_dec + result_for_additional_method_dec_list
 
         case MethodDeclaration(identifier, parameter_list, statement_list):
-            result_for_parameter_list: str = emit_ast_into_output(parameter_list)
-            result_for_statement_list: str = emit_ast_into_output(statement_list)
+            next_indent_level = indent_level + 1
 
-            return (
+            result_for_parameter_list: str = emit_ast_into_output(parameter_list,
+                                                                  next_indent_level)
+            result_for_statement_list: str = emit_ast_into_output(statement_list,
+                                                                  next_indent_level)
+
+            return with_indent(
                 DEF_KEYWORD + SPACE + identifier + OPENED_PARENTHESIS
                 + result_for_parameter_list + CLOSED_PARENTHESIS + COLON +
                 NEW_LINE + result_for_statement_list
@@ -1836,7 +1845,7 @@ def emit_ast_into_output(node: Node) -> str:
             assert additional_parameter_list is not None
 
             result_for_additional_parameter_list: str = emit_ast_into_output(
-                additional_parameter_list
+                additional_parameter_list, indent_level 
             )
 
             return (
@@ -1849,42 +1858,51 @@ def emit_ast_into_output(node: Node) -> str:
 
         case StatementList(statement, None):
             assert statement is not None
-            return emit_ast_into_output(statement)
+            result_for_statement: str = emit_ast_into_output(statement,
+                                                             indent_level)
+            return with_indent(result_for_statement)
 
         case StatementList(statement, additional_statement_list):
             assert statement is not None
             assert additional_statement_list is not None
 
-            result_for_statement: str = emit_ast_into_output(statement)
+            result_for_statement: str = emit_ast_into_output(statement, indent_level)
             result_for_additional_statement_list: str = emit_ast_into_output(
-                additional_statement_list
+                additional_statement_list, indent_level
             )
 
-            return result_for_statement + result_for_additional_statement_list
+            return with_indent(result_for_statement +
+                               result_for_additional_statement_list)
             
 
         case BlockStatement(statement):
-            return emit_ast_into_output(statement)
+            result_for_statement: str = emit_ast_into_output(statement,
+                                                             indent_level)
+            return (result_for_statement)
        
         # buddy there's an error here
         case IfStatement(comparison_expression, statement_list,
                          else_if_statement, else_statement):
-
+            
             result_for_comp_expression: str = emit_ast_into_output(
-                comparison_expression
+                comparison_expression, indent_level
             )
-
-            result_for_statement_list: str = emit_ast_into_output(statement_list)
-
+            
+            next_indent_level = indent_level + 1
+            result_for_statement_list: str = emit_ast_into_output(
+                statement_list, next_indent_level
+            )
+            
             result_for_else_if_statement: str = (
                 "" if else_if_statement is None
-                else "el" + emit_ast_into_output(else_if_statement) 
+                else with_indent("el" + emit_ast_into_output(else_if_statement,
+                                                             indent_level))
             )
 
             result_for_else_statement: str = (
                 "" if else_statement is None
-                else ELSE_KEYWORD + COLON + NEW_LINE +
-                emit_ast_into_output(else_statement) 
+                else with_indent(ELSE_KEYWORD + COLON + NEW_LINE +
+                emit_ast_into_output(else_statement, next_indent_level))
             )
 
             return (
@@ -1895,10 +1913,13 @@ def emit_ast_into_output(node: Node) -> str:
 
         case WhileStatement(comparison_expression, statement_list):
             result_for_comp_expression: str = emit_ast_into_output(
-                comparison_expression
+                comparison_expression, indent_level
             )
 
-            result_for_statement_list: str = emit_ast_into_output(statement_list)
+            next_indent_level = indent_level + 1
+
+            result_for_statement_list: str = emit_ast_into_output(statement_list,
+                                                                  next_indent_level)
 
             return (
                 WHILE_KEYWORD + SPACE + result_for_comp_expression + COLON
@@ -1906,10 +1927,10 @@ def emit_ast_into_output(node: Node) -> str:
             )
         
         case InlineStatement(statement):
-            return emit_ast_into_output(statement) + NEW_LINE
+            return emit_ast_into_output(statement, indent_level) + NEW_LINE
 
         case VariableIncrement(identifier, expression):
-            result_for_expression: str = emit_ast_into_output(expression)
+            result_for_expression: str = emit_ast_into_output(expression, indent_level)
 
             return (
                 identifier + SPACE + PLUS + EQUALS + SPACE +
@@ -1917,7 +1938,7 @@ def emit_ast_into_output(node: Node) -> str:
             )
         
         case VariableInitialization(identifier, expression):
-            result_for_expression: str = emit_ast_into_output(expression)
+            result_for_expression: str = emit_ast_into_output(expression, indent_level)
 
             return identifier + SPACE + EQUALS + SPACE + result_for_expression
 
@@ -1925,21 +1946,21 @@ def emit_ast_into_output(node: Node) -> str:
             return RETURN_KEYWORD
 
         case ReturnStatement(expression) if expression is not None:
-            result_for_expression: str = emit_ast_into_output(expression)
+            result_for_expression: str = emit_ast_into_output(expression, indent_level)
 
             return RETURN_KEYWORD + SPACE + result_for_expression
 
         case ComparisonExpression(expression, None, None):
-            return emit_ast_into_output(expression)
+            return emit_ast_into_output(expression, indent_level)
 
         case ComparisonExpression(expression, operator, additional_expression):
             assert operator is not None
             assert additional_expression is not None
 
-            result_for_expression: str = emit_ast_into_output(expression)
-            result_for_operator: str = emit_ast_into_output(operator)
+            result_for_expression: str = emit_ast_into_output(expression, indent_level)
+            result_for_operator: str = emit_ast_into_output(operator, indent_level)
             result_for_additional_expression: str = emit_ast_into_output(
-                additional_expression
+                additional_expression, indent_level
             )
 
             return (
@@ -1948,16 +1969,18 @@ def emit_ast_into_output(node: Node) -> str:
             )
 
         case ExpressionNode(single_term_node, None, None):
-            return emit_ast_into_output(single_term_node)
+            return emit_ast_into_output(single_term_node, indent_level)
 
         case ExpressionNode(single_term_node, operator, additional_expression_node):
             assert operator is not None
             assert additional_expression_node is not None
 
-            result_for_single_factor: str = emit_ast_into_output(single_term_node)
-            result_for_operator: str = emit_ast_into_output(operator)
+            result_for_single_factor: str = emit_ast_into_output(single_term_node,
+                                                                 indent_level)
+
+            result_for_operator: str = emit_ast_into_output(operator, indent_level)
             result_for_additional_term: str = emit_ast_into_output(
-                additional_expression_node
+                additional_expression_node, indent_level
             )
 
             return (
@@ -1966,16 +1989,17 @@ def emit_ast_into_output(node: Node) -> str:
             )
 
         case TermNode(single_factor_node, None, None):
-            return emit_ast_into_output(single_factor_node)
+            return emit_ast_into_output(single_factor_node, indent_level)
 
         case TermNode(single_factor_node, operator, additional_term_node):
             assert operator is not None
             assert additional_term_node is not None
 
-            result_for_single_factor: str = emit_ast_into_output(single_factor_node)
-            result_for_operator: str = emit_ast_into_output(operator)
+            result_for_single_factor: str = emit_ast_into_output(single_factor_node,
+                                                                 indent_level)
+            result_for_operator: str = emit_ast_into_output(operator, indent_level)
             result_for_additional_term: str = emit_ast_into_output(
-                additional_term_node
+                additional_term_node, indent_level
             )
 
             return (
@@ -1987,10 +2011,11 @@ def emit_ast_into_output(node: Node) -> str:
             return number_or_identifier            
 
         case FactorNode("", method_call) if method_call is not None:
-            return emit_ast_into_output(method_call)
+            return emit_ast_into_output(method_call, indent_level)
 
         case MethodCall(identifier, argument_list):
-            result_for_argument_list: str = emit_ast_into_output(argument_list)
+            result_for_argument_list: str = emit_ast_into_output(argument_list,
+                                                                 indent_level)
 
             return (
                 identifier + OPENED_PARENTHESIS + result_for_argument_list +
@@ -2001,7 +2026,7 @@ def emit_ast_into_output(node: Node) -> str:
             return ""
 
         case ArgumentList(argument, None) if argument is not None:
-            return emit_ast_into_output(argument)
+            return emit_ast_into_output(argument, indent_level)
 
         case ArgumentList(argument, additional_argument_list):
 
@@ -2009,9 +2034,9 @@ def emit_ast_into_output(node: Node) -> str:
             assert argument is not None
             assert additional_argument_list is not None
 
-            result_for_argument: str = emit_ast_into_output(argument)
+            result_for_argument: str = emit_ast_into_output(argument, indent_level)
             result_for_additional_argument_list: str = emit_ast_into_output(
-                additional_argument_list
+                additional_argument_list, indent_level
             )
 
             return (
