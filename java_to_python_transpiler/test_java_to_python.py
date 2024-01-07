@@ -2778,6 +2778,55 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_single_term_expression():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an ExpressionNode object with only it `first_term_node` field given a
+    value and its other fields remaining None.
+    """
+    
+    NUMBER = "85"
+    factor = FactorNode(NUMBER)
+    term = TermNode(factor)
+    emitter_input = ExpressionNode(term)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = NUMBER
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_complex_expression_node():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an ExpressionNode object with all of its field not set to None; an example
+    input may look like "6 + 5 - 1"
+    """
+
+    NUMBER = "86"
+    number_factor = FactorNode(NUMBER)
+    additional_term = TermNode(number_factor)
+
+    IDENTIFIER = "anju"
+    identifier_factor = FactorNode(IDENTIFIER)
+    complex_term = TermNode(identifier_factor, ArithmeticOperator.MULTIPLY,
+                            additional_term)
+    additional_expression = ExpressionNode(complex_term)
+
+    ANOTHER_NUMBER = "1"
+    another_number_factor = FactorNode(ANOTHER_NUMBER)
+    number_term = TermNode(another_number_factor)
+    emitter_input = ExpressionNode(number_term, ArithmeticOperator.PLUS,
+                                   additional_expression)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"1+{IDENTIFIER}*{NUMBER}"
+
+    assert expected_output == emitter_result
+
+
+
 def test_emitter_can_produce_correct_output_for_single_factor_term():
     """
     This test checks that the emitter can produce the correct output when given
