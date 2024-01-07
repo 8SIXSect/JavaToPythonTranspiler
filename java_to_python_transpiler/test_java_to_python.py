@@ -2803,8 +2803,37 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_empty_return_statement():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ReturnStatement object with its `comparison_expression` field set to None;
+    thus, making it an empty return statement.
+    """
+
+    emitter_input = ReturnStatement()
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = "return"
+    assert expected_output == emitter_result
 
 
+def test_emitter_can_produce_correct_output_for_non_empty_return_statement():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ReturnStatement object with its `comparison_expression` field set not to
+    None; thus, making it a return statement with a value.
+    """
+
+    IDENTIFIER = "kurena"
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        IDENTIFIER
+    )
+    emitter_input = ReturnStatement(comp_expression)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"return {IDENTIFIER}"
+
+    assert expected_output == emitter_result
 
 
 def test_emitter_can_produce_correct_output_for_single_expression_comp_expression():
