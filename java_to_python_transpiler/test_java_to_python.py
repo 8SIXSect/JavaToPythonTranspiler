@@ -2778,6 +2778,45 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_single_factor_term():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a TermNode object with only it `first_factor_node` field given a value and
+    its other fields remaining None.
+    """
+    
+    NUMBER = "85"
+    factor = FactorNode(NUMBER)
+    emitter_input = TermNode(factor)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = NUMBER
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_complex_term_node():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a TermNode object with all of its field not set to None; an example input
+    may look like "6 * 3 / 1"
+    """
+
+    NUMBER = "86"
+    number_factor = FactorNode(NUMBER)
+    additional_term = TermNode(number_factor)
+
+    IDENTIFIER = "anju"
+    identifier_factor = FactorNode(IDENTIFIER)
+    emitter_input = TermNode(identifier_factor, ArithmeticOperator.MULTIPLY,
+                             additional_term)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"{IDENTIFIER}*{NUMBER}"
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_factor_node_with_no_method_call():
     """
     This test checks that the emitter can produce the correct output when given
