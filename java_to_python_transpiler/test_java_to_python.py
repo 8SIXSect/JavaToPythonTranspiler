@@ -338,6 +338,31 @@ def generate_single_comp_expression(number_or_id: str) -> ComparisonExpression:
     return ComparisonExpression(expression)
 
 
+def generate_limited_comp_expression(first_number_or_id: str,
+                                     operator: ComparisonOperator,
+                                     second_number_or_id: str):
+    """
+    This is a helper function that generates a ComparisonExpression object with
+    two single-term-single-factor expressions.
+
+    `first_number_or_id` represents the first number/identifier
+
+    `operator` represents the comparison operatar (<, >, <=, >=, ==, !=)
+
+    `second_number_or_id` represents the second number/identifier
+    """
+
+    first_factor = FactorNode(first_number_or_id)
+    first_term = TermNode(first_factor)
+    first_expression = ExpressionNode(first_term)
+
+    second_factor = FactorNode(second_number_or_id)
+    second_term = TermNode(second_factor)
+    second_expression = ExpressionNode(second_term)
+
+    return ComparisonExpression(first_expression, operator, second_expression) 
+
+
 def test_parser_can_generate_correct_error_given_faulty_input():
     """
     This test checks the parser's entrypoint function `parse_tokens`
@@ -2778,10 +2803,55 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+
+
+
+
+def test_emitter_can_produce_correct_output_for_single_expression_comp_expression():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ComparisonExpression object with only the `first_expression` field given
+    a value and its other fields remaining None.
+    """
+
+    NUMBER = "0"
+    factor = FactorNode(NUMBER)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    emitter_input = ComparisonExpression(expression)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = NUMBER
+
+    assert expected_output == emitter_result 
+
+
+def test_emitter_can_produce_correct_output_for_complex_comp_expression():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ComparisonExpression object with all of its fields not set to None; every
+    field will be given a value. An example expression may be: 5 <= 3
+    """
+
+    FIRST_NUMBER = "2"
+    operator = ComparisonOperator.NOT_EQUAL
+    SECOND_NUMBER = "93"
+    emitter_input: ComparisonExpression = generate_limited_comp_expression(
+        FIRST_NUMBER, operator, SECOND_NUMBER
+    )
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"{FIRST_NUMBER}!={SECOND_NUMBER}"
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_single_term_expression():
     """
     This test checks that the emitter can produce the correct output when given
-    an ExpressionNode object with only it `first_term_node` field given a
+    an ExpressionNode object with only the `first_term_node` field given a
     value and its other fields remaining None.
     """
     
@@ -2824,7 +2894,6 @@ def test_emitter_can_produce_correct_output_for_complex_expression_node():
     expected_output = f"1+{IDENTIFIER}*{NUMBER}"
 
     assert expected_output == emitter_result
-
 
 
 def test_emitter_can_produce_correct_output_for_single_factor_term():
