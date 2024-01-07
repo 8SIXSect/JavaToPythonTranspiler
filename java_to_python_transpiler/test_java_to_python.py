@@ -2803,6 +2803,26 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_variable_increment():
+    """
+    This test checks that emitter can produce the correct output when given a
+    VariableIncrement object.
+    """
+
+    IDENTIFIER = "laughingfox"
+    NUMBER = "86"
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        NUMBER
+    )
+    emitter_input = VariableIncrement(IDENTIFIER, comp_expression)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"{IDENTIFIER} += {NUMBER}"
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_variable_initialization():
     """
     This test checks that the emitter can produce the correct output when given
