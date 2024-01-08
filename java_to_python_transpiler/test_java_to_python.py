@@ -2803,6 +2803,59 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+# -----------------------------------------------------------------------------
+# START OF EMITTER TESTS
+# -----------------------------------------------------------------------------
+
+
+def test_emitter_can_produce_correct_output_for_multiple_parameters_parameter_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ParameterList object with multiple parameters
+    """
+
+    PARAMETER_3 = "lena"
+    parameter_3_list = ParameterList(PARAMETER_3)
+
+    PARAMETER_2 = "shin"
+    parameter_2_list = ParameterList(PARAMETER_2, parameter_3_list)
+
+    IDENTIFIER = "kurena"
+    emitter_input = ParameterList(IDENTIFIER, parameter_2_list)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = "kurena, shin, lena"
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_singular_parameter_parameter_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ParameterList object with only its first field, `parameter`, given a field,
+    and its other field set to None.
+    """
+
+    IDENTIFIER = "kurena"
+    emitter_input = ParameterList(IDENTIFIER)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = IDENTIFIER
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_empty_parameter_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ParameterList object with both of its fields set to None.
+    """
+
+    emitter_input = ParameterList()
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = ""
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_statement_list_with_multiple_statements():
     """
     This test checks that the emitter can prodcue the correct output when given
