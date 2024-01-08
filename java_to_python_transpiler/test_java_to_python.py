@@ -2808,6 +2808,81 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
 # -----------------------------------------------------------------------------
 
 
+def test_emitter_can_produce_correct_output_for_method_declaration_list_multiple_methods():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a MethodDeclarationList object with more than one method
+    """
+
+    METHOD_IDENTIFIER = "mymethod"
+    PARAMETER_1 = "num"
+    parameter_list = ParameterList(PARAMETER_1)
+
+    comp_expression: ComparisonExpression = generate_single_comp_expression("0")
+    return_statement = ReturnStatement(comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    method_declaration = MethodDeclaration(
+        METHOD_IDENTIFIER, parameter_list, statement_list
+    )
+    additional_method_declaration_list = MethodDeclarationList(method_declaration) 
+    emitter_input = MethodDeclarationList(method_declaration,
+                                          additional_method_declaration_list)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = (
+        f"def {METHOD_IDENTIFIER}(num):\n" +
+        "    return 0\n" +
+        f"def {METHOD_IDENTIFIER}(num):\n" +
+        "    return 0\n"
+    )
+    
+    assert expected_output == emitter_result
+
+
+
+def test_emitter_can_produce_correct_output_for_one_method_method_declaration_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a MethodDeclarationList object with a singular method.
+    """
+
+    METHOD_IDENTIFIER = "mymethod"
+    PARAMETER_1 = "num"
+    parameter_list = ParameterList(PARAMETER_1)
+
+    comp_expression: ComparisonExpression = generate_single_comp_expression("0")
+    return_statement = ReturnStatement(comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    method_declaration = MethodDeclaration(
+        METHOD_IDENTIFIER, parameter_list, statement_list
+    )
+ 
+    emitter_input = MethodDeclarationList(method_declaration)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = (
+        f"def {METHOD_IDENTIFIER}(num):\n" +
+        "    return 0\n"
+    )
+    
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_empty_method_declaration_list():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a MethodDeclarationList object with all of its fields set to None.
+    """
+
+    emitter_input = MethodDeclarationList()
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = ""
+    
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_method_declaration():
     """
     This test checks that the emitter can produce the correct output when given
