@@ -496,7 +496,7 @@ class InlineStatement:
 
     statement: Union[
         ReturnStatement, VariableInitialization, VariableIncrement,
-        ExpressionNode
+        ComparisonExpression
     ]
 
 
@@ -1302,22 +1302,23 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
 
 
     # If no other statement, then try to parse an expression
-    node_result_for_expression: NodeResult = parse_tokens_for_expression(tokens)
+    node_result_for_comp_expression: NodeResult
+    node_result_for_comp_expression = parse_tokens_for_comparison_expression(tokens)
 
-    if isinstance(node_result_for_expression, NodeFailure):
-        return node_result_for_expression
+    if isinstance(node_result_for_comp_expression, NodeFailure):
+        return node_result_for_comp_expression 
 
-    assert isinstance(node_result_for_expression.node, ExpressionNode)
+    assert isinstance(node_result_for_comp_expression.node, ComparisonExpression)
 
-    expected_semicolon_token: Token = node_result_for_expression.tokens[0]
+    expected_semicolon_token: Token = node_result_for_comp_expression.tokens[0]
     
     if expected_semicolon_token.token_type != TokenType.SEMI_COLON:
         return report_error_in_parser(expected_semicolon_token.token_type)
 
     tokens_with_semicolon_removed: Tokens
-    tokens_with_semicolon_removed = node_result_for_expression.tokens[1:]
+    tokens_with_semicolon_removed = node_result_for_comp_expression.tokens[1:]
 
-    inline_statement = InlineStatement(node_result_for_expression.node)
+    inline_statement = InlineStatement(node_result_for_comp_expression.node)
     return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
 
 
