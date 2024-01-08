@@ -2803,6 +2803,32 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_block_statement():
+    """
+    This test checks that the emitter can produce the correct ouptput when given
+    a BlockStatement object.
+    """
+
+    comp_expression: ComparisonExpression = generate_limited_comp_expression(
+        "5", ComparisonOperator.LESS_THAN_OR_EQUAL, "86"
+    )
+    return_statement = ReturnStatement(comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+    while_statement = WhileStatement(comp_expression, statement_list)
+    emitter_input = BlockStatement(while_statement)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = (
+        "while 5<=86:\n" +
+        "    return 5<=86\n"
+    )
+
+    assert expected_output == emitter_result
+
+
+# TODO: create a test for if-elif-else clauses altogether.
 def test_emitter_can_produce_correct_output_for_if_else_if_statement():
     """
     This test checks that the emitter can produce the correct output when given
