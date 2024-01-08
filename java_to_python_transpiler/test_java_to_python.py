@@ -2803,6 +2803,72 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_statement_list_with_multiple_statements():
+    """
+    This test checks that the emitter can prodcue the correct output when given
+    a StatementList object with both of its fields set to values that are not
+    None.
+    """
+
+    NUMBER = "86"
+    comp_expression_for_additional_statement_list: ComparisonExpression
+    comp_expression_for_additional_statement_list = generate_single_comp_expression(
+        NUMBER
+    )
+
+    inline_statement_for_additional_statement_list = InlineStatement(
+        comp_expression_for_additional_statement_list
+    )
+    additional_statement_list = StatementList(
+        inline_statement_for_additional_statement_list
+    )
+
+    comp_expression: ComparisonExpression = generate_single_comp_expression("theo")
+    IDENTIFIER = "var"
+    variable_initialization = VariableInitialization(IDENTIFIER, comp_expression)
+    inline_statement = InlineStatement(variable_initialization)
+    emitter_input = StatementList(inline_statement, additional_statement_list)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = (
+        "var = theo\n" +
+        "86\n"
+    )
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_statement_list_with_singular_statement():
+    """
+    This test checks that the emitter can prodcue the correct output when given
+    a StatementList object with only its `statement` field given a value and its
+    `additional_statement_list` field set to None
+    """
+
+    comp_expression: ComparisonExpression = generate_single_comp_expression("theo")
+    IDENTIFIER = "var"
+    variable_initialization = VariableInitialization(IDENTIFIER, comp_expression)
+    inline_statement = InlineStatement(variable_initialization)
+    emitter_input = StatementList(inline_statement)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = "var = theo\n"
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_empty_statement_list():
+    """
+    This test checks that the emitter can prodcue the correct output when given
+    a StatementList object with both of its fields set to None; thus, making it
+    an empty StatementList.
+    """
+
+    emitter_input = StatementList()
+    emitter_result: str = emit_ast_into_output(emitter_input)
+    expected_output = ""
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_block_statement():
     """
     This test checks that the emitter can produce the correct ouptput when given
