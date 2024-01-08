@@ -2808,6 +2808,44 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
 # -----------------------------------------------------------------------------
 
 
+def test_emitter_can_produce_correct_output_for_class_declaration():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a ClassDeclaration object.
+    """
+    
+    NUMBER = "86"
+    return_comp_expression: ComparisonExpression
+    return_comp_expression = generate_single_comp_expression(NUMBER)
+
+    return_statement = ReturnStatement(return_comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    parameter_list = ParameterList()
+
+    METHOD_IDENTIFIER = "hello"
+    method_declaration = MethodDeclaration(
+        METHOD_IDENTIFIER, parameter_list, statement_list
+    )
+    method_declaration_list = MethodDeclarationList(method_declaration)
+    CLASS_IDENTIFEIR = "Person"
+    emitter_input = ClassDeclaration(
+        CLASS_IDENTIFEIR,
+        method_declaration_list
+    )
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = (
+        f"class {CLASS_IDENTIFEIR}:\n" +
+        f"    def {METHOD_IDENTIFIER}():\n" +
+        "        return 86\n"
+    )
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_method_declaration_list_multiple_methods():
     """
     This test checks that the emitter can produce the correct output when given
