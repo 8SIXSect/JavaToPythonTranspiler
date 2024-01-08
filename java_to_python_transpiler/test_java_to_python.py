@@ -2803,6 +2803,102 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     assert expected_output == node_result
 
 
+def test_emitter_can_produce_correct_output_for_if_else_if_statement():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an IfStatement object for an IfStatement with an additional if statement.
+    """
+
+    additional_if_comp_expression: ComparisonExpression
+    additional_if_comp_expression = generate_single_comp_expression("cond")
+    additional_if_return_statement = ReturnStatement()
+    additional_if_inline_statement = InlineStatement(
+        additional_if_return_statement
+    )
+    additional_if_statement_list = StatementList(additional_if_inline_statement)
+    additional_if_statement = IfStatement(additional_if_comp_expression,
+                                          additional_if_statement_list)
+
+    comp_expression: ComparisonExpression
+    comp_expression = generate_single_comp_expression("false")
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+    emitter_input = IfStatement(comp_expression, statement_list,
+                                additional_if_statement=additional_if_statement)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = (
+        "if false:\n" +
+        "    return\n" +
+        "elif cond:\n" +
+        "    return\n"
+    )
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_if_else_statement():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an IfStatement object for an IfStatement with an else clause.
+    """
+
+    comp_expression: ComparisonExpression
+    comp_expression = generate_single_comp_expression("false")
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    VARIABLE_INCREMENT_IDENTIFIER = "anju"
+    variable_increment_comp_expression: ComparisonExpression
+    variable_increment_comp_expression = generate_single_comp_expression("12")
+    variable_increment = VariableIncrement(
+        VARIABLE_INCREMENT_IDENTIFIER, variable_increment_comp_expression
+    )
+    variable_increment_inline_statement = InlineStatement(variable_increment)
+    else_statement_list = StatementList(variable_increment_inline_statement)
+    emitter_input = IfStatement(comp_expression, statement_list,
+                                else_clause=else_statement_list)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = (
+        "if false:\n" +
+        "    return\n" +
+        "else:\n" +
+        "    anju += 12\n"
+    )
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_a_lone_if_statement():
+    """
+    This test checks that the emitter can produce the correct output when given
+    an IfStatement object for an IfStatement by itself.
+    """
+
+    comp_expression = generate_single_comp_expression("false")
+    return_statement = ReturnStatement()
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+    emitter_input = IfStatement(comp_expression, statement_list)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = (
+        "if false:\n" +
+        "    return\n"
+    )
+
+    assert expected_output == emitter_result
+
+
+
+
+
 def test_emitter_can_produce_correct_output_for_while_statement():
     """
     This test checks that the emitter can produce the correct output when given
@@ -2823,7 +2919,6 @@ def test_emitter_can_produce_correct_output_for_while_statement():
     )
 
     assert expected_output == emitter_result
-
 
 
 def test_emitter_can_produce_correct_output_for_inline_statement():
