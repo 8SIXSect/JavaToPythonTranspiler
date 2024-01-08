@@ -1789,8 +1789,6 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
         return indent_level * "    " + output
 
 
-    # Write a lot of tests for this. I know it's not fun but write some tests.
-    # Then refactor this awful code. Hopefully have that done by Jan 7th
     match node:
         case ClassDeclaration(identifier, method_declaration_list):
             next_indent_level = indent_level + 1
