@@ -791,17 +791,12 @@ def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
     if isinstance(node_result_for_access_modifier_list, NodeFailure):
         return node_result_for_access_modifier_list
 
-    expected_variable_type_token: Token
-    expected_variable_type_token = node_result_for_access_modifier_list.tokens[0]
 
     RETURN_TYPES: Tuple[TokenType, ...] = VARIABLE_TYPES + (TokenType.VOID,)
-    if expected_variable_type_token.token_type not in RETURN_TYPES:
-        return report_error_in_parser(expected_variable_type_token.token_type)
-    
-    # TODO: also make this func check that its first token is a var type :: DRY
+   
     node_result_for_return_type: NodeResult
     node_result_for_return_type = parse_tokens_for_complete_variable_type(
-        node_result_for_access_modifier_list.tokens
+        node_result_for_access_modifier_list.tokens, RETURN_TYPES
     )
 
     if isinstance(node_result_for_return_type, NodeFailure):
@@ -880,7 +875,9 @@ def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
     return NodeSuccess(tokens_as_tuple, no_node)   
 
 
-def parse_tokens_for_complete_variable_type(tokens: Tokens) -> NodeResult:
+def parse_tokens_for_complete_variable_type(tokens: Tokens,
+                                            variable_types: Tuple[TokenType, ...]
+                                            ) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a NoNode object.
 
@@ -891,8 +888,10 @@ def parse_tokens_for_complete_variable_type(tokens: Tokens) -> NodeResult:
     returns with [] right after it signifying an array.
     """
 
-    # This function should be called only when we know that there is already
-    # a variable type there, so we should be able to safely remove it.
+    expected_variable_type_token: Token = tokens[0]
+    if expected_variable_type_token.token_type not in variable_types:
+        return report_error_in_parser(expected_variable_type_token.token_type)
+
     tokens_with_variable_type_removed: Tokens = tokens[1:]
 
     # There's no point in declaraing this twice since it's static.
@@ -924,12 +923,9 @@ def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
         parameter_list = ParameterList()
         return NodeSuccess(tokens, parameter_list)
 
-    if initial_token.token_type not in VARIABLE_TYPES:
-        return report_error_in_parser(initial_token.token_type)
-
     node_result_for_variable_type: NodeResult
     node_result_for_variable_type = parse_tokens_for_complete_variable_type(
-        tokens
+        tokens, VARIABLE_TYPES
     )
 
     if isinstance(node_result_for_variable_type, NodeFailure):
@@ -1440,7 +1436,7 @@ def parse_tokens_for_variable_initialization(tokens: Tokens) -> NodeResult:
 
     node_result_for_variable_type: NodeResult
     node_result_for_variable_type = parse_tokens_for_complete_variable_type(
-        tokens
+        tokens, VARIABLE_TYPES
     )
 
     if isinstance(node_result_for_variable_type, NodeFailure):

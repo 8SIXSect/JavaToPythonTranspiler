@@ -2,7 +2,7 @@ import random
 from typing import Tuple
 
 from java_to_python_transpiler.java_to_python import (
-    ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration,
+    VARIABLE_TYPES, ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration,
     ComparisonExpression, ComparisonOperator, ExpressionNode, FactorNode,
     IfStatement, InlineStatement, MethodDeclaration, MethodDeclarationList,
     NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
@@ -12,9 +12,9 @@ from java_to_python_transpiler.java_to_python import (
     parse_tokens, parse_tokens_for_access_modifier_list,
     parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body, parse_tokens_for_class_declaration,
-    parse_tokens_for_comparison_expression, parse_tokens_for_complete_variable_type, parse_tokens_for_expression,
-    parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
-    parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
+    parse_tokens_for_comparison_expression, parse_tokens_for_complete_variable_type,
+    parse_tokens_for_expression, parse_tokens_for_expression_in_paren,
+    parse_tokens_for_factor, parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
     parse_tokens_for_method_declaration, parse_tokens_for_method_declaration_list,
     parse_tokens_for_parameter_list, parse_tokens_for_statement_list,
     parse_tokens_for_method_call, parse_tokens_for_return_statement,
@@ -1079,7 +1079,9 @@ def test_parser_can_generate_correct_ast_for_simple_variable_type():
     expected_output_tokens: Tokens = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, no_node)
 
-    node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
+    node_result: NodeResult = parse_tokens_for_complete_variable_type(
+        tokens, VARIABLE_TYPES
+    )
 
     assert expected_output == node_result
 
@@ -1097,7 +1099,9 @@ def test_parser_can_produce_correct_error_for_variable_type_that_omits_right_bra
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
     expected_output = NodeFailure(error_message)
 
-    node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
+    node_result: NodeResult = parse_tokens_for_complete_variable_type(
+        tokens, VARIABLE_TYPES
+    )
 
     assert expected_output == node_result
 
@@ -1122,7 +1126,9 @@ def test_parser_can_generate_correct_ast_for_complete_variable_type():
     expected_output_tokens: Tokens = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, no_node)
 
-    node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
+    node_result: NodeResult = parse_tokens_for_complete_variable_type(
+        tokens, VARIABLE_TYPES
+    )
 
     assert expected_output == node_result
 
