@@ -797,15 +797,21 @@ def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
     RETURN_TYPES: Tuple[TokenType, ...] = VARIABLE_TYPES + (TokenType.VOID,)
     if expected_variable_type_token.token_type not in RETURN_TYPES:
         return report_error_in_parser(expected_variable_type_token.token_type)
+    
+    # TODO: also make this func check that its first token is a var type :: DRY
+    node_result_for_return_type: NodeResult
+    node_result_for_return_type = parse_tokens_for_complete_variable_type(
+        node_result_for_access_modifier_list.tokens
+    )
 
-    tokens_with_return_type_removed: Tokens
-    tokens_with_return_type_removed = node_result_for_access_modifier_list.tokens[1:]
+    if isinstance(node_result_for_return_type, NodeFailure):
+        return node_result_for_return_type
 
-    expected_identifier_token: Token = tokens_with_return_type_removed[0]
+    expected_identifier_token: Token = node_result_for_return_type.tokens[0]
     if expected_identifier_token.token_type != TokenType.IDENTIFIER:
         return report_error_in_parser(expected_identifier_token.token_type)
 
-    tokens_with_identifier_removed: Tokens = tokens_with_return_type_removed[1:]
+    tokens_with_identifier_removed: Tokens = node_result_for_return_type.tokens[1:]
 
     expected_left_paren_token: Token = tokens_with_identifier_removed[0]
     if expected_left_paren_token.token_type != TokenType.LEFT_PARENTHESIS:
@@ -921,13 +927,19 @@ def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
     if initial_token.token_type not in VARIABLE_TYPES:
         return report_error_in_parser(initial_token.token_type)
 
-    tokens_with_type_removed: Tokens = tokens[1:]
+    node_result_for_variable_type: NodeResult
+    node_result_for_variable_type = parse_tokens_for_complete_variable_type(
+        tokens
+    )
 
-    expected_identifier_token: Token = tokens_with_type_removed[0]
+    if isinstance(node_result_for_variable_type, NodeFailure):
+        return node_result_for_variable_type
+
+    expected_identifier_token: Token = node_result_for_variable_type.tokens[0]
     if expected_identifier_token.token_type != TokenType.IDENTIFIER:
         return report_error_in_parser(expected_identifier_token.token_type)
 
-    tokens_with_identifier_removed: Tokens = tokens_with_type_removed[1:]
+    tokens_with_identifier_removed: Tokens = node_result_for_variable_type.tokens[1:]
 
     EXPECTED_TYPES: Tuple[TokenType, TokenType] = (TokenType.COMMA,
                                                    TokenType.RIGHT_PARENTHESIS)
