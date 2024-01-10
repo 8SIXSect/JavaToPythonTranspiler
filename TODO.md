@@ -12,4 +12,12 @@ Stuff I need to get Done
 - [x] Add Parser support for using arrays in a return type
 - [] Enhance the documentation of the functions in the transpiler file
 - [] Enhance error information; track rows and columns (possibly more)
+- [] Create test(s) for usings arrays in variable type
+- [] Create test(s) for using identifiers as a variable type (may not be nes.)
+- [] Add Parser & Emitter support for using Parenthesis in factors
+- [] Add Parser & Emitter support for exponentation
+- [] Add Parser & Emitter support for modulus operator
+- [] Create tests (more) comprehensive tests for variable types
+- [] Implement error checking in the Emitter (so checking that certain var types exist)
+- [] Add Full Support for Float Literals (possibly combine w/ decimal and call it number?)
 

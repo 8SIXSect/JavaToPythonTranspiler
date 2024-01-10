@@ -1681,12 +1681,12 @@ def parse_tokens_for_term(tokens: Tokens) -> NodeResult:
 def parse_tokens_for_factor(tokens: Tokens) -> NodeResult:
     """
     Parses a list of tokens to construct an abstract syntax tree (AST) for
-    a mathematical term.
+    a mathematical factor.
     """
 
-    FACTOR_TOKEN_TYPES: Tuple[TokenType, TokenType, TokenType, TokenType] = (
+    FACTOR_TOKEN_TYPES: Tuple[TokenType, ...] = (
         TokenType.DECIMAL_LITERAL, TokenType.TRUE, TokenType.FALSE,
-        TokenType.IDENTIFIER,
+        TokenType.IDENTIFIER, TokenType.STRING_LITERAL,
     )
 
     # The purpose for not popping off tokens[0] is b/c method_call may need to
