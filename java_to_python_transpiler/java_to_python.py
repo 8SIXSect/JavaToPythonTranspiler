@@ -907,7 +907,6 @@ def parse_tokens_for_complete_variable_type(tokens: Tokens) -> NodeResult:
     return NodeSuccess(tokens_with_brackets_removed, no_node)
 
 
-# TODO: Enhance the documentation of the ALL THESE functions
 def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
     """
     Parses a tuple of tokens in order to construct a ParameterList object.
