@@ -1,7 +1,6 @@
 public class Main {   
-    public static void main(double args) {
+    public static void main(String[] args) {
         print(5);
-        int[] x = 86;
     }
 }
 

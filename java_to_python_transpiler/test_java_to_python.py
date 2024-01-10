@@ -868,8 +868,10 @@ def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
         end_of_file_token
     )
 
+    # Explanation: IDENTIFIER Counts as a VARIABLE TYPE so it sees that and
+    # hits LEFT PARENTHESIS
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.IDENTIFIER
+        TokenType.LEFT_PARENTHESIS
     )
     expected_output = NodeFailure(error_message)
     
@@ -957,8 +959,10 @@ def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaratio
         end_of_file_token
     )
 
+    # Explanation: IDENTIFIER counts as a VARIABLE TYPE so it sees that but not
+    # a second identifier for actual name of the parameter; instead its RPAREN
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.IDENTIFIER
+        TokenType.RIGHT_PARENTHESIS
     )
     expected_output = NodeFailure(error_message)
     
@@ -1183,8 +1187,11 @@ def test_parser_can_produce_error_when_parameter_without_type():
 
     identifier_token = Token(TokenType.IDENTIFIER, "apl")
     tokens: Tokens = (identifier_token, right_parenthesis_token, end_of_file_token)
-
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.IDENTIFIER)
+    
+    # Explanation: IDENTIFIER counts as a VARIABLE_TYPE so.........
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        TokenType.RIGHT_PARENTHESIS
+    )
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_parameter_list(tokens)

@@ -658,6 +658,7 @@ NodeResult = NodeSuccess | NodeFailure
 VARIABLE_TYPES: Tuple[TokenType, ...] = (
     TokenType.INT, TokenType.CHAR, TokenType.SHORT, TokenType.LONG,
     TokenType.BYTE, TokenType.DOUBLE, TokenType.BOOLEAN, TokenType.FLOAT,
+    TokenType.IDENTIFIER,
 )
 
 ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
@@ -1282,8 +1283,34 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
         return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
 
     next_token: Token = tokens[1]
-    
-    if current_token.token_type in VARIABLE_TYPES:
+
+    condition_for_simple_initialization: bool = (
+        current_token.token_type in VARIABLE_TYPES and
+        next_token.token_type == TokenType.IDENTIFIER
+    )
+
+    condition_for_complex_initialization = False
+
+    length_of_tokens: int = len(tokens)
+
+    # Bare minimum: [type, l-bracket, r-bracket, id, eof]
+    # Obviously, this still produces an error, but it will pass this section.
+    if length_of_tokens >= 5:
+        possible_right_bracket_token: Token = tokens[2]
+        possible_identifier_token: Token = tokens[3]
+
+        condition_for_complex_initialization = (
+            current_token.token_type in VARIABLE_TYPES and
+            next_token.token_type == TokenType.LEFT_BRACKET and
+            possible_right_bracket_token.token_type == TokenType.RIGHT_BRACKET and
+            possible_identifier_token.token_type == TokenType.IDENTIFIER
+        )
+
+    conditions_for_variable_initializaion: Tuple[bool, bool] = (
+        condition_for_simple_initialization, condition_for_complex_initialization
+    )
+
+    if any(conditions_for_variable_initializaion):
         node_result_for_initialization: NodeResult = \
                 parse_tokens_for_variable_initialization(tokens)
 
@@ -1302,8 +1329,6 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
  
         inline_statement = InlineStatement(node_result_for_initialization.node)
         return NodeSuccess(tokens_with_semicolon_removed, inline_statement)
-
-    length_of_tokens: int = len(tokens)
 
     # The purpose for being 5 is it should have [id, plus, plus | eq, semicol, eof]
     if length_of_tokens >= 5:
