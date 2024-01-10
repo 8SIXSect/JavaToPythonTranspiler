@@ -21,6 +21,7 @@ class TokenType(Enum):
     RIGHT_BRACKET = "RIGHT_BRACKET"
     SEMI_COLON = "SEMI_COLON"
     COMMA = "COMMA"
+    PERIOD = "PERIOD"
     EXCLAMATION = "EXCLAMATION"
     EQUALS = "EQUALS"
     LESS_THAN = "LESS_THAN"
@@ -71,6 +72,7 @@ TOKEN_PATTERNS: Dict[str, TokenType] = {
     r"\]": TokenType.RIGHT_BRACKET,
     r";": TokenType.SEMI_COLON,
     r",": TokenType.COMMA,
+    r"\.": TokenType.PERIOD,
     r"!": TokenType.EXCLAMATION,
     r"=": TokenType.EQUALS,
     r"\<": TokenType.LESS_THAN,
