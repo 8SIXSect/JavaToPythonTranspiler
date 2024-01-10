@@ -874,6 +874,18 @@ def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
     return NodeSuccess(tokens_as_tuple, no_node)   
 
 
+def parse_tokens_for_complete_variable_type(tokens: Tokens) -> NodeResult:
+    """
+    Parses a tuple of tokens in order to construct a NoNode object.
+
+    This function is soley used for verifying the syntax, and it doesn't care
+    for any of the data (as it returns a NoNode).
+
+    This function not only parses for the variable type but also checks if it
+    returns with [] right after it signifying an array.
+    """
+
+
 # TODO: Enhance the documentation of the ALL THESE functions
 def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
     """
