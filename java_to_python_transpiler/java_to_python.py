@@ -2076,8 +2076,8 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
                 result_for_additional_term
             )
         
-        case FactorNode(number_or_identifier, None):
-            return number_or_identifier            
+        case FactorNode(number_or_ident_or_string, None):
+            return number_or_ident_or_string            
 
         case FactorNode("", method_call) if method_call is not None:
             return emit_ast_into_output(method_call, indent_level)
