@@ -400,17 +400,19 @@ class FactorNode:
     """
     Represents a node for a numerical factor.
 
-    number_or_identifier represents number or identifier that is the factor.
-    It is not necessary to differentiate between the two because the emitter sees
+    `number_or_ident_or_string` represents number or identifier or string literal
+    that is the factor.
+    It is not necessary to differentiate between these because the emitter sees
     them the same way. This field defaults to an empty string.
 
     method_call represents a call to a method. This field defaults to None.
 
     FactorNode cannot have both its fields using their default values. If
-    method_call is None, then number_or_identifier has a value, and vice-versa.
+    method_call is None, then number_or_ident_or_string has a value, and
+    vice-versa.
     """
 
-    number_or_identifier: str = ""
+    number_or_ident_or_string: str = ""
     method_call: Optional[MethodCall] = None
 
 

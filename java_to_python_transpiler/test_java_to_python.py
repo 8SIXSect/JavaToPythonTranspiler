@@ -2718,7 +2718,6 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_false_token():
     correct FactorNode object using a false_token.
     """
 
-
     tokens: Tuple[Token, Token] = (false_token, end_of_file_token)
 
     factor_node = FactorNode(false_token.value)
