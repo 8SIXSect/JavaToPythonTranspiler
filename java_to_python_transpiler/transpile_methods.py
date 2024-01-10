@@ -22,7 +22,7 @@ PROMPT = ">>> "
 @dataclass
 class TranspilerFailure:
     """
-    This class representing a failure that occurred in the Transpiler.
+    This class represents a failure that occurred in the Transpiler.
 
     `error_message` represents the error that occurred; it is a String of
     information that informs the user what went wrong.
@@ -59,7 +59,8 @@ def java_to_python_from_string(user_input: str) -> str | TranspilerFailure:
 
 
 def java_to_python_from_file(file_path: Optional[str] = None,
-                             file_object: Optional[TextIOWrapper] = None):
+                             file_object: Optional[TextIOWrapper] = None
+                             ) -> str | TranspilerFailure:
     """
     This function is the secondary purpose of this library; it allows one to
     transpile the contents of a file (of java source code) to Python source.
