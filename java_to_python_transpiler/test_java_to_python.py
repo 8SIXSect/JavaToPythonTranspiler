@@ -2675,10 +2675,10 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
     assert expected_output == node_result
 
 
-def test_parser_can_generate_correct_ast_for_single_factor():
+def test_parser_can_generate_correct_ast_for_single_factor_with_decimal_literal():
     """
     This test checks if the function `parse_tokens_for_factor` returns the
-    correct FactorNode object.
+    correct FactorNode object using a decimal literal.
     """
 
     decimal_literal_token: Token = generate_number_token_with_random_value()
@@ -2687,8 +2687,81 @@ def test_parser_can_generate_correct_ast_for_single_factor():
 
     factor_node = FactorNode(decimal_literal_token.value)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
-    expected_output = NodeSuccess(expected_output_tokens,
-                                               factor_node)
+    expected_output = NodeSuccess(expected_output_tokens, factor_node)
+
+    node_output: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_single_factor_with_true_token():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct FactorNode object using a true_token.
+    """
+
+
+    tokens: Tuple[Token, Token] = (true_token, end_of_file_token)
+
+    factor_node = FactorNode(true_token.value)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, factor_node)
+
+    node_output: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_single_factor_with_false_token():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct FactorNode object using a false_token.
+    """
+
+
+    tokens: Tuple[Token, Token] = (false_token, end_of_file_token)
+
+    factor_node = FactorNode(false_token.value)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, factor_node)
+
+    node_output: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_single_factor_with_identifier():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct FactorNode object using a identifier token.
+    """
+
+    identifier_token = Token(TokenType.IDENTIFIER, "raidenShuga")
+
+    tokens: Tuple[Token, Token] = (identifier_token, end_of_file_token)
+
+    factor_node = FactorNode(identifier_token.value)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, factor_node)
+
+    node_output: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_output 
+
+
+def test_parser_can_generate_correct_ast_for_single_factor_with_string_literal():
+    """
+    This test checks if the function `parse_tokens_for_factor` returns the
+    correct FactorNode object using a string literal token.
+    """
+
+    string_literal_token = Token(TokenType.STRING_LITERAL, "raidenShuga")
+
+    tokens: Tuple[Token, Token] = (string_literal_token, end_of_file_token)
+
+    factor_node = FactorNode(string_literal_token.value)
+    expected_output_tokens: Tuple[Token] = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
     node_output: NodeResult = parse_tokens_for_factor(tokens)
 
