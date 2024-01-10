@@ -653,14 +653,11 @@ def parse_tokens(tokens: Tokens) -> ParserResult:
     return root_node_result.node
 
 
-# TODO: Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
-# HOwever, that may only apply to statements but no if expr reaches semi, it stops
 NodeResult = NodeSuccess | NodeFailure
 
 VARIABLE_TYPES: Tuple[TokenType, ...] = (
     TokenType.INT, TokenType.CHAR, TokenType.SHORT, TokenType.LONG,
     TokenType.BYTE, TokenType.DOUBLE, TokenType.BOOLEAN, TokenType.FLOAT,
-    TokenType.VOID
 )
 
 ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
@@ -797,7 +794,8 @@ def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
     expected_variable_type_token: Token
     expected_variable_type_token = node_result_for_access_modifier_list.tokens[0]
 
-    if expected_variable_type_token.token_type not in VARIABLE_TYPES:
+    RETURN_TYPES: Tuple[TokenType, ...] = VARIABLE_TYPES + (TokenType.VOID,)
+    if expected_variable_type_token.token_type not in RETURN_TYPES:
         return report_error_in_parser(expected_variable_type_token.token_type)
 
     tokens_with_return_type_removed: Tokens
