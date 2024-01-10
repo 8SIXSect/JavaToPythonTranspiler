@@ -12,4 +12,5 @@ Stuff I need to get Done
 - [] However, that may only apply to statements but no if expr reaches semi, it stops
 - [] Add Parser support for using arrays in a return type
 - [] Enhance the documentation of the functions in the transpiler file
+- [] Enhance error information; track rows and columns (possibly more)
 
