@@ -659,7 +659,8 @@ NodeResult = NodeSuccess | NodeFailure
 
 VARIABLE_TYPES: Tuple[TokenType, ...] = (
     TokenType.INT, TokenType.CHAR, TokenType.SHORT, TokenType.LONG,
-    TokenType.BYTE, TokenType.DOUBLE, TokenType.BOOLEAN, TokenType.FLOAT
+    TokenType.BYTE, TokenType.DOUBLE, TokenType.BOOLEAN, TokenType.FLOAT,
+    TokenType.VOID
 )
 
 ACCESS_MODIFIER_TYPES: Tuple[TokenType, ...] = (
