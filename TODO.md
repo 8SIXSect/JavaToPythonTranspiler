@@ -10,4 +10,5 @@ Stuff I need to get Done
 - [] Add Parser & Emitter support for using String Literals in factors
 - [] Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON
 - [] However, that may only apply to statements but no if expr reaches semi, it stops
+- [] Add Parser support for using arrays in a return type
 
