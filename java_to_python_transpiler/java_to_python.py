@@ -885,6 +885,27 @@ def parse_tokens_for_complete_variable_type(tokens: Tokens) -> NodeResult:
     returns with [] right after it signifying an array.
     """
 
+    # This function should be called only when we know that there is already
+    # a variable type there, so we should be able to safely remove it.
+    tokens_with_variable_type_removed: Tokens = tokens[1:]
+
+    # There's no point in declaraing this twice since it's static.
+    no_node = NoNode()
+
+    possible_left_bracket_token: Token = tokens_with_variable_type_removed[0]
+    if possible_left_bracket_token.token_type != TokenType.LEFT_BRACKET:
+        return NodeSuccess(tokens_with_variable_type_removed, no_node)
+
+    tokens_with_left_bracket_removed: Tokens = tokens_with_variable_type_removed[1:]
+
+    expected_right_bracket_token: Token = tokens_with_left_bracket_removed[0]
+    if expected_right_bracket_token.token_type != TokenType.RIGHT_BRACKET:
+        return report_error_in_parser(expected_right_bracket_token.token_type)
+
+    tokens_with_brackets_removed: Tokens = tokens_with_left_bracket_removed[1:]
+
+    return NodeSuccess(tokens_with_brackets_removed, no_node)
+
 
 # TODO: Enhance the documentation of the ALL THESE functions
 def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:

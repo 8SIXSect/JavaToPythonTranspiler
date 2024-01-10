@@ -1073,8 +1073,11 @@ def test_parser_can_generate_correct_ast_for_simple_variable_type():
 
     variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
     tokens: Tokens = (variable_type_token, end_of_file_token)
+    
+    no_node = NoNode()
 
-    expected_output = NoNode()
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, no_node)
 
     node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
 
@@ -1114,7 +1117,10 @@ def test_parser_can_generate_correct_ast_for_complete_variable_type():
         end_of_file_token
     )
 
-    expected_output = NoNode()
+    no_node = NoNode()
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, no_node)
 
     node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
 
