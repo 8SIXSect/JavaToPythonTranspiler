@@ -1287,12 +1287,7 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
 
     next_token: Token = tokens[1]
     
-    conditions_for_variable_initialization: Tuple[bool, bool] = (
-        current_token.token_type in VARIABLE_TYPES,
-        next_token.token_type == TokenType.IDENTIFIER
-    )
-
-    if all(conditions_for_variable_initialization):
+    if current_token.token_type in VARIABLE_TYPES:
         node_result_for_initialization: NodeResult = \
                 parse_tokens_for_variable_initialization(tokens)
 
@@ -1443,12 +1438,17 @@ def parse_tokens_for_variable_initialization(tokens: Tokens) -> NodeResult:
     object.
     """
 
-    tokens_with_variable_type_removed: Tokens = tokens[1:]
+    node_result_for_variable_type: NodeResult
+    node_result_for_variable_type = parse_tokens_for_complete_variable_type(
+        tokens
+    )
 
-    identifier_token: Token = tokens_with_variable_type_removed[0]
+    if isinstance(node_result_for_variable_type, NodeFailure):
+        return node_result_for_variable_type
+
+    identifier_token: Token = node_result_for_variable_type.tokens[0]
     
-    tokens_with_identifier_removed: Tokens = \
-            tokens_with_variable_type_removed[1:]
+    tokens_with_identifier_removed: Tokens = node_result_for_variable_type.tokens[1:]
 
     current_token: Token = tokens_with_identifier_removed[0]
     if current_token.token_type != TokenType.EQUALS:
