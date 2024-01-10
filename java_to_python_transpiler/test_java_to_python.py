@@ -802,6 +802,50 @@ def test_parser_can_produce_error_for_no_access_modifiers_in_method_declaration(
     assert expected_output == node_result
 
 
+def test_parser_can_produce_correct_output_for_void_return_type_in_method_declaration():
+    """
+    This test checks if the function `parse_tokens_for_method_declaration`
+    can generate the correct output when given a void return type in a method
+    declaration.
+    """
+
+    void_return_type = Token(TokenType.VOID, "VOID")
+    method_identifier_token = Token(TokenType.IDENTIFIER, "csharp")
+    parameter_identifier = Token(TokenType.IDENTIFIER, "jython")
+    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    tokens: Tokens = (
+        public_token, static_token, void_return_type, method_identifier_token,
+        left_parenthesis_token, right_parenthesis_token, left_curly_brace_token,
+        return_token, decimal_literal_token, semi_colon_token,
+        right_curly_brace_token,
+        end_of_file_token
+    )
+
+    parameter_list = ParameterList()
+    
+    return_factor = FactorNode(decimal_literal_token.value)
+    return_term = TermNode(return_factor)
+    return_expression = ExpressionNode(return_term)
+    return_comp_expression = ComparisonExpression(return_expression)
+    return_statement = ReturnStatement(return_comp_expression)
+    inline_statement = InlineStatement(return_statement)
+    statement_list = StatementList(inline_statement)
+
+    method_declaration = MethodDeclaration(
+        method_identifier_token.value,
+        parameter_list,
+        statement_list
+    )
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, method_declaration)
+
+    node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
+
+    assert expected_output == node_result
+
+
 def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
     """
     This test checks if the function `parse_tokens_for_method_declaration`
