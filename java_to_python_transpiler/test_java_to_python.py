@@ -12,7 +12,7 @@ from java_to_python_transpiler.java_to_python import (
     parse_tokens, parse_tokens_for_access_modifier_list,
     parse_tokens_for_argument_list, parse_tokens_for_block_statement,
     parse_tokens_for_block_statement_body, parse_tokens_for_class_declaration,
-    parse_tokens_for_comparison_expression, parse_tokens_for_expression,
+    parse_tokens_for_comparison_expression, parse_tokens_for_complete_variable_type, parse_tokens_for_expression,
     parse_tokens_for_expression_in_paren, parse_tokens_for_factor,
     parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
     parse_tokens_for_method_declaration, parse_tokens_for_method_declaration_list,
@@ -36,6 +36,8 @@ left_curly_brace_token = Token(TokenType.LEFT_CURLY_BRACE, "{")
 right_curly_brace_token = Token(TokenType.RIGHT_CURLY_BRACE, "}")
 left_parenthesis_token = Token(TokenType.LEFT_PARENTHESIS, "(")
 right_parenthesis_token = Token(TokenType.RIGHT_PARENTHESIS, ")")
+left_bracket_token = Token(TokenType.LEFT_BRACKET, "[")
+right_bracket_token = Token(TokenType.RIGHT_BRACKET, "]")
 comma_token = Token(TokenType.COMMA, ",")
 period_token = Token(TokenType.PERIOD, ".")
 semi_colon_token = Token(TokenType.SEMI_COLON, ";")
@@ -811,7 +813,6 @@ def test_parser_can_produce_correct_output_for_void_return_type_in_method_declar
 
     void_return_type = Token(TokenType.VOID, "VOID")
     method_identifier_token = Token(TokenType.IDENTIFIER, "csharp")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "jython")
     decimal_literal_token: Token = generate_number_token_with_random_value()
 
     tokens: Tokens = (
@@ -1059,6 +1060,63 @@ def test_parser_can_generate_correct_output_for_multiple_access_modifiers():
     expected_output = NodeSuccess(expected_output_tokens, no_node)
 
     node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_simple_variable_type():
+    """
+    This test checks if the function `parse_tokens_for_complete_variable_type`
+    can correctly parse the tokens when provided with a simple variable type
+    (i.e. one without brackets that signify that is an Array).
+    """
+
+    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
+    tokens: Tokens = (variable_type_token, end_of_file_token)
+
+    expected_output = NoNode()
+
+    node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_produce_correct_error_for_variable_type_that_omits_right_bracket():
+    """
+    This test checks if the function `parse_tokens_for_complete_variable_type`
+    can produce the correct error provided with a variable that has a left
+    bracket but does not have closing right bracket.
+    """
+
+    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
+    tokens: Tokens = (variable_type_token, left_bracket_token, end_of_file_token)
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_complete_variable_type():
+    """
+    This test checks if the function `parse_tokens_for_complete_variable_type`
+    can generate the correct ast when provided with a variable type with a
+    set of brackets appended to it.
+
+    Example: int[]
+    """
+
+    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
+    tokens: Tokens = (
+        variable_type_token, left_bracket_token, right_bracket_token,
+        end_of_file_token
+    )
+
+    expected_output = NoNode()
+
+    node_result: NodeResult = parse_tokens_for_complete_variable_type(tokens)
 
     assert expected_output == node_result
 
