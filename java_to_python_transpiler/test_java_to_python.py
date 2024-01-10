@@ -37,6 +37,7 @@ right_curly_brace_token = Token(TokenType.RIGHT_CURLY_BRACE, "}")
 left_parenthesis_token = Token(TokenType.LEFT_PARENTHESIS, "(")
 right_parenthesis_token = Token(TokenType.RIGHT_PARENTHESIS, ")")
 comma_token = Token(TokenType.COMMA, ",")
+period_token = Token(TokenType.PERIOD, ".")
 semi_colon_token = Token(TokenType.SEMI_COLON, ";")
 equals_token = Token(TokenType.EQUALS, "equals")
 
@@ -117,16 +118,14 @@ def test_lexer_can_generate_token_for_grouping_characters():
 def test_lexer_can_generate_tokens_for_punctuation_characters():
     """
     This test checks if the lexer can successfully generate Token objects for
-    semicolons and commas.
+    semicolons, commas, and periods.
     """
 
-    INPUT = ";,,;"
-
-    semi_colon_token = Token(TokenType.SEMI_COLON, ";")
-    comma_token = Token(TokenType.COMMA, ",")
+    INPUT = ";.,,.;.."
 
     expected_output: Tokens = (
-        semi_colon_token, comma_token, comma_token, semi_colon_token,
+        semi_colon_token, period_token, comma_token, comma_token, period_token,
+        semi_colon_token, period_token, period_token,
         end_of_file_token
     )
 
