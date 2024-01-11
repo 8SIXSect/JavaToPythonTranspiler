@@ -7,7 +7,7 @@ Stuff I need to get Done
 - [x] Add Parser support for 'void' Token
 - [x] Add Parser support for using identifiers as a variable type
 - [x] Add Parser support for using arrays in a variable type
-- [] Add Parser & Emitter support for using String Literals in factors
+- [x] Add Parser & Emitter support for using String Literals in factors
 - [] Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON; however, that may only apply to statements but no if expr reaches semi, it stops
 - [x] Add Parser support for using arrays in a return type
 - [] Enhance the documentation of the functions in the transpiler file
@@ -20,4 +20,8 @@ Stuff I need to get Done
 - [] Create tests (more) comprehensive tests for variable types
 - [] Implement error checking in the Emitter (so checking that certain var types exist)
 - [] Add Full Support for Float Literals (possibly combine w/ decimal and call it number?)
+
+All you need to do is add error handling for now and remove all the TODO comments
+in this project (or like move them here). Then update your version, and push this
+to pypi. Update heroku, and after that, remake the website :)
 
