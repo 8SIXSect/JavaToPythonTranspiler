@@ -94,7 +94,13 @@ class Token:
     """
     This class represents tokens.
 
-    It's two fields are token_type and value which a self-explanatory
+    It's two fields are token_type and value which a self-explanatory.
+
+    Additionally, it contains field, `line_number`
+
+    Additionally, it contains field, `column_start`
+
+    The purpose of these fields is to track error information
     """
 
     token_type: TokenType 
@@ -114,16 +120,18 @@ class LexerFailure:
     error_message: str
 
 
-ERROR_MESSAGE_FOR_LEXER = "Found an unknown character, '{0}'"
+ERROR_MESSAGE_FOR_LEXER = "Found an unknown character, '{0}' on line {1}"
 
 
-def report_error_for_lexer(unknown_character: str) -> LexerFailure:
+def report_error_for_lexer(unknown_character: str,
+                           line_number: int) -> LexerFailure:
     """
     This function's purpose is to report an error that occurred in the
     lexer.
     """
 
-    error_message: str = ERROR_MESSAGE_FOR_LEXER.format(unknown_character)
+    error_message: str = ERROR_MESSAGE_FOR_LEXER.format(unknown_character,
+                                                        line_number)
 
     return LexerFailure(error_message)
 
@@ -172,7 +180,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
         
         if match is None:
             unknown_character: str = user_input[position]
-            return report_error_for_lexer(unknown_character)
+            return report_error_for_lexer(unknown_character, line_number)
 
         match_end: int = match.end()
         position += match_end
@@ -243,7 +251,7 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
 
     tokens_as_tuple: Tokens = tuple(tokens_with_keywords_as_list)
 
-    [print(i) for i in tokens_as_tuple]
+    #[print(i) for i in tokens_as_tuple]
     return tokens_as_tuple 
 
 

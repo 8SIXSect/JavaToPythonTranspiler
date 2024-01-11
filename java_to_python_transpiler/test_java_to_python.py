@@ -26,34 +26,154 @@ from java_to_python_transpiler.java_to_python import (
 
 
 # These tokens may be reused throughout the tests in this file
-end_of_file_token = Token(TokenType.END_OF_FILE, "")
-plus_token = Token(TokenType.PLUS, "+")
-minus_token = Token(TokenType.MINUS, "-")
-multiply_token = Token(TokenType.MULTIPLY, "*")
-divide_token = Token(TokenType.DIVIDE, "/")
+end_of_file_token = Token(TokenType.END_OF_FILE, "", -1, -1)
 
-left_curly_brace_token = Token(TokenType.LEFT_CURLY_BRACE, "{")
-right_curly_brace_token = Token(TokenType.RIGHT_CURLY_BRACE, "}")
-left_parenthesis_token = Token(TokenType.LEFT_PARENTHESIS, "(")
-right_parenthesis_token = Token(TokenType.RIGHT_PARENTHESIS, ")")
-left_bracket_token = Token(TokenType.LEFT_BRACKET, "[")
-right_bracket_token = Token(TokenType.RIGHT_BRACKET, "]")
-comma_token = Token(TokenType.COMMA, ",")
-period_token = Token(TokenType.PERIOD, ".")
-semi_colon_token = Token(TokenType.SEMI_COLON, ";")
-equals_token = Token(TokenType.EQUALS, "equals")
 
-true_token = Token(TokenType.TRUE, "TRUE")
-false_token = Token(TokenType.FALSE, "FALSE")
-return_token = Token(TokenType.RETURN, "RETURN")
-while_token = Token(TokenType.WHILE, "WHILE")
-if_token = Token(TokenType.IF, "IF")
-else_token = Token(TokenType.ELSE, "ELSE")
+def plus_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.PLUS, "+", line_number, column_start)
 
-class_token = Token(TokenType.CLASS, "CLASS")
-public_token = Token(TokenType.PUBLIC, "PUBLIC")
-private_token = Token(TokenType.PRIVATE, "PRIVATE")
-static_token = Token(TokenType.STATIC, "STATIC")
+
+def minus_token (line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.MINUS, "-", line_number, column_start)
+
+
+def multiply_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.MULTIPLY, "*", line_number, column_start)
+
+
+def divide_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.DIVIDE, "/", line_number, column_start)
+
+
+def left_curly_brace_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.LEFT_CURLY_BRACE, "{", line_number, column_start)
+
+
+def right_curly_brace_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.RIGHT_CURLY_BRACE, "}", line_number, column_start)
+
+def left_parenthesis_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.LEFT_PARENTHESIS, "(", line_number, column_start)
+
+
+def right_parenthesis_token (line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.RIGHT_PARENTHESIS, ")", line_number, column_start)
+
+
+def left_bracket_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.LEFT_BRACKET, "[", line_number, column_start)
+
+
+def right_bracket_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.RIGHT_BRACKET, "]", line_number, column_start)
+
+
+def exclamation_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.EXCLAMATION, "!", line_number, column_start)
+
+
+def comma_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.COMMA, ",", line_number, column_start)
+
+
+def period_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.PERIOD, ".", line_number, column_start)
+
+
+def semi_colon_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.SEMI_COLON, ";", line_number, column_start)
+
+
+def less_than_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.LESS_THAN, "<", line_number, column_start)
+
+
+def greater_than_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.GREATER_THAN, ">", line_number, column_start)
+
+
+def equals_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.EQUALS, "=", line_number, column_start)
+
+
+def true_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.TRUE, "TRUE", line_number, column_start)
+
+
+def false_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.FALSE, "FALSE", line_number, column_start)
+
+
+def return_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.RETURN, "RETURN", line_number, column_start)
+
+
+def while_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.WHILE, "WHILE", line_number, column_start)
+
+
+def if_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.IF, "IF", line_number, column_start)
+
+
+def else_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.ELSE, "ELSE", line_number, column_start)
+
+
+def class_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.CLASS, "CLASS", line_number, column_start)
+
+
+def public_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.PUBLIC, "PUBLIC", line_number, column_start)
+
+
+def private_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.PRIVATE, "PRIVATE", line_number, column_start)
+
+
+def static_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.STATIC, "STATIC", line_number, column_start)
+
+
+def void_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.VOID, "VOID", line_number, column_start)
+
+
+def char_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.CHAR, "CHAR", line_number, column_start)
+
+
+def int_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.INT, "INT", line_number, column_start)
+
+
+def short_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.SHORT, "SHORT", line_number, column_start)
+
+
+def double_token(line_number: int = 1, column_start: int = 1) -> Token:
+    return Token(TokenType.DOUBLE, "DOUBLE", line_number, column_start)
+
+
+def decimal_literal_token(value: str, line_number: int = 1,
+                          column_start: int = 1) -> Token:
+    return Token(TokenType.DECIMAL_LITERAL, value, line_number, column_start)
+
+
+def float_literal_token(value: str, line_number: int = 1,
+                        column_start: int = 1) -> Token:
+    return Token(TokenType.FLOAT_LITERAL, value, line_number, column_start)
+
+
+def string_literal_token(value: str, line_number: int = 1,
+                         column_start: int = 1) -> Token:
+    return Token(TokenType.STRING_LITERAL, value, line_number, column_start)
+
+
+def identifier_token(value: str, line_number: int = 1,
+                     column_start: int = 1) -> Token:
+    return Token(TokenType.IDENTIFIER, value, line_number, column_start)
 
 
 def test_report_error_for_lexer_returns_proper_error_object():
@@ -63,11 +183,14 @@ def test_report_error_for_lexer_returns_proper_error_object():
     """
 
     UNKNOWN_CHARACTER = "~"
+    LINE_NUMBER = 1
 
-    error_message: str = ERROR_MESSAGE_FOR_LEXER.format(UNKNOWN_CHARACTER)
+    error_message: str = ERROR_MESSAGE_FOR_LEXER.format(UNKNOWN_CHARACTER,
+                                                        LINE_NUMBER)
     expected_output = LexerFailure(error_message)
 
-    report_error_output: LexerFailure = report_error_for_lexer(UNKNOWN_CHARACTER)
+    report_error_output: LexerFailure = report_error_for_lexer(UNKNOWN_CHARACTER,
+                                                               LINE_NUMBER)
 
     assert expected_output == report_error_output
 
@@ -80,7 +203,7 @@ def test_lexer_can_generate_tokens_for_single_line_comment():
 
     INPUT = "// this is in a `comment`"
 
-    expected_output_token = Token(TokenType.SINGLE_LINE_COMMENT, INPUT)
+    expected_output_token = Token(TokenType.SINGLE_LINE_COMMENT, INPUT, 1, 1)
     expected_output: Tuple[Token, Token] = (expected_output_token, end_of_file_token)
  
     lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
@@ -96,19 +219,13 @@ def test_lexer_can_generate_token_for_grouping_characters():
 
     INPUT = "(){}[]"
 
-    left_parenthesis_token = Token(TokenType.LEFT_PARENTHESIS, "(")
-    right_parenthesis_token = Token(TokenType.RIGHT_PARENTHESIS, ")")
-
-    left_curly_braces_token = Token(TokenType.LEFT_CURLY_BRACE, "{")
-    right_curly_braces_token = Token(TokenType.RIGHT_CURLY_BRACE, "}")
-
-    left_bracket_token = Token(TokenType.LEFT_BRACKET, "[")
-    right_bracket_token = Token(TokenType.RIGHT_BRACKET, "]")
-
     expected_output: Tokens = (
-        left_parenthesis_token, right_parenthesis_token,
-        left_curly_braces_token, right_curly_braces_token,
-        left_bracket_token, right_bracket_token,
+        left_parenthesis_token(1, 1),
+        right_parenthesis_token(1, 2),
+        left_curly_brace_token(1, 3),
+        right_curly_brace_token(1, 4),
+        left_bracket_token(1, 5),
+        right_bracket_token(1, 6),
         end_of_file_token
     )
 
@@ -125,9 +242,16 @@ def test_lexer_can_generate_tokens_for_punctuation_characters():
 
     INPUT = ";.,,.;.."
 
+    # Not the prettiest solution, but it saves lines so I like it as is
     expected_output: Tokens = (
-        semi_colon_token, period_token, comma_token, comma_token, period_token,
-        semi_colon_token, period_token, period_token,
+        semi_colon_token(1, 1),
+        period_token(1, 2),
+        comma_token(1, 3),
+        comma_token(1, 4),
+        period_token(1, 5),
+        semi_colon_token(1, 6),
+        period_token(1, 7),
+        period_token(1, 8),
         end_of_file_token
     )
 
@@ -144,13 +268,13 @@ def test_lexer_can_generate_tokens_for_comparison_operators():
 
     LEXER_INPUT = "=>=<="
 
-    less_than_token = Token(TokenType.LESS_THAN, "<")
-    greater_than_token = Token(TokenType.GREATER_THAN, ">")
-    equals_token = Token(TokenType.EQUALS, "=")
 
     expected_output: Tokens = (
-        equals_token, greater_than_token, equals_token, less_than_token,
-        equals_token,
+        equals_token(1, 1),
+        greater_than_token(1, 2),
+        equals_token(1, 3),
+        less_than_token(1, 4),
+        equals_token(1, 5),
         end_of_file_token
     )
 
@@ -167,14 +291,13 @@ def test_lexer_can_generate_tokens_for_arithmetic_operators():
 
     INPUT = "++/*-/"
 
-    plus_token = Token(TokenType.PLUS, "+")
-    minus_token = Token(TokenType.MINUS, "-")
-    multiply_token = Token(TokenType.MULTIPLY, "*")
-    divide_token = Token(TokenType.DIVIDE, "/")
-
     expected_output: Tokens = (
-        plus_token, plus_token, divide_token, multiply_token, minus_token,
-        divide_token,
+        plus_token(1, 1),
+        plus_token(1, 2),
+        divide_token(1, 3),
+        multiply_token(1, 4),
+        minus_token(1, 5),
+        divide_token(1, 6),
         end_of_file_token
         )
 
@@ -191,8 +314,10 @@ def test_lexer_can_generate_tokens_for_float_literals():
 
     INPUT = "86.86"
 
-    float_literal_token = Token(TokenType.FLOAT_LITERAL, INPUT)
-    expected_output: Tuple[Token, Token] = (float_literal_token, end_of_file_token)
+    expected_output: Tuple[Token, Token] = (
+        float_literal_token(INPUT, 1, 1),
+        end_of_file_token
+    )
 
     lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
     
@@ -207,8 +332,10 @@ def test_lexer_can_generate_tokens_for_decimal_literals():
 
     INPUT = "86868686"
 
-    decimal_literal_token = Token(TokenType.DECIMAL_LITERAL, INPUT)
-    expected_output: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+    expected_output: Tuple[Token, Token] = (
+        decimal_literal_token(INPUT, 1, 1),
+        end_of_file_token
+    )
 
     lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
@@ -223,10 +350,8 @@ def test_lexer_can_generate_tokens_for_string_literals():
 
     INPUT = '"hello"'
 
-    first_string_literal_token = Token(TokenType.STRING_LITERAL, '"hello"')
-
     expected_output: Tuple[Token, Token] = (
-        first_string_literal_token,
+        string_literal_token(INPUT, 1, 1),
         end_of_file_token
     )
 
@@ -243,12 +368,10 @@ def test_lexer_can_generate_tokens_for_identifiers():
 
     INPUT = "eighty sixth sector"
 
-    first_identifier_token = Token(TokenType.IDENTIFIER, "eighty")
-    second_identifier_token = Token(TokenType.IDENTIFIER, "sixth")
-    third_identifier_token = Token(TokenType.IDENTIFIER, "sector")
-
     expected_output: Tokens = (
-        first_identifier_token, second_identifier_token, third_identifier_token,
+        identifier_token("eighty", 1, 1),
+        identifier_token("sixth", 1, 8),
+        identifier_token("sector", 1, 14),
         end_of_file_token
     )
 
@@ -297,30 +420,16 @@ def test_lexer_can_generate_proper_keyword_tokens():
 
     INPUT = "true short while"
 
-    true_token = Token(TokenType.TRUE, "true")
-    short_token = Token(TokenType.SHORT, "short")
-    while_token = Token(TokenType.WHILE, "while")
-
     expected_output: Tokens = (
-        true_token, short_token, while_token,
+        Token(TokenType.TRUE, "true", 1, 1),
+        Token(TokenType.SHORT, "short", 1, 6),
+        Token(TokenType.WHILE, "while", 1, 12),
         end_of_file_token
     )
 
     lexer_result: LexerResult = scan_and_tokenize_input(INPUT)
 
     assert expected_output == lexer_result
-
-
-def generate_number_token_with_random_value() -> Token:
-    """
-    This is a helper function that generates a Token object with a random int
-    value
-    """
-
-    random_number: int = random.randint(0, 100)
-    token_value = str(random_number)
-
-    return Token(TokenType.DECIMAL_LITERAL, token_value)
 
 
 def generate_single_comp_expression(number_or_id: str) -> ComparisonExpression:
@@ -370,7 +479,10 @@ def test_parser_can_generate_correct_error_given_faulty_input():
     to see if it can generate the correct error output given a faulty input
     """
 
-    tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        plus_token(),
+        end_of_file_token
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS)
     expected_output = ParserFailure(error_message)
@@ -386,25 +498,33 @@ def test_parser_can_generate_correct_ast_for_class_declaration():
     can correctly parse the tokens when provided with a valid input
     """
 
-    class_identifier_token = Token(TokenType.IDENTIFIER, "abra")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "cadabra")
-    int_token = Token(TokenType.INT, "INT")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    CLASS_IDENTIFIER = "abra"
+    METHOD_IDENTIFIER = "apl"
+    DECIMAL_LITERAL_VALUE = "86"
 
+    # The col/row values dont really matter
     tokens: Tokens = (
-        private_token, class_token, class_identifier_token,
-        left_curly_brace_token,
-        public_token, int_token, method_identifier_token, left_parenthesis_token,
-        right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token, right_curly_brace_token,
+        private_token(),
+        class_token(),
+        identifier_token(CLASS_IDENTIFIER),
+        left_curly_brace_token(),
+        public_token(),
+        int_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    return_factor = FactorNode(decimal_literal_token.value)
-    return_term = TermNode(return_factor)
-    return_expression = ExpressionNode(return_term)
-    return_comp_expression = ComparisonExpression(return_expression)
+    return_comp_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
     return_statement = ReturnStatement(return_comp_expression)
     inline_statement = InlineStatement(return_statement)
@@ -413,12 +533,11 @@ def test_parser_can_generate_correct_ast_for_class_declaration():
     parameter_list = ParameterList()
 
     method_declaration = MethodDeclaration(
-        method_identifier_token.value, parameter_list, statement_list
+        METHOD_IDENTIFIER, parameter_list, statement_list
     )
     method_declaration_list = MethodDeclarationList(method_declaration)
     class_declaration = ClassDeclaration(
-        class_identifier_token.value,
-        method_declaration_list
+        CLASS_IDENTIFIER, method_declaration_list
     )
 
     expected_output_tokens: Tokens = (end_of_file_token,)
@@ -435,11 +554,13 @@ def test_parser_can_produce_error_for_class_dec_when_access_modifier_omitted():
     can produce an error when the access modifier(s) of a class are omitted.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "shinnei")
+    CLASS_IDENTIFIER = "myid"
 
     tokens: Tokens = (
-        class_token, identifier_token, left_curly_brace_token,
-        right_curly_brace_token,
+        class_token(),
+        identifier_token(CLASS_IDENTIFIER),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -457,11 +578,13 @@ def test_parser_can_produce_error_for_class_dec_when_class_keyword_omitted():
     can produce an error when the class keyword is omitted.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "shinnei")
+    CLASS_IDENTIFIER = "shinnei"
 
     tokens: Tokens = (
-        public_token, identifier_token, left_curly_brace_token,
-        right_curly_brace_token,
+        public_token(),
+        identifier_token(CLASS_IDENTIFIER),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -480,8 +603,10 @@ def test_parser_can_produce_error_for_class_dec_when_identifier_omitted():
     """
 
     tokens: Tokens = (
-        public_token, class_token, left_curly_brace_token,
-        right_curly_brace_token,
+        public_token(),
+        class_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -499,10 +624,13 @@ def test_parser_can_produce_error_for_class_dec_when_left_brace_omitted():
     can produce an error when the left/opening curly brace is omitted.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "shinnei")
+    CLASS_IDENTIFIER = "pascal"
 
     tokens: Tokens = (
-        public_token, class_token, identifier_token, right_curly_brace_token,
+        public_token(),
+        class_token(),
+            identifier_token(CLASS_IDENTIFIER),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -520,12 +648,15 @@ def test_parser_can_produce_error_for_class_dec_when_error_occurs_method_dec_lis
     can produce an error when an error occurs in method_declaration_list
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "shinnei")
+    CLASS_IDENTIFIER = "shiden"
 
     tokens: Tokens = (
-        public_token, class_token, identifier_token, left_curly_brace_token,
-        while_token,
-        right_curly_brace_token,
+        public_token(),
+        class_token(),
+        identifier_token(CLASS_IDENTIFIER),
+        left_curly_brace_token(),
+        while_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -543,10 +674,13 @@ def test_parser_can_produce_error_for_class_dec_when_right_brace_omitted():
     can produce an error when the right/closing curly brace is omitted.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "shinnei")
+    CLASS_IDENTIFIER = "vladilena"
 
     tokens: Tokens = (
-        public_token, class_token, identifier_token, left_curly_brace_token,
+        public_token(),
+        class_token(),
+        identifier_token(CLASS_IDENTIFIER),
+        left_curly_brace_token(),
         end_of_file_token
     )
 
@@ -564,7 +698,10 @@ def test_parser_can_generate_correct_ast_for_method_dec_list_with_no_methods():
     can correctly parse the tokens when provided with no methods.
     """
 
-    tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        right_curly_brace_token(),
+        end_of_file_token
+    )
     
     method_declaration_list = MethodDeclarationList()
     expected_output = NodeSuccess(tokens, method_declaration_list)
@@ -580,13 +717,17 @@ def test_parser_can_generate_correct_ast_for_method_dec_list_with_one_method():
     can corretly parse the tokens when provided with a singular method.
     """
 
-    int_token = Token(TokenType.INT, "INT")
-    identifier_token = Token(TokenType.IDENTIFIER, "factor")
+    IDENTIFIER = "annette"
 
     tokens: Tokens = (
-        private_token, int_token, identifier_token, left_parenthesis_token,
-        right_parenthesis_token, left_curly_brace_token, right_curly_brace_token,
-        right_curly_brace_token,
+        private_token(),
+        int_token(),
+        identifier_token(IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -594,15 +735,17 @@ def test_parser_can_generate_correct_ast_for_method_dec_list_with_one_method():
     statement_list = StatementList()
 
     method_declaration = MethodDeclaration(
-        identifier_token.value,
+        IDENTIFIER,
         parameter_list,
         statement_list
     )
 
     method_declaration_list = MethodDeclarationList(method_declaration)
 
-    expected_output_tokens: Tuple[Token, Token] = (right_curly_brace_token,
-                                                   end_of_file_token,)
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_curly_brace_token(),
+        end_of_file_token,
+    )
     expected_output = NodeSuccess(expected_output_tokens, method_declaration_list)
 
     node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
@@ -616,12 +759,14 @@ def test_parser_can_produce_error_for_method_dec_list_that_fails_initial_method(
     can produce an error because of failure of the initial method.
     """
 
-    int_token = Token(TokenType.INT, "INT")
-
     tokens: Tokens = (
-        private_token, int_token, left_parenthesis_token,
-        right_parenthesis_token, left_curly_brace_token, right_curly_brace_token,
-        right_curly_brace_token,
+        private_token(),
+        int_token(),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -640,29 +785,38 @@ def test_parser_can_produce_ast_for_method_dec_list_with_multiple_methods():
     methods.
     """
 
-    variable_type = Token(TokenType.CHAR, "CHAR")
-    identifier_token = Token(TokenType.IDENTIFIER, "sat")
-    another_identifier_token = Token(TokenType.IDENTIFIER, "Jhu")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "vagabond"
+    ADDITIONAL_IDENTIFIER = "vinland"
+    RETURN_VALUE = "86"
 
     tokens: Tokens = (
-        static_token, variable_type, identifier_token, left_parenthesis_token,
-        right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
-        public_token, variable_type, another_identifier_token,
-        left_parenthesis_token, right_parenthesis_token, left_curly_brace_token,
-        right_curly_brace_token,
-        right_curly_brace_token,
+        static_token(),
+        int_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(RETURN_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
+        public_token(),
+        int_token(),
+        identifier_token(ADDITIONAL_IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
     parameter_list = ParameterList()
 
-    return_factor = FactorNode(decimal_literal_token.value)
-    return_term = TermNode(return_factor)
-    return_expression = ExpressionNode(return_term)
-    return_comparison_expression = ComparisonExpression(return_expression)
+    return_comparison_expression: ComparisonExpression
+    return_comparison_expression = generate_single_comp_expression(
+        RETURN_VALUE
+    )
     return_statement = ReturnStatement(return_comparison_expression)
 
     inline_statement = InlineStatement(return_statement)
@@ -671,7 +825,7 @@ def test_parser_can_produce_ast_for_method_dec_list_with_multiple_methods():
     second_statement_list = StatementList()
 
     additional_method_declaration = MethodDeclaration(
-        another_identifier_token.value,
+        ADDITIONAL_IDENTIFIER,
         parameter_list, second_statement_list
     )
     additional_method_declaration_list = MethodDeclarationList(
@@ -679,7 +833,7 @@ def test_parser_can_produce_ast_for_method_dec_list_with_multiple_methods():
     )
 
     method_declaration = MethodDeclaration(
-        identifier_token.value,
+        METHOD_IDENTIFIER,
         parameter_list,
         first_statement_list
     )
@@ -689,7 +843,10 @@ def test_parser_can_produce_ast_for_method_dec_list_with_multiple_methods():
         additional_method_declaration_list
     )
 
-    expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
+    expected_output_tokens = (
+        right_curly_brace_token(),
+        end_of_file_token,
+    )
     expected_output = NodeSuccess(expected_output_tokens, method_declaration_list)
 
     node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
@@ -703,20 +860,28 @@ def test_parser_can_produce_error_for_method_dec_list_that_fails_additional_meth
     can produce an error because of failure of the additional method.
     """
 
-    variable_type = Token(TokenType.CHAR, "CHAR")
-    identifier_token = Token(TokenType.IDENTIFIER, "sat")
-    another_identifier_token = Token(TokenType.IDENTIFIER, "Jhu")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "sat"
+    ADDITIONAL_METHOD_IDENTIFIER = "Jhu"
+    RETURN_VALUE = "85"
 
     tokens: Tokens = (
-        static_token, variable_type, identifier_token, left_parenthesis_token,
-        right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
-        public_token, variable_type, another_identifier_token,
-        left_parenthesis_token, left_curly_brace_token,
-        right_curly_brace_token,
-        right_curly_brace_token,
+        static_token(),
+        short_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(RETURN_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
+        public_token(),
+        int_token(),
+        identifier_token(ADDITIONAL_METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -735,32 +900,40 @@ def test_parser_can_generate_correct_ast_for_method_declaration():
     declaration.
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "pascal"
+    PARAMETER_IDENTIFIER = "cpp"
+    DECIMAL_LITERAL_VALUE = "1"
 
     tokens: Tokens = (
-        public_token, static_token, return_type_token, method_identifier_token,
-        left_parenthesis_token, return_type_token, parameter_identifier,
-        right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
+        public_token(),
+        static_token(),
+        short_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        int_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    parameter_list = ParameterList(parameter_identifier.value)
+    parameter_list = ParameterList(PARAMETER_IDENTIFIER)
     
-    return_factor = FactorNode(decimal_literal_token.value)
-    return_term = TermNode(return_factor)
-    return_expression = ExpressionNode(return_term)
-    return_comp_expression = ComparisonExpression(return_expression)
+    return_comp_expression: ComparisonExpression 
+    return_comp_expression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
+
     return_statement = ReturnStatement(return_comp_expression)
     inline_statement = InlineStatement(return_statement)
     statement_list = StatementList(inline_statement)
 
     method_declaration = MethodDeclaration(
-        method_identifier_token.value,
+        METHOD_IDENTIFIER,
         parameter_list,
         statement_list
     )
@@ -780,22 +953,28 @@ def test_parser_can_produce_error_for_no_access_modifiers_in_method_declaration(
     expected for a method declaration
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "pascal"
+    PARAMETER_IDENTIFIER = "cpp" 
+    DECIMAL_LITERAL_VALUE = "999"
 
     tokens: Tokens = (
-        return_type_token, return_token, method_identifier_token,
-        left_parenthesis_token, return_type_token, parameter_identifier,
-        right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
+        int_token(),
+        return_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        short_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        return_type_token.token_type
+        TokenType.INT
     )
     expected_output = NodeFailure(error_message)
     
@@ -811,30 +990,37 @@ def test_parser_can_produce_correct_output_for_void_return_type_in_method_declar
     declaration.
     """
 
-    void_return_type = Token(TokenType.VOID, "VOID")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "csharp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "csharp"
+    DECIMAL_LITERAL_VALUE = "85" 
 
     tokens: Tokens = (
-        public_token, static_token, void_return_type, method_identifier_token,
-        left_parenthesis_token, right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
+        public_token(),
+        static_token(),
+        void_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
     parameter_list = ParameterList()
     
-    return_factor = FactorNode(decimal_literal_token.value)
-    return_term = TermNode(return_factor)
-    return_expression = ExpressionNode(return_term)
-    return_comp_expression = ComparisonExpression(return_expression)
+    return_comp_expression: ComparisonExpression
+    return_comp_expression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
+
     return_statement = ReturnStatement(return_comp_expression)
     inline_statement = InlineStatement(return_statement)
     statement_list = StatementList(inline_statement)
 
     method_declaration = MethodDeclaration(
-        method_identifier_token.value,
+        METHOD_IDENTIFIER,
         parameter_list,
         statement_list
     )
@@ -854,17 +1040,23 @@ def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
     declaration.
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "pascal"
+    PARAMETER_IDENTIFIER = "cpp"
+    DECIMAL_LITERAL_VALUE = "1"
 
     tokens: Tokens = (
-        public_token, static_token, method_identifier_token,
-        left_parenthesis_token, return_type_token, parameter_identifier,
-        right_parenthesis_token, left_curly_brace_token,
-        return_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
+        public_token(),
+        static_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        double_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -887,15 +1079,22 @@ def test_parser_can_produce_error_for_no_identifier_in_method_declaration():
     declaration.
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    PARAMETER_IDENTIFIER = "perl"
+    DECIMAL_LITERAL_VALUE = "8686"
 
     tokens: Tokens = (
-        public_token, static_token, return_type_token, left_parenthesis_token,
-        return_type_token, parameter_identifier, right_parenthesis_token,
-        left_curly_brace_token, return_token, decimal_literal_token,
-        semi_colon_token, right_curly_brace_token,
+        public_token(),
+        static_token(),
+        double_token(),
+        left_parenthesis_token(),
+        int_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -917,21 +1116,28 @@ def test_parser_can_produce_error_for_no_left_paren_in_method_declaration():
     method declaration.
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "walterWhite"
+    PARAMETER_IDENTIFIER = "mihal"
+    DECIMAL_LITERAL_VALUE = "991"
 
     tokens: Tokens = (
-        public_token, static_token, return_type_token, method_identifier_token,
-        return_type_token, parameter_identifier, right_parenthesis_token,
-        left_curly_brace_token, return_token, decimal_literal_token,
-        semi_colon_token, right_curly_brace_token,
+        public_token(),
+        static_token(),
+        int_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        short_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        return_type_token.token_type
+            TokenType.SHORT
     )
     expected_output = NodeFailure(error_message)
     
@@ -946,16 +1152,23 @@ def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaratio
     can generate the correct error when parameter list fails.
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "datalog"
+    PARAMETER_IDENTIFIER = "prolog"
+    DECIMAL_LITERAL_VALUE = "90"
 
     tokens: Tokens = (
-        public_token, static_token, return_type_token, method_identifier_token,
-        left_parenthesis_token, parameter_identifier, right_parenthesis_token,
-        left_curly_brace_token, return_token, decimal_literal_token,
-        semi_colon_token, right_curly_brace_token,
+        public_token(),
+        static_token(),
+        double_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -979,16 +1192,23 @@ def test_parser_can_produce_error_for_no_block_statement_body_in_method_declarat
     method declaration.
     """
 
-    return_type_token = Token(TokenType.SHORT, "SHORT")
-    method_identifier_token = Token(TokenType.IDENTIFIER, "pascal")
-    parameter_identifier = Token(TokenType.IDENTIFIER, "cpp")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    METHOD_IDENTIFIER = "java"
+    PARAMETER_IDENTIFIER = "recursion"
+    DECIMAL_LITERAL_VALUE = "101"
 
     tokens: Tokens = (
-        public_token, static_token, return_type_token, method_identifier_token,
-        left_parenthesis_token, return_type_token, parameter_identifier,
-        right_parenthesis_token, left_curly_brace_token, return_token,
-        decimal_literal_token, semi_colon_token,
+        public_token(),
+        static_token(),
+        double_token(),
+        identifier_token(METHOD_IDENTIFIER),
+        left_parenthesis_token(),
+        double_token(),
+        identifier_token(PARAMETER_IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
@@ -1007,10 +1227,13 @@ def test_parser_can_produce_error_for_no_access_modifiers_given():
     expected.
     """
 
-    int_token = Token(TokenType.INT, "INT")
-    identifier_token = Token(TokenType.IDENTIFIER, "turing")
+    IDENTIFIER = "turing"
 
-    tokens: Tokens = (int_token, identifier_token, end_of_file_token)
+    tokens: Tokens = (
+        int_token(),
+        identifier_token(IDENTIFIER),
+        end_of_file_token
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.INT)
     expected_output = NodeFailure(error_message)
@@ -1026,17 +1249,17 @@ def test_parser_can_generate_correct_output_for_a_single_access_modifier():
     can generate the correct output when given one access modifer.
     """
 
-    int_token = Token(TokenType.INT, "INT")
-    identifier_token = Token(TokenType.IDENTIFIER, "forth")
+    IDENTIFIER = "factor"
 
     tokens: Tokens = (
-        public_token, int_token, identifier_token,
+        public_token(),
+        int_token(),
+        identifier_token(IDENTIFIER),
         end_of_file_token
     )
 
     no_node = NoNode()
-    expected_output_tokens: Tokens = (int_token, identifier_token,
-                                      end_of_file_token)
+    expected_output_tokens: Tokens = tokens[1:]
     expected_output = NodeSuccess(expected_output_tokens, no_node)
 
     node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
@@ -1050,17 +1273,22 @@ def test_parser_can_generate_correct_output_for_multiple_access_modifiers():
     generate the correct output when given multiple access modifiers
     """
 
-    char_token = Token(TokenType.CHAR, "CHAR")
-    identifier_token = Token(TokenType.IDENTIFIER, "porth")
+    IDENTIFIER = "porth"
 
     tokens: Tokens = (
-        public_token, static_token, char_token, identifier_token,
+        public_token(),
+        static_token(),
+        char_token(),
+        identifier_token(IDENTIFIER),
         end_of_file_token
     )
 
     no_node = NoNode()
-    expected_output_tokens: Tokens = (char_token, identifier_token,
-                                      end_of_file_token)
+    expected_output_tokens: Tokens = (
+        char_token(),
+        identifier_token(IDENTIFIER),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, no_node)
 
     node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
@@ -1075,8 +1303,10 @@ def test_parser_can_generate_correct_ast_for_simple_variable_type():
     (i.e. one without brackets that signify that is an Array).
     """
 
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
-    tokens: Tokens = (variable_type_token, end_of_file_token)
+    tokens: Tokens = (
+        double_token(),
+        end_of_file_token
+    )
     
     no_node = NoNode()
 
@@ -1097,8 +1327,11 @@ def test_parser_can_produce_correct_error_for_variable_type_that_omits_right_bra
     bracket but does not have closing right bracket.
     """
 
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
-    tokens: Tokens = (variable_type_token, left_bracket_token, end_of_file_token)
+    tokens: Tokens = (
+        int_token(),
+        left_bracket_token(),
+        end_of_file_token
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
     expected_output = NodeFailure(error_message)
@@ -1119,9 +1352,10 @@ def test_parser_can_generate_correct_ast_for_complete_variable_type():
     Example: int[]
     """
 
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
     tokens: Tokens = (
-        variable_type_token, left_bracket_token, right_bracket_token,
+        char_token(),
+        left_bracket_token(),
+        right_bracket_token(),
         end_of_file_token
     )
 
@@ -1143,7 +1377,10 @@ def test_parser_can_generate_correct_ast_for_parameter_list_with_no_parameters()
     correctly parse the tokens when provided with no parameters.
     """
 
-    tokens: Tokens = (right_parenthesis_token, end_of_file_token)
+    tokens: Tokens = (
+        right_parenthesis_token(),
+        end_of_file_token
+    )
 
     parameter_list = ParameterList()
     expected_output = NodeSuccess(tokens, parameter_list)
@@ -1160,17 +1397,21 @@ def test_parser_can_generate_correct_ast_for_single_parameter_list():
     input of a singular parameter.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "ada")
-    double_token = Token(TokenType.DOUBLE, "DOUBLE")
+    IDENTIFIER = "ada"
     
     tokens: Tokens = (
-        double_token, identifier_token, right_parenthesis_token,
+        double_token(),
+        identifier_token(IDENTIFIER),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    parameter_list = ParameterList(identifier_token.value)
+    parameter_list = ParameterList(IDENTIFIER)
 
-    expected_output_tokens: Tokens = (right_parenthesis_token, end_of_file_token)
+    expected_output_tokens: Tokens = (
+        right_parenthesis_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, parameter_list)
 
     node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
@@ -1185,8 +1426,12 @@ def test_parser_can_produce_error_when_parameter_without_type():
     an input the omits the variable type for a parameter
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "apl")
-    tokens: Tokens = (identifier_token, right_parenthesis_token, end_of_file_token)
+    IDENTIFIER = "apl"
+    tokens: Tokens = (
+        identifier_token(IDENTIFIER),
+        right_parenthesis_token(),
+        end_of_file_token
+    )
     
     # Explanation: IDENTIFIER counts as a VARIABLE_TYPE so.........
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
@@ -1206,21 +1451,27 @@ def test_parser_can_generate_correct_ast_for_multiple_parameter_list():
     input of multiple parameters.
     """
 
-    int_token = Token(TokenType.INT, "INT")
-    first_identifier_token = Token(TokenType.IDENTIFIER, "logtalk")
-    second_identifier_token = Token(TokenType.IDENTIFIER, "datalog")
+    FIRST_IDENTIFIER = "logtalk"
+    SECOND_IDENTIFIER = "datalog"
 
     tokens: Tokens = (
-        int_token, first_identifier_token, comma_token,
-        int_token, second_identifier_token, right_parenthesis_token,
+        int_token(),
+        identifier_token(FIRST_IDENTIFIER),
+        comma_token(),
+        int_token(),
+        identifier_token(SECOND_IDENTIFIER),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    additional_parameter_list = ParameterList(second_identifier_token.value)
-    parameter_list = ParameterList(first_identifier_token.value,
+    additional_parameter_list = ParameterList(SECOND_IDENTIFIER)
+    parameter_list = ParameterList(FIRST_IDENTIFIER,
                                    additional_parameter_list)
 
-    expected_output_tokens: Tokens = (right_parenthesis_token, end_of_file_token)
+    expected_output_tokens: Tokens = (
+        right_parenthesis_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, parameter_list)
 
     node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
@@ -1234,10 +1485,13 @@ def test_parser_can_generate_correct_error_when_parameter_list_expects_parenthes
     when supplied a faulty input that omits either a comma or a parenthesis.
     """
 
-    char_token = Token(TokenType.CHAR, "char")
-    identifier_token = Token(TokenType.IDENTIFIER, "cabal")
+    IDENTIFIER = "cabal"
 
-    tokens: Tokens = (char_token, identifier_token, end_of_file_token)
+    tokens: Tokens = (
+        char_token(),
+        identifier_token(IDENTIFIER),
+        end_of_file_token
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
     expected_output = NodeFailure(error_message)
@@ -1253,7 +1507,10 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_no_statements()
     can correctly parse the tokens when provided with no statements.
     """
 
-    tokens: Tuple[Token, Token] = (right_curly_brace_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        right_curly_brace_token(),
+        end_of_file_token
+    )
     
     inline_statement_list = StatementList()
     expected_output = NodeSuccess(tokens, inline_statement_list)
@@ -1268,18 +1525,19 @@ def test_parser_can_generate_correct_ast_for_statement_list_with_one_statement()
     This test checks if the function `parse_tokens_for_inline_statement_list`
     can corretly parse the tokens when provided with a singular statement.
     """
-    
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    DECIMAL_LITERAL_VALUE = "01"
 
     tokens: Tokens = (
-        return_token, decimal_literal_token, semi_colon_token,
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
     return_statement = ReturnStatement(comparison_expression)
 
     inline_statement = InlineStatement(return_statement)
@@ -1299,7 +1557,11 @@ def test_parser_can_produce_error_for_statement_list_that_fails_initial_statemen
     can produce an error because of failure of the initial statement.
     """
 
-    tokens: Tokens = (return_token, return_token, end_of_file_token)
+    tokens: Tokens = (
+        return_token(),
+        return_token(),
+        end_of_file_token
+    )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RETURN)
     expected_output = NodeFailure(error_message)
@@ -1315,39 +1577,45 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     can produce the correct ast for a statement list with multiple statements.
     """
 
-    variable_type = Token(TokenType.CHAR, "CHAR")
-    identifier_token = Token(TokenType.IDENTIFIER, "sat")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "sat"
+    ADDITIONAL_IDENTIFIER = "mof"
+    DECIMAL_LITERAL_VALUE = "7"
 
     tokens: Tokens = (
-        variable_type, identifier_token, equals_token, decimal_literal_token,
-        semi_colon_token,
-        return_token, identifier_token, semi_colon_token,
-        right_curly_brace_token,
+        double_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        return_token(),
+        identifier_token(ADDITIONAL_IDENTIFIER),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
-    variable_increment = VariableInitialization(identifier_token.value,
-                                                comparison_expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
+    variable_initialization = VariableInitialization(IDENTIFIER,
+                                                     comparison_expression)
 
-    return_factor = FactorNode(identifier_token.value)
-    return_term = TermNode(return_factor)
-    return_expression = ExpressionNode(return_term)
-    return_comparison_expression = ComparisonExpression(return_expression)
-    return_statement = ReturnStatement(return_comparison_expression)
+    return_comp_expression: ComparisonExpression = generate_single_comp_expression(
+        ADDITIONAL_IDENTIFIER
+    )
+    return_statement = ReturnStatement(return_comp_expression)
 
-    initial_inline_statement = InlineStatement(variable_increment)
+    initial_inline_statement = InlineStatement(variable_initialization)
     additional_inline_statement = InlineStatement(return_statement)
     additional_statement_list = StatementList(additional_inline_statement)
 
     inline_statement_list = StatementList(initial_inline_statement,
                                                 additional_statement_list)
 
-    expected_output_tokens = (right_curly_brace_token, end_of_file_token,)
+    expected_output_tokens = (
+        right_curly_brace_token(),
+        end_of_file_token,
+    )
     expected_output = NodeSuccess(expected_output_tokens, inline_statement_list)
 
     node_result: NodeResult = parse_tokens_for_statement_list(tokens)
@@ -1361,14 +1629,18 @@ def test_parser_can_produce_error_for_statement_list_that_fails_additional_state
     can produce an error because of failure of the additional statement.
     """
 
-    variable_type = Token(TokenType.CHAR, "CHAR")
-    identifier_token = Token(TokenType.IDENTIFIER, "sat")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "giannis"
+    DECIMAL_LITERAL_VALUE = "40"
 
     tokens: Tokens = (
-        variable_type, identifier_token, equals_token, decimal_literal_token,
-        semi_colon_token,
-        return_token, equals_token, semi_colon_token,
+        char_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        return_token(),
+        equals_token(),
+        semi_colon_token(),
         end_of_file_token
     )
 
@@ -1388,31 +1660,35 @@ def test_parser_can_generate_correct_ast_for_block_statement():
     parse the tokens when provided with tokens containing a block statement.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "PROLOG")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "PROLOG"
+    DECIMAL_LITERAL_VALUE = "87"
 
     tokens: Tokens = (
-        while_token, left_parenthesis_token, identifier_token,
-        right_parenthesis_token, left_curly_brace_token,
-        identifier_token, plus_token, equals_token, decimal_literal_token,
-        semi_colon_token, right_curly_brace_token,
+        while_token(),
+        left_parenthesis_token(),
+        identifier_token(IDENTIFIER),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        identifier_token(IDENTIFIER),
+        plus_token(),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    while_condition_factor = FactorNode(identifier_token.value)
-    while_condition_term = TermNode(while_condition_factor)
-    while_condition_expression = ExpressionNode(while_condition_term)
-    while_condition_comp_expression = ComparisonExpression(
-        while_condition_expression
+    while_condition_comp_expression: ComparisonExpression
+    while_condition_comp_expression = generate_single_comp_expression(
+        IDENTIFIER
     )
 
-    increment_factor = FactorNode(decimal_literal_token.value)
-    increment_term = TermNode(increment_factor)
-    increment_expression = ExpressionNode(increment_term)
-    increment_comp_expression = ComparisonExpression(increment_expression)
+    increment_comp_expression: ComparisonExpression
+    increment_comp_expression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
-    variable_increment = VariableIncrement(identifier_token.value,
-                                           increment_comp_expression)
+    variable_increment = VariableIncrement(IDENTIFIER, increment_comp_expression)
     inline_statement = InlineStatement(variable_increment)
     statement_list = StatementList(inline_statement)
     
@@ -1435,17 +1711,19 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_empty_body():
     parse the tokens when provided with a while loop without a body.
     """
 
-    false_token = Token(TokenType.FALSE, "FALSE")
     tokens: Tokens = (
-        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
+        while_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(false_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        "FALSE"
+    )
     
     statement_list = StatementList()
 
@@ -1466,8 +1744,12 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condi
     """
 
     tokens: Tokens = (
-        while_token, left_parenthesis_token, minus_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
+        while_token(),
+        left_parenthesis_token(),
+        minus_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -1485,18 +1767,19 @@ def test_parser_can_generate_correct_ast_for_while_statement_with_non_empty_body
     parse the tokens when provided with a while with a non-empty body/
     """
  
-    false_token = Token(TokenType.FALSE, "FALSE")
     tokens: Tokens = (
-        while_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, return_token, semi_colon_token,
-        right_curly_brace_token,
+        while_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(false_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
+    comp_expression: ComparisonExpression = generate_single_comp_expression("FALSE")
     
     return_statement = ReturnStatement()
     inline_statement = InlineStatement(return_statement)
@@ -1518,13 +1801,19 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body(
     body.
     """
 
-    true_token = Token(TokenType.TRUE, "TRUE")
-    identifier_token = Token(TokenType.IDENTIFIER, "variable")
+    IDENTIFIER = "variable"
 
     tokens: Tokens = (
-        while_token, left_parenthesis_token, true_token, right_parenthesis_token,
-        left_curly_brace_token, identifier_token, minus_token, divide_token,
-        semi_colon_token, right_curly_brace_token,
+        while_token(),
+        left_parenthesis_token(),
+        true_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        identifier_token(IDENTIFIER),
+        minus_token(),
+        divide_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -1543,15 +1832,18 @@ def test_parser_can_generate_correct_ast_for_if_statement_with_empty_body():
     """
  
     tokens: Tokens = (
-        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(false_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        "FALSE"
+    )
     
     statement_list = StatementList()
 
@@ -1572,8 +1864,12 @@ def test_parser_can_generate_error_for_if_statement_with_faulty_condition():
     """
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, minus_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        minus_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -1592,16 +1888,19 @@ def test_parser_can_generate_correct_ast_for_if_statement_with_non_empty_body():
     """
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, return_token, false_token, semi_colon_token,
-        right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        false_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(false_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
+    comp_expression: ComparisonExpression = generate_single_comp_expression("FALSE")
 
     return_statement = ReturnStatement(comp_expression)
     inline_statement = InlineStatement(return_statement)
@@ -1623,12 +1922,19 @@ def test_parser_can_generate_correct_error_for_if_statement_with_faulty_body():
     body.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "variable")
+    IDENTIFIER = "variable"
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, true_token, right_parenthesis_token,
-        left_curly_brace_token, identifier_token, minus_token, divide_token,
-        semi_colon_token, right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        true_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        identifier_token(IDENTIFIER),
+        minus_token(),
+        divide_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -1646,26 +1952,40 @@ def test_parser_can_generate_correct_ast_for_if_else_if_statement():
     the tokens when provided with an if statement with an else if clause.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "y")
+    IDENTIFIER = "y"
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, true_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
-        else_token, if_token, left_parenthesis_token, true_token, equals_token,
-        equals_token, false_token, right_parenthesis_token, left_curly_brace_token,
-        identifier_token, plus_token, plus_token, semi_colon_token,
-        right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        true_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        else_token(),
+        if_token(),
+        left_parenthesis_token(),
+        true_token(),
+        equals_token(),
+        equals_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        identifier_token(IDENTIFIER),
+        plus_token(),
+        plus_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
     
-    true_factor = FactorNode(true_token.value)
+    true_factor = FactorNode("TRUE")
     true_term = TermNode(true_factor)
     true_expression = ExpressionNode(true_term)
     true_comp_expression = ComparisonExpression(true_expression)
 
     if_statement_statement_list = StatementList()
 
-    false_factor = FactorNode(false_token.value)
+    false_factor = FactorNode("FALSE")
     false_term = TermNode(false_factor)
     false_expression = ExpressionNode(false_term)
     else_if_comp_expression = ComparisonExpression(
@@ -1679,7 +1999,7 @@ def test_parser_can_generate_correct_ast_for_if_else_if_statement():
     increment_expression = ExpressionNode(increment_term)
     increment_comp_expression = ComparisonExpression(increment_expression)
 
-    variable_increment = VariableIncrement(identifier_token.value,
+    variable_increment = VariableIncrement(IDENTIFIER,
                                            increment_comp_expression)
 
     inline_statement = InlineStatement(variable_increment)
@@ -1712,10 +2032,18 @@ def test_parser_can_produce_correct_error_for_faulty_if_else_if_statement():
     """
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
-        else_token, if_token, left_parenthesis_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        else_token(),
+        if_token(),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -1736,15 +2064,23 @@ def test_parser_can_generate_correct_ast_for_if_else_statement():
     """
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, return_token, semi_colon_token,
-        right_curly_brace_token,
-        else_token, left_curly_brace_token, return_token, semi_colon_token,
-        right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        return_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
+        else_token(),
+        left_curly_brace_token(),
+        return_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    false_factor = FactorNode(false_token.value)
+    false_factor = FactorNode("FALSE")
     false_term = TermNode(false_factor)
     false_expression = ExpressionNode(false_term)
     if_statement_comp_expression = ComparisonExpression(false_expression)
@@ -1774,10 +2110,16 @@ def test_parser_can_produce_correct_error_for_fauly_if_else_statement():
     """
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, false_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
-        else_token, left_curly_brace_token, semi_colon_token,
-        right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        else_token(),
+        left_curly_brace_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
@@ -1796,28 +2138,45 @@ def test_parser_can_generate_correct_ast_for_if_else_if_else_statement():
     an else clause.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "y")
+    IDENTIFIER = "pt"
 
     tokens: Tokens = (
-        if_token, left_parenthesis_token, true_token, right_parenthesis_token,
-        left_curly_brace_token, right_curly_brace_token,
-        else_token, if_token, left_parenthesis_token, true_token, equals_token,
-        equals_token, false_token, right_parenthesis_token, left_curly_brace_token,
-        identifier_token, plus_token, plus_token, semi_colon_token,
-        right_curly_brace_token,
-        else_token, left_curly_brace_token, return_token, semi_colon_token,
-        right_curly_brace_token,
+        if_token(),
+        left_parenthesis_token(),
+        true_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        right_curly_brace_token(),
+        else_token(),
+        if_token(),
+        left_parenthesis_token(),
+        true_token(),
+        equals_token(),
+        equals_token(),
+        false_token(),
+        right_parenthesis_token(),
+        left_curly_brace_token(),
+        identifier_token(IDENTIFIER),
+        plus_token(),
+        plus_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
+        else_token(),
+        left_curly_brace_token(),
+        return_token(),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
     
-    true_factor = FactorNode(true_token.value)
+    true_factor = FactorNode("TRUE")
     true_term = TermNode(true_factor)
     true_expression = ExpressionNode(true_term)
     true_comp_expression = ComparisonExpression(true_expression)
 
     if_statement_statement_list = StatementList()
 
-    false_factor = FactorNode(false_token.value)
+    false_factor = FactorNode("FALSE")
     false_term = TermNode(false_factor)
     false_expression = ExpressionNode(false_term)
     else_if_comp_expression = ComparisonExpression(
@@ -1831,8 +2190,7 @@ def test_parser_can_generate_correct_ast_for_if_else_if_else_statement():
     increment_expression = ExpressionNode(increment_term)
     increment_comp_expression = ComparisonExpression(increment_expression)
 
-    variable_increment = VariableIncrement(identifier_token.value,
-                                           increment_comp_expression)
+    variable_increment = VariableIncrement(IDENTIFIER, increment_comp_expression)
 
     inline_statement = InlineStatement(variable_increment)
     else_if_statement_list = StatementList(inline_statement)
@@ -1866,25 +2224,26 @@ def test_parser_can_generate_correct_ast_for_block_statement_body():
     This test checks if the function `parse_tokens_for_block_statement_body`
     can correctly parse the tokens when provided with the correct input.
     """
-    
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
-    identifier_token = Token(TokenType.IDENTIFIER, "x")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+   
+    IDENTIFIER = "x"
+    DECIMAL_LITERAL_VALUE = "89"
 
     tokens: Tokens = (
-        left_curly_brace_token, variable_type_token, identifier_token,
-        equals_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
+        left_curly_brace_token(),
+        double_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
+    
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
-
-    variable_initialization = VariableInitialization(identifier_token.value,
-                                                     comp_expression)
+    variable_initialization = VariableInitialization(IDENTIFIER, comp_expression)
 
     inline_statement = InlineStatement(variable_initialization)
     statement_list = StatementList(inline_statement)
@@ -1903,20 +2262,21 @@ def test_parser_can_produce_error_for_block_statement_without_left_brace():
     can produce the correct error when given an input that omits the opening/left
     curly brace.
     """
- 
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
-    identifier_token = Token(TokenType.IDENTIFIER, "x")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    IDENTIFIER = "Z"
+    DECIMAL_LITERAL_VALUE = "699"
 
     tokens: Tokens = (
-        variable_type_token, identifier_token,
-        equals_token, decimal_literal_token, semi_colon_token,
-        right_curly_brace_token,
+        int_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
+        right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = \
-            ERROR_MESSAGE_FOR_PARSER.format(TokenType.DOUBLE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.INT)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
@@ -1930,14 +2290,17 @@ def test_parser_can_produce_error_for_block_statement_without_right_brace():
     can produce the correct error when given an input that omits the opening/left
     curly brace.
     """
- 
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
-    identifier_token = Token(TokenType.IDENTIFIER, "x")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+
+    IDENTIFIER = "X"
+    DECIMAL_LITERAL_VALUE = "88"
 
     tokens: Tokens = (
-        left_curly_brace_token, variable_type_token, identifier_token,
-        equals_token, decimal_literal_token, semi_colon_token,
+        left_curly_brace_token(),
+        double_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
@@ -1961,7 +2324,8 @@ def test_parser_can_generate_correct_ast_for_return_statement_with_semicolon():
     """
 
     tokens: Tuple[Token, Token, Token] = (
-        return_token, semi_colon_token,
+        return_token(),
+        semi_colon_token(),
         end_of_file_token
     )
 
@@ -1983,22 +2347,23 @@ def test_parser_can_generate_correct_ast_for_initialization_with_semicolon():
     can get this to work: "int x = 86;" (with the semicolon).
     """
 
-    variable_type_token = Token(TokenType.CHAR, "CHAR")
-    identifier_token = Token(TokenType.IDENTIFIER, "yolo")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "yolo"
+    DECIMAL_LITERAL_VALUE = "78"
 
     tokens: Tokens = (
-        variable_type_token, identifier_token, equals_token,
-        decimal_literal_token, semi_colon_token,
+        char_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
-    variable_initialization = VariableInitialization(identifier_token.value,
+    variable_initialization = VariableInitialization(IDENTIFIER,
                                                      comparison_expression)
 
     inline_statement = InlineStatement(variable_initialization)
@@ -2017,13 +2382,16 @@ def test_parser_can_generate_correct_error_for_statement_that_expects_semicolon(
     semicolon for an InlineStatement but doesn't get it.
     """
 
-    variable_type_token = Token(TokenType.LONG, "LONG")
-    identifier_token = Token(TokenType.IDENTIFIER, "yolo")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "YOlo"
+    DECIMAL_LITERAL_VALUE = "66"
 
     tokens: Tokens = (
-        variable_type_token, identifier_token, equals_token,
-        decimal_literal_token, divide_token, decimal_literal_token,
+        int_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        divide_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
         end_of_file_token
     )
 
@@ -2042,23 +2410,29 @@ def test_parser_can_generate_correct_for_variable_increment_for_plus_plus():
 
     This test checks for the ++ operator
     """
+    
+    IDENTIFIER = "yoworld"
 
-    identifier_token = Token(TokenType.IDENTIFIER, "yoworld")
     tokens: Tokens = (
-        identifier_token, plus_token, plus_token, semi_colon_token,
+        identifier_token(IDENTIFIER),
+        plus_token(),
+        plus_token(),
+        semi_colon_token(),
         end_of_file_token
     )
 
     DEFAULT_INCREMENT = "1"
 
-    factor = FactorNode(DEFAULT_INCREMENT)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        DEFAULT_INCREMENT
+    )
 
-    variable_increment = VariableIncrement(identifier_token.value, comp_expression)
+    variable_increment = VariableIncrement(IDENTIFIER, comp_expression)
     
-    expected_output_tokens: Tokens = (semi_colon_token, end_of_file_token)
+    expected_output_tokens: Tokens = (
+        semi_colon_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, variable_increment)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
@@ -2072,22 +2446,28 @@ def test_parser_can_generate_correct_ast_for_increment_with_expression():
     object when supplied with an expression like "x += 1" opposed to "x++"
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "yoworld")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "yowoRLd"
+    DECIMAL_LITERAL_VALUE = "91"
+
     tokens: Tokens = (
-        identifier_token, plus_token, equals_token, decimal_literal_token,
-        semi_colon_token,
+        identifier_token(IDENTIFIER),
+        plus_token(),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comp_expression = ComparisonExpression(expression)
+    comp_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    ) 
 
-    variable_increment = VariableIncrement(identifier_token.value, comp_expression)
+    variable_increment = VariableIncrement(IDENTIFIER, comp_expression)
     
-    expected_output_tokens: Tokens = (semi_colon_token, end_of_file_token)
+    expected_output_tokens: Tokens = (
+        semi_colon_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, variable_increment)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
@@ -2102,12 +2482,15 @@ def test_parser_can_generate_correct_error_given_bad_expression_to_increment():
     contains a syntax error like "x += /9".
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "x")
-    decimal_literal_token: Token =  generate_number_token_with_random_value()
+    IDENTIFIER = "yy"
+    DECIMAL_LITERAL_VALUE = "74"
 
     tokens: Tokens = (
-        identifier_token, plus_token, equals_token, decimal_literal_token,
-        plus_token,
+        identifier_token(IDENTIFIER),
+        plus_token(),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        plus_token(),
         end_of_file_token
     )
 
@@ -2126,9 +2509,9 @@ def test_parser_can_generate_correct_ast_for_empty_return_statement():
     statement (i.e. returning without an expression provided)
     """
 
-    return_statement_token = Token(TokenType.RETURN, "RETURN")
     tokens: Tuple[Token, Token, Token] = (
-        return_statement_token, semi_colon_token,
+        return_token(),
+        semi_colon_token(),
         end_of_file_token
     )
 
@@ -2148,16 +2531,18 @@ def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
     is not empty for the return statement
     """
 
-    return_statement_token = Token(TokenType.RETURN, "RETURN")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "86"
 
     tokens: Tokens = (
-        return_statement_token, decimal_literal_token, plus_token,
-        decimal_literal_token, semi_colon_token,
+        return_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        plus_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
+    factor = FactorNode(DECIMAL_LITERAL_VALUE)
     term = TermNode(factor)
 
     additional_expression = ExpressionNode(term)
@@ -2167,8 +2552,10 @@ def test_parser_can_generate_correct_ast_for_non_empty_return_statement():
 
     return_statement = ReturnStatement(comparison_expression)
 
-    expected_output_tokens: Tuple[Token, Token] = (semi_colon_token,
-                                                   end_of_file_token)
+    expected_output_tokens: Tuple[Token, Token] = (
+        semi_colon_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, return_statement)
 
     node_result: NodeResult = parse_tokens_for_return_statement(tokens)
@@ -2182,10 +2569,9 @@ def test_parse_can_generate_correct_error_given_invalid_expression_to_return():
     return the correct error when given an invalid expression to return.
     """
     
-    return_statement_token = Token(TokenType.RETURN, "RETURN")
-
     tokens: Tuple[Token, Token, Token] = (
-        return_statement_token, return_statement_token,
+        return_token(),
+        return_token(),
         end_of_file_token
     )
 
@@ -2204,26 +2590,30 @@ def test_parser_can_generate_correct_ast_for_variable_initialization():
     `parse_tokens_for_variable_initilization` function
     """
 
-    variable_type_token = Token(TokenType.INT, "INT")
-    identifier_token = Token(TokenType.IDENTIFIER, "my_var")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "myvar"
+    DECIMAL_LITERAL_VALUE = "63"
 
     tokens: Tokens = (
-        variable_type_token, identifier_token, equals_token,
-        decimal_literal_token, semi_colon_token,
+        double_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        semi_colon_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression);
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
     
-    variable_intialization = VariableInitialization(identifier_token.value,
-                                                    comparison_expression)
+    variable_intialization = VariableInitialization(
+        IDENTIFIER,
+        comparison_expression
+    )
 
     expected_output_tokens: Tuple[Token, Token] = (
-        semi_colon_token, end_of_file_token
+        semi_colon_token(),
+        end_of_file_token
     )
     expected_output = NodeSuccess(expected_output_tokens, variable_intialization)
 
@@ -2239,11 +2629,11 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_equals(
     object when given a tuple of tokens that omits the equals sign. 
     """
 
-    variable_type_token = Token(TokenType.INT, "INT")
-    identifier_token = Token(TokenType.IDENTIFIER, "my_error_prone_var")
+    IDENTIFIER = "errorprone"
 
     tokens: Tuple[Token, Token, Token] = (
-        variable_type_token, identifier_token,
+        char_token(),
+        identifier_token(IDENTIFIER),
         end_of_file_token
     )
 
@@ -2262,11 +2652,12 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_express
     that omits an expression (which is required).
     """
 
-    variable_type_token = Token(TokenType.DOUBLE, "DOUBLE")
-    identifier_token = Token(TokenType.IDENTIFIER, "anju")
+    IDENTIFIER = "anju"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        variable_type_token, identifier_token, equals_token,
+        char_token(),
+        identifier_token(IDENTIFIER),
+        equals_token(),
         end_of_file_token
     )
 
@@ -2287,14 +2678,14 @@ def test_parser_can_generate_correct_ast_for_simple_comparison_expression():
     """
 
     tokens: Tuple[Token, Token, Token] = (
-        true_token, right_parenthesis_token,
+        true_token(),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(true_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        "TRUE"
+    )
 
     expected_output_tokens: Tuple[Token, Token] = tokens[1:]
     expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
@@ -2311,18 +2702,20 @@ def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
     given an input with one expression that may have multiple factors and terms.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "Lookatme")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "LOOKATME"
+    DECIMAL_LITERAL_VALUE = "2701"
 
     tokens: Tokens = (
-        identifier_token, multiply_token, decimal_literal_token,
-        right_parenthesis_token,
+        identifier_token(IDENTIFIER),
+        multiply_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(identifier_token.value)
+    factor = FactorNode(IDENTIFIER)
 
-    factor_for_additional_term = FactorNode(decimal_literal_token.value)
+    factor_for_additional_term = FactorNode(DECIMAL_LITERAL_VALUE)
     additional_term = TermNode(factor_for_additional_term)
     
     term = TermNode(factor, ArithmeticOperator.MULTIPLY, additional_term)
@@ -2330,8 +2723,10 @@ def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
 
     comparison_expression = ComparisonExpression(expression)
 
-    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
-                                                   end_of_file_token)
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_parenthesis_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
@@ -2346,19 +2741,20 @@ def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
     given an input with an operator and an additional expression.
     """
 
-    exclamation_token = Token(TokenType.EXCLAMATION, "EXCLAMATION")
-
     tokens: Tokens = (
-        true_token, exclamation_token, equals_token, false_token,
-        right_parenthesis_token,
+        true_token(),
+        exclamation_token(),
+        equals_token(),
+        false_token(),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(true_token.value)
+    factor = FactorNode("TRUE")
     term = TermNode(factor)
     expression = ExpressionNode(term)
 
-    additional_factor = FactorNode(false_token.value)
+    additional_factor = FactorNode("FALSE")
     additional_term = TermNode(additional_factor)
     additional_expression = ExpressionNode(additional_term)
 
@@ -2366,8 +2762,10 @@ def test_parser_can_generate_correct_ast_for_complex_comparison_expression():
                                                  ComparisonOperator.NOT_EQUAL,
                                                  additional_expression)
     
-    expected_output_tokens: Tuple[Token, Token] = (right_parenthesis_token,
-                                                   end_of_file_token)
+    expected_output_tokens: Tuple[Token, Token] = (
+        right_parenthesis_token(),
+        end_of_file_token
+    )
     expected_output = NodeSuccess(expected_output_tokens, comparison_expression)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
@@ -2381,12 +2779,12 @@ def test_parser_can_generate_correct_error_for_complex_comparison_expression():
     can correctly generate an error for a complex expression with a syntax error
     """
     
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    less_than_token = Token(TokenType.LESS_THAN, "<")
+    DECIMAL_LITERAL_VALUE = "31"
 
     tokens: Tokens = (
-        decimal_literal_token, less_than_token, plus_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        less_than_token(),
+        plus_token(),
         end_of_file_token
     )
 
@@ -2406,7 +2804,8 @@ def test_parser_can_produce_error_for_comp_expression_with_no_left_paren():
     """
 
     tokens: Tokens = (
-        true_token, right_parenthesis_token,
+        true_token(),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
@@ -2426,7 +2825,8 @@ def test_parser_can_produce_error_for_comp_expression_with_no_right_paren():
     """
 
     tokens: Tokens = (
-        left_parenthesis_token, false_token,
+        left_parenthesis_token(),
+        false_token(),
         end_of_file_token
     )
 
@@ -2444,11 +2844,14 @@ def test_parser_can_generate_correct_ast_for_simple_expression():
     expression with a singular term and that term has a singular factor.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value() 
+    DECIMAL_LITERAL_VALUE = "64"
     
-    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+            decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        end_of_file_token
+    )
 
-    factor_node = FactorNode(decimal_literal_token.value)
+    factor_node = FactorNode(DECIMAL_LITERAL_VALUE)
     term_node = TermNode(factor_node)
     expression_node = ExpressionNode(term_node)
 
@@ -2465,18 +2868,20 @@ def test_parser_can_generate_correct_ast_for_expression_with_one_term():
     This test checks if the parser can properly generate an AST for a simple
     expression with a singular term but multiple factors
     """
-
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    
+    DECIMAL_LITERAL_VALUE = "24"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, multiply_token, decimal_literal_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        multiply_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
         end_of_file_token
     )
 
-    single_factor = FactorNode(decimal_literal_token.value)
+    single_factor = FactorNode(DECIMAL_LITERAL_VALUE)
     multiply_operator = ArithmeticOperator.MULTIPLY
     
-    factor_for_additional_term = FactorNode(decimal_literal_token.value)
+    factor_for_additional_term = FactorNode(DECIMAL_LITERAL_VALUE)
     additional_term = TermNode(factor_for_additional_term)
 
     term_node = TermNode(single_factor, multiply_operator, additional_term)
@@ -2497,14 +2902,16 @@ def test_parser_can_generate_correct_ast_for_complex_expression():
     complex expression like "5+5" or "3-3"
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "7"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, plus_token, decimal_literal_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        plus_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
+    factor = FactorNode(DECIMAL_LITERAL_VALUE)
     term = TermNode(factor)
     additional_expression = ExpressionNode(term)
 
@@ -2524,9 +2931,12 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     complex expression with an error.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "5"
+
     tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token, plus_token, minus_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        plus_token(),
+        minus_token(),
         end_of_file_token
     )
 
@@ -2545,10 +2955,14 @@ def test_parser_can_generate_correct_ast_for_simple_term():
     function.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
-    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+    DECIMAL_LITERAL_VALUE = "90"
 
-    factor_node = FactorNode(decimal_literal_token.value)
+    tokens: Tuple[Token, Token] = (
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        end_of_file_token
+    )
+
+    factor_node = FactorNode(DECIMAL_LITERAL_VALUE)
     term_node = TermNode(factor_node)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
@@ -2566,20 +2980,23 @@ def test_parser_can_generate_correct_ast_for_multiply_term():
     `parse_tokens_for_term` function, 
     """
 
-    first_decimal_literal_token: Token = generate_number_token_with_random_value()
-    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
+    FIRST_DECIMAL_LITERAL_VALUE = "1"
+    SECOND_DECIMAL_LITERAL_VALUE = "2"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        first_decimal_literal_token, multiply_token, second_decimal_literal_token,
+        decimal_literal_token(FIRST_DECIMAL_LITERAL_VALUE),
+        multiply_token(),
+        decimal_literal_token(SECOND_DECIMAL_LITERAL_VALUE),
         end_of_file_token
     )
 
-    single_factor = FactorNode(first_decimal_literal_token.value)
+    single_factor = FactorNode(FIRST_DECIMAL_LITERAL_VALUE)
     
-    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
+    factor_for_additional_term = FactorNode(SECOND_DECIMAL_LITERAL_VALUE)
     additional_term = TermNode(factor_for_additional_term)
 
-    term_node = TermNode(single_factor, ArithmeticOperator.MULTIPLY, additional_term)
+    term_node = TermNode(single_factor, ArithmeticOperator.MULTIPLY,
+                         additional_term)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, term_node)
@@ -2596,17 +3013,19 @@ def test_parser_can_generate_correct_ast_for_divide_term():
     `parse_tokens_for_term` function, 
     """
 
-    first_decimal_literal_token: Token = generate_number_token_with_random_value() 
-    second_decimal_literal_token: Token = generate_number_token_with_random_value() 
+    FIRST_DECIMAL_LITERAL_VALUE = "101"
+    SECOND_DECIMAL_LITERAL_VALUE = "20"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        first_decimal_literal_token, divide_token, second_decimal_literal_token,
+        decimal_literal_token(FIRST_DECIMAL_LITERAL_VALUE),
+        divide_token(),
+        decimal_literal_token(SECOND_DECIMAL_LITERAL_VALUE),
         end_of_file_token
     )
 
-    single_factor = FactorNode(first_decimal_literal_token.value)
+    single_factor = FactorNode(FIRST_DECIMAL_LITERAL_VALUE)
     
-    factor_for_additional_term = FactorNode(second_decimal_literal_token.value)
+    factor_for_additional_term = FactorNode(SECOND_DECIMAL_LITERAL_VALUE)
     additional_term = TermNode(factor_for_additional_term)
 
     term_node = TermNode(single_factor, ArithmeticOperator.DIVIDE,
@@ -2626,10 +3045,12 @@ def test_parser_can_generate_correct_error_for_complex_term():
     a syntax error kind of term like "5//" or "5*"
     """
 
-    first_decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "3"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        first_decimal_literal_token, divide_token, divide_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        divide_token(),
+        divide_token(),
         end_of_file_token
     )
 
@@ -2647,17 +3068,20 @@ def test_parser_can_generate_correct_ast_for_multiple_terms():
     terms at once
     """
  
-    decimal_literal_token: Token = generate_number_token_with_random_value() 
+    DECIMAL_LITERAL_VALUE = "33"
 
     tokens: Tokens = (
-        decimal_literal_token, multiply_token, decimal_literal_token,
-        divide_token, decimal_literal_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        multiply_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        divide_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
         end_of_file_token
     )
 
-    first_factor = FactorNode(decimal_literal_token.value)
-    second_factor = FactorNode(decimal_literal_token.value)
-    third_factor = FactorNode(decimal_literal_token.value)
+    first_factor = FactorNode(DECIMAL_LITERAL_VALUE)
+    second_factor = FactorNode(DECIMAL_LITERAL_VALUE)
+    third_factor = FactorNode(DECIMAL_LITERAL_VALUE)
     
     additional_term_of_additional_term = TermNode(third_factor)
     additional_term = TermNode(second_factor, ArithmeticOperator.DIVIDE,
@@ -2681,11 +3105,14 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_decimal_literal(
     correct FactorNode object using a decimal literal.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "12"
 
-    tokens: Tuple[Token, Token] = (decimal_literal_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        end_of_file_token
+    )
 
-    factor_node = FactorNode(decimal_literal_token.value)
+    factor_node = FactorNode(DECIMAL_LITERAL_VALUE)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
@@ -2700,10 +3127,12 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_true_token():
     correct FactorNode object using a true_token.
     """
 
+    tokens: Tuple[Token, Token] = (
+        true_token(),
+        end_of_file_token
+    )
 
-    tokens: Tuple[Token, Token] = (true_token, end_of_file_token)
-
-    factor_node = FactorNode(true_token.value)
+    factor_node = FactorNode("TRUE")
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
@@ -2718,9 +3147,12 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_false_token():
     correct FactorNode object using a false_token.
     """
 
-    tokens: Tuple[Token, Token] = (false_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        false_token(),
+        end_of_file_token
+    )
 
-    factor_node = FactorNode(false_token.value)
+    factor_node = FactorNode("FALSE")
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
@@ -2735,11 +3167,14 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_identifier():
     correct FactorNode object using a identifier token.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "raidenShuga")
+    IDENTIFIER = "RaidenShuga"
 
-    tokens: Tuple[Token, Token] = (identifier_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        identifier_token(IDENTIFIER),
+        end_of_file_token
+    )
 
-    factor_node = FactorNode(identifier_token.value)
+    factor_node = FactorNode(IDENTIFIER)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
@@ -2754,11 +3189,14 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_string_literal()
     correct FactorNode object using a string literal token.
     """
 
-    string_literal_token = Token(TokenType.STRING_LITERAL, "raidenShuga")
+    STRING_LITERAL_VALUE = "raidenShuga"
 
-    tokens: Tuple[Token, Token] = (string_literal_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        string_literal_token(STRING_LITERAL_VALUE),
+        end_of_file_token
+    )
 
-    factor_node = FactorNode(string_literal_token.value)
+    factor_node = FactorNode(STRING_LITERAL_VALUE)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
@@ -2776,7 +3214,10 @@ def test_parser_can_generate_correct_error_for_factor():
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS)
     expected_output = NodeFailure(error_message)
 
-    tokens: Tuple[Token, Token] = (plus_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        plus_token(),
+        end_of_file_token
+    )
 
     node_result: NodeResult = parse_tokens_for_factor(tokens)
 
@@ -2788,16 +3229,18 @@ def test_parser_can_generate_correct_ast_for_no_argument_method_call():
     This test checks that the parser can correctly generate a MethodCall object
     using the `parse_tokens_for_method_call` function.
     """
- 
-    identifier_token = Token(TokenType.IDENTIFIER, "func")
+
+    IDENTIFIER = "func"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token, left_parenthesis_token, right_parenthesis_token,
+        identifier_token(IDENTIFIER),
+        left_parenthesis_token(),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
     argument_list = ArgumentList()
-    method_call = MethodCall(identifier_token.value, argument_list)
+    method_call = MethodCall(IDENTIFIER, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, method_call)
@@ -2813,10 +3256,12 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
     correct NodeFailure object when given an input that has a syntax error.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "hlelo")
+    IDENTIFIER = "heELLO"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token, left_parenthesis_token, plus_token,
+        identifier_token(IDENTIFIER),
+        left_parenthesis_token(),
+        plus_token(),
         end_of_file_token
     )
 
@@ -2834,22 +3279,23 @@ def test_parser_can_generate_correct_ast_for_single_argument_method_call():
     correct MethodCall object when given a single argument.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "raiden")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "tok"
+    DECIMAL_LITERAL_VALUE = "10"
 
     tokens: Tuple[Token, Token, Token, Token, Token] = (
-        identifier_token, left_parenthesis_token, decimal_literal_token,
-        right_parenthesis_token,
+        identifier_token(IDENTIFIER),
+        left_parenthesis_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
     argument_list = ArgumentList(comparison_expression)
-    method_call = MethodCall(identifier_token.value, argument_list)
+    method_call = MethodCall(IDENTIFIER, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, method_call)
@@ -2865,23 +3311,26 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
     correct MethodCall object when given a tuple of multiple arguments as input.
     """
 
-    identifier_token = Token(TokenType.IDENTIFIER, "raiden")
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    IDENTIFIER = "raiden"
+    DECIMAL_LITERAL_VALUE = "42"
 
     tokens: Tokens = (
-        identifier_token, left_parenthesis_token, decimal_literal_token,
-        comma_token, decimal_literal_token, right_parenthesis_token,
+        identifier_token(IDENTIFIER),
+        left_parenthesis_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        comma_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
     additional_argument_list = ArgumentList(comparison_expression)
     argument_list = ArgumentList(comparison_expression, additional_argument_list)
-    method_call = MethodCall(identifier_token.value, argument_list)
+    method_call = MethodCall(IDENTIFIER, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, method_call)
@@ -2898,7 +3347,10 @@ def test_parser_can_generate_correct_ast_for_argument_list_with_no_arguments():
     without an arguments supplied.
     """
 
-    tokens: Tuple[Token, Token] = (right_parenthesis_token, end_of_file_token)
+    tokens: Tuple[Token, Token] = (
+        right_parenthesis_token(),
+        end_of_file_token
+    )
 
     argument_list = ArgumentList() 
     expected_output = NodeSuccess(tokens, argument_list)
@@ -2915,23 +3367,23 @@ def test_parser_can_generate_correct_ast_for_single_argument_list():
     of a singular argument.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "5"
 
     tokens: Tuple[Token, Token, Token] = (
-        decimal_literal_token,
-        right_parenthesis_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
     argument_list = ArgumentList(comparison_expression)
     
     expected_output_tokens: Tuple[Token, Token] = (
-        right_parenthesis_token, end_of_file_token
+        right_parenthesis_token(),
+        end_of_file_token
     )
     expected_output = NodeSuccess(expected_output_tokens, argument_list)
 
@@ -2947,24 +3399,26 @@ def test_parser_can_generate_correct_ast_for_multiple_argument_list():
     of multiple arguments.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "3"
 
     tokens: Tokens = (
-        decimal_literal_token, comma_token, decimal_literal_token,
-        right_parenthesis_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        comma_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
-    factor = FactorNode(decimal_literal_token.value)
-    term = TermNode(factor)
-    expression = ExpressionNode(term)
-    comparison_expression = ComparisonExpression(expression)
+    comparison_expression: ComparisonExpression = generate_single_comp_expression(
+        DECIMAL_LITERAL_VALUE
+    )
 
     additional_argument_list = ArgumentList(comparison_expression)
     argument_list = ArgumentList(comparison_expression, additional_argument_list)
     
     expected_output_tokens: Tuple[Token, Token] = (
-        right_parenthesis_token, end_of_file_token
+        right_parenthesis_token(),
+        end_of_file_token
     )
     expected_output = NodeSuccess(expected_output_tokens, argument_list)
 
@@ -2979,11 +3433,14 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     when supplied a faulty input that omits either a comma or a parenthesis.
     """
 
-    decimal_literal_token: Token = generate_number_token_with_random_value()
+    DECIMAL_LITERAL_VALUE = "3435"
 
     tokens: Tokens = (
-        decimal_literal_token, comma_token, decimal_literal_token,
-        decimal_literal_token, right_parenthesis_token,
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        comma_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        right_parenthesis_token(),
         end_of_file_token
     )
 
