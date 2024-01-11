@@ -99,6 +99,8 @@ class Token:
 
     token_type: TokenType 
     value: str
+    line_number: int
+    column_start: int
 
 
 @dataclass
@@ -135,6 +137,9 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
 
     tokens: List[Token] = []
     position = 0
+    line_number = 1
+    column_position = 1
+
     length_of_input: int = len(user_input)
     
     while position < length_of_input:
@@ -148,24 +153,30 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
         for pattern in TOKEN_PATTERNS.keys():
 
             match = re.match(pattern,sliced_input)
-
             if match is not None:
+
+                token_value: str = match.group(0)
 
                 token_type: TokenType = TOKEN_PATTERNS[pattern]
                 if token_type == TokenType.WHITESPACE:
+                    line_count = token_value.count("\n")
+                    line_number += line_count
+
+                    if line_count > 0:
+                        column_position = 1
                     break
 
-                token_value: str = match.group(0)
-                token = Token(token_type, token_value) 
+                token = Token(token_type, token_value, line_number, column_position)
                 tokens.append(token)
-
                 break
         
         if match is None:
             unknown_character: str = user_input[position]
             return report_error_for_lexer(unknown_character)
 
-        position += match.end()
+        match_end: int = match.end()
+        position += match_end
+        column_position += match_end
 
 
     # I don't think this closure needs to be tested. It used as a map a couple
@@ -215,7 +226,10 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
         keyword_token_type: TokenType = KEYWORDS[token.value]
 
         # The value is kind of redundant
-        keyword_token = Token(keyword_token_type, token.value)
+        keyword_token = Token(
+            keyword_token_type, token.value,
+            token.line_number, token.column_start
+        )
 
         return keyword_token
 
@@ -224,11 +238,12 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
     tokens_with_keywords_as_list: List[Token] = list(tokens_with_keywords)
 
     # Reminder, let's stop using mutable data and switch to immutable data
-    end_of_file_token = Token(TokenType.END_OF_FILE, "")
+    end_of_file_token = Token(TokenType.END_OF_FILE, "", -1, -1)
     tokens_with_keywords_as_list.append(end_of_file_token)
 
     tokens_as_tuple: Tokens = tuple(tokens_with_keywords_as_list)
 
+    [print(i) for i in tokens_as_tuple]
     return tokens_as_tuple 
 
 
