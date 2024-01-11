@@ -11,7 +11,7 @@ Stuff I need to get Done
 - [] Everything todo w/ expr stops at EOF but it really should stop at SEMICOLON; however, that may only apply to statements but no if expr reaches semi, it stops
 - [x] Add Parser support for using arrays in a return type
 - [] Enhance the documentation of the functions in the transpiler file
-- [] Enhance error information; track rows and columns (possibly more)
+- [x] Enhance error information; track rows and columns (possibly more)
 - [] Create test(s) for usings arrays in variable type
 - [] Create test(s) for using identifiers as a variable type (may not be nes.)
 - [] Add Parser & Emitter support for using Parenthesis in factors
