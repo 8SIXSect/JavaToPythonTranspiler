@@ -2270,3 +2270,36 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
             # This should be unreachable
             assert False
 
+
+def supported_features_of_transpiler() -> Tuple[str, ...]:
+    """
+    This function's purpose is to return a Tuple of strings with each string
+    being a name of a feature that is supported by the transpiler.
+    """
+
+    return (
+        "Class Declarations",
+        "Method Declarations",
+        "Some Access Modifiers (public, private, & static)",
+        "Return Type of `void`",
+        "Variable Types w/ Identifier (Semi-working)",
+        "Variable Types (byte, int, short, long, float, double, char, boolean)",
+        "Parameter Lists (empty, singular, & multiple)",
+        "If Statements (else-if & else support as well)",
+        "While Statements",
+        "Inline Statements (support for ';')",
+        "Variable Increment (++ & +=)",
+        "Variable Initialization (Not Declaration though)",
+        "Return Statements (empty & non-empty)",
+        "Comparison Expressions (<, >, <=, >=, ==, !=)",
+        "Expressions (+, -)",
+        "Terms (*, /)",
+        "Factors with String Literals",
+        "Fcators with Decimal Literals (Not Float Literals yet)",
+        "Factors with Qualified Identifiers",
+        "Factors with Method Calls",
+        "Qualified Identifiers (& includes normal Identifiers)",
+        "Method Calls",
+        "Argument Lists (empty, singular, & multiple)"
+    )
+
