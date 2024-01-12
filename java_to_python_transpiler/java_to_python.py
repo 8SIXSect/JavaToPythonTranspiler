@@ -458,12 +458,12 @@ class MethodCall:
     """
     Represents a call to a method.
 
-    identifier represents the name of the method being called.
+    `qualified_identifier` represents the name of the method being called.
 
     argument_list represents the list of arguments supplied to the method.
     """
     
-    identifier: str
+    qualified_identifier: QualifiedIdentifier 
     argument_list: ArgumentList 
 
 
@@ -1760,50 +1760,44 @@ def parse_tokens_for_factor(tokens: Tokens) -> NodeResult:
         return report_error_in_parser(current_token.token_type,
                                       current_token.line_number)
 
-    next_token: Token = tokens[1]
+    if current_token.token_type != TokenType.IDENTIFIER:        
+        tokens_after_deleting_current_token: Tokens = tokens[1:]
 
-    conditions_for_method_call: Tuple[bool, bool] = (
-        current_token.token_type == TokenType.IDENTIFIER,
-        next_token.token_type == TokenType.LEFT_PARENTHESIS
+        # You may need to add a check for END_OF_FILE but idk yet
+        factor_node = FactorNode(current_token.value)
+        return NodeSuccess(tokens_after_deleting_current_token, factor_node)
+
+    node_result_for_qual_identifier: NodeResult
+    node_result_for_qual_identifier = parse_tokens_for_qualified_identifier(
+        tokens
     )
 
-    if all(conditions_for_method_call):
+    if isinstance(node_result_for_qual_identifier, NodeFailure):
+        return node_result_for_qual_identifier
 
-        node_result_for_method_call: NodeResult = parse_tokens_for_method_call(tokens)
-        
-        if isinstance(node_result_for_method_call, NodeFailure):
-            return node_result_for_method_call
+    assert isinstance(node_result_for_qual_identifier.node, QualifiedIdentifier)
 
-        assert isinstance(node_result_for_method_call.node, MethodCall)
-    
-        factor_node = FactorNode(method_call=node_result_for_method_call.node)
-
-        return NodeSuccess(node_result_for_method_call.tokens, factor_node)
-
-    # The stmt verifies this is not a Method call
-    if current_token.token_type == TokenType.IDENTIFIER:
-        node_result_for_qual_identifier: NodeResult
-        node_result_for_qual_identifier = parse_tokens_for_qualified_identifier(
-            tokens
-        )
-
-        if isinstance(node_result_for_qual_identifier, NodeFailure):
-            return node_result_for_qual_identifier
-
-        assert isinstance(node_result_for_qual_identifier.node,
-                          QualifiedIdentifier)
-
+    possible_left_paren_token: Token = node_result_for_qual_identifier.tokens[0]
+    if possible_left_paren_token.token_type != TokenType.LEFT_PARENTHESIS:
         factor_node = FactorNode(
             qualified_identifier=node_result_for_qual_identifier.node
         )
 
         return NodeSuccess(node_result_for_qual_identifier.tokens, factor_node)
-    
-    tokens_after_deleting_current_token: Tokens = tokens[1:]
 
-    # You may need to add a check for END_OF_FILE but idk yet
-    factor_node = FactorNode(current_token.value)
-    return NodeSuccess(tokens_after_deleting_current_token, factor_node)
+
+    node_result_for_method_call: NodeResult = parse_tokens_for_method_call(
+        node_result_for_qual_identifier.tokens,
+        node_result_for_qual_identifier.node
+    )
+    
+    if isinstance(node_result_for_method_call, NodeFailure):
+        return node_result_for_method_call
+
+    assert isinstance(node_result_for_method_call.node, MethodCall)
+
+    factor_node = FactorNode(method_call=node_result_for_method_call.node)
+    return NodeSuccess(node_result_for_method_call.tokens, factor_node)
 
 
 def parse_tokens_for_qualified_identifier(tokens: Tokens) -> NodeResult:
@@ -1850,19 +1844,20 @@ def parse_tokens_for_qualified_identifier(tokens: Tokens) -> NodeResult:
                        qualified_identifier)
 
 
-def parse_tokens_for_method_call(tokens: Tokens) -> NodeResult:
+def parse_tokens_for_method_call(tokens: Tokens,
+                                 qualified_identifer: QualifiedIdentifier
+                                 ) -> NodeResult:
     """
     This function parses a list of tokens in order to turn them into a MethodCall
     object.
     """
 
-    identifier_token: Token = tokens[0]
+    # Method call is no longer responsible for removing identifier
+    tokens_with_left_paren_removed: Tokens = tokens[1:]
 
-    # The purpose of this line is to remove identifier token and left parenthesis
-    tokens_without_identifier_and_parenthesis: Tokens = tokens[2:]
-
-    node_result_argument_list: NodeResult = \
-            parse_tokens_for_argument_list(tokens_without_identifier_and_parenthesis)
+    node_result_argument_list: NodeResult = parse_tokens_for_argument_list(
+        tokens_with_left_paren_removed
+    )
     
     if isinstance(node_result_argument_list, NodeFailure):
         return node_result_argument_list
@@ -1877,8 +1872,7 @@ def parse_tokens_for_method_call(tokens: Tokens) -> NodeResult:
 
     assert isinstance(node_result_argument_list.node, ArgumentList)
 
-    method_call = MethodCall(identifier_token.value,
-                                         node_result_argument_list.node)
+    method_call = MethodCall(qualified_identifer, node_result_argument_list.node)
     return NodeSuccess(tokens_after_deleting_right_parenthesis, method_call)
 
 
@@ -1984,8 +1978,6 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
 
     def with_indent(output: str) -> str:
         return indent_level * "    " + output
-
-    #breakpoint()
 
     match node:
         case ClassDeclaration(identifier, method_declaration_list):
@@ -2216,6 +2208,7 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
         case FactorNode("", None, method_call) if method_call is not None:
             return emit_ast_into_output(method_call, indent_level)
 
+        # Add emitter tests 4 these
         case QualifiedIdentifier(identifier, None):
             return identifier
         
@@ -2227,13 +2220,16 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
                 emit_ast_into_output(additional_identifier)
             )
 
-        case MethodCall(identifier, argument_list):
+        case MethodCall(qualified_identifier, argument_list):
+            result_for_qualified_identifier: str = emit_ast_into_output(
+                qualified_identifier
+            )
             result_for_argument_list: str = emit_ast_into_output(argument_list,
                                                                  indent_level)
 
             return (
-                identifier + OPENED_PARENTHESIS + result_for_argument_list +
-                CLOSED_PARENTHESIS
+                result_for_qualified_identifier + OPENED_PARENTHESIS +
+                result_for_argument_list + CLOSED_PARENTHESIS
             )
 
         case ArgumentList(None, _):

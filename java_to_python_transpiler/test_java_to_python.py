@@ -3317,20 +3317,21 @@ def test_parser_can_generate_correct_ast_for_no_argument_method_call():
 
     IDENTIFIER = "func"
 
-    tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token(IDENTIFIER),
+    tokens: Tokens = (
         left_parenthesis_token(),
         right_parenthesis_token(),
         end_of_file_token
     )
 
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
     argument_list = ArgumentList()
-    method_call = MethodCall(IDENTIFIER, argument_list)
+    method_call = MethodCall(qualified_identifier, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, method_call)
 
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+    node_result: NodeResult = parse_tokens_for_method_call(tokens,
+                                                           qualified_identifier)
 
     assert expected_output == node_result
 
@@ -3343,8 +3344,7 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
 
     IDENTIFIER = "heELLO"
 
-    tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token(IDENTIFIER, 1),
+    tokens: Tokens = (
         left_parenthesis_token(1),
         plus_token(1),
         end_of_file_token
@@ -3353,7 +3353,10 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS, 1)
     expected_output = NodeFailure(error_message)
 
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
+
+    node_result: NodeResult = parse_tokens_for_method_call(tokens,
+                                                           qualified_identifier)
 
     assert expected_output == node_result
 
@@ -3367,8 +3370,7 @@ def test_parser_can_generate_correct_ast_for_single_argument_method_call():
     IDENTIFIER = "tok"
     DECIMAL_LITERAL_VALUE = "10"
 
-    tokens: Tuple[Token, Token, Token, Token, Token] = (
-        identifier_token(IDENTIFIER),
+    tokens: Tokens = (
         left_parenthesis_token(),
         decimal_literal_token(DECIMAL_LITERAL_VALUE),
         right_parenthesis_token(),
@@ -3379,13 +3381,15 @@ def test_parser_can_generate_correct_ast_for_single_argument_method_call():
         DECIMAL_LITERAL_VALUE
     )
 
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
     argument_list = ArgumentList(comparison_expression)
-    method_call = MethodCall(IDENTIFIER, argument_list)
+    method_call = MethodCall(qualified_identifier, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, method_call)
 
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+    node_result: NodeResult = parse_tokens_for_method_call(tokens,
+                                                           qualified_identifier)
 
     assert expected_output == node_result
 
@@ -3400,7 +3404,6 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
     DECIMAL_LITERAL_VALUE = "42"
 
     tokens: Tokens = (
-        identifier_token(IDENTIFIER),
         left_parenthesis_token(),
         decimal_literal_token(DECIMAL_LITERAL_VALUE),
         comma_token(),
@@ -3413,14 +3416,16 @@ def test_parser_can_generate_correct_ast_for_multiple_arguments_for_method_call(
         DECIMAL_LITERAL_VALUE
     )
 
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
     additional_argument_list = ArgumentList(comparison_expression)
     argument_list = ArgumentList(comparison_expression, additional_argument_list)
-    method_call = MethodCall(IDENTIFIER, argument_list)
+    method_call = MethodCall(qualified_identifier, argument_list)
 
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, method_call)
 
-    node_result: NodeResult = parse_tokens_for_method_call(tokens)
+    node_result: NodeResult = parse_tokens_for_method_call(tokens,
+                                                           qualified_identifier)
 
     assert expected_output == node_result
 
@@ -4187,7 +4192,8 @@ def test_emitter_can_produce_correct_output_for_factor_node_with_a_method_call()
     argument_list = ArgumentList(argument_comp_expression)
 
     IDENTIFIER = "vladilena"
-    method_call = MethodCall(IDENTIFIER, argument_list)
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
+    method_call = MethodCall(qualified_identifier, argument_list)
     emitter_input = FactorNode(method_call=method_call)
 
     emitter_result: str = emit_ast_into_output(emitter_input)
@@ -4204,8 +4210,9 @@ def test_emitter_can_produce_correct_output_for_method_call():
     """
 
     IDENTIFIER = "shinnei"
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
     argument_list = ArgumentList()
-    emitter_input = MethodCall(IDENTIFIER, argument_list)
+    emitter_input = MethodCall(qualified_identifier, argument_list)
 
     emitter_result: str = emit_ast_into_output(emitter_input)
 
