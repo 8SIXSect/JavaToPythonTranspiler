@@ -251,7 +251,6 @@ def scan_and_tokenize_input(user_input: str) -> LexerResult:
 
     tokens_as_tuple: Tokens = tuple(tokens_with_keywords_as_list)
 
-    #[print(i) for i in tokens_as_tuple]
     return tokens_as_tuple 
 
 
@@ -617,7 +616,6 @@ class ParameterList:
     additional_parameter_list: Optional[ParameterList] = None
 
 
-# TODO: you could keep track of the return type, parameters, etc. for typehint
 @dataclass
 class MethodDeclaration:
     """

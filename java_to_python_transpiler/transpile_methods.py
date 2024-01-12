@@ -31,7 +31,6 @@ class TranspilerFailure:
     error_message: str
 
 
-# Writes tests for java_to_python_* functions
 def java_to_python_from_string(user_input: str) -> str | TranspilerFailure:
     """
     This is the primary function provided by this library.
@@ -113,7 +112,6 @@ def test_parser(user_input: str):
     format_ast(0, parser_result)
 
 
-# TODO: reformat `indent_level` to have a default value of 0
 def format_ast(indent_level: int, node: Node | None):
     """
     This function is an internal tool for debugging the parser when given a

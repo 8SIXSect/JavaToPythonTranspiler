@@ -1,4 +1,3 @@
-import random
 from typing import Tuple
 
 from java_to_python_transpiler.java_to_python import (
@@ -1658,8 +1657,6 @@ def test_parser_can_produce_error_for_statement_list_that_fails_additional_state
     assert expected_output == node_result
 
 
-# The structure of block_statement is in need of change, but that is a problem
-# for tomorrow
 def test_parser_can_generate_correct_ast_for_block_statement():
     """
     This test checks if the function `parse_tokens_for_block_statement` can
@@ -3828,7 +3825,6 @@ def test_emitter_can_produce_correct_output_for_block_statement():
     assert expected_output == emitter_result
 
 
-# TODO: create a test for if-elif-else clauses altogether.
 def test_emitter_can_produce_correct_output_for_if_else_if_statement():
     """
     This test checks that the emitter can produce the correct output when given
@@ -4334,5 +4330,4 @@ def test_emitter_can_produce_correct_output_for_multiple_argument_argument_list(
     assert expected_output == emitter_result
 
 
-# TODO: Implement tests for ArithmeticOperator and ComparisonOperator
 
