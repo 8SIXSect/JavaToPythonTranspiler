@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "java-to-python-transpiler"
-version = "0.1.0"
+version = "0.1.1"
 description = "Transpiles Java source code into Python source code"
 authors = ["Hunter G."]
 license = "MIT"
