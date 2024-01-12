@@ -649,15 +649,17 @@ class ClassDeclaration:
     method_list: MethodDeclarationList 
 
 
-ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0}"
+ERROR_MESSAGE_FOR_PARSER = "Unexpected token type, {0} on line {1}"
 
 
-def report_error_in_parser(unexpected_token_type: TokenType) -> NodeFailure:
+def report_error_in_parser(unexpected_token_type: TokenType,
+                           line_number: int) -> NodeFailure:
     """
     This function's purpose is to report an error found in the parser
     """
 
-    error_message = ERROR_MESSAGE_FOR_PARSER.format(unexpected_token_type)
+    error_message = ERROR_MESSAGE_FOR_PARSER.format(unexpected_token_type,
+                                                    line_number)
 
     return NodeFailure(error_message)
 
@@ -705,20 +707,23 @@ def parse_tokens_for_class_declaration(tokens: Tokens) -> NodeResult:
 
     expected_class_token: Token = node_result_for_access_modifier_list.tokens[0]
     if expected_class_token.token_type != TokenType.CLASS:
-        return report_error_in_parser(expected_class_token.token_type)
+        return report_error_in_parser(expected_class_token.token_type,
+                                      expected_class_token.line_number)
 
     tokens_with_class_token_removed: Tokens
     tokens_with_class_token_removed = node_result_for_access_modifier_list.tokens[1:]
 
     expected_identifier_token: Token = tokens_with_class_token_removed[0]
     if expected_identifier_token.token_type != TokenType.IDENTIFIER:
-        return report_error_in_parser(expected_identifier_token.token_type)
+        return report_error_in_parser(expected_identifier_token.token_type,
+                                      expected_identifier_token.line_number)
 
     tokens_with_identifier_removed: Tokens = tokens_with_class_token_removed[1:]
 
     expected_left_brace_token: Token = tokens_with_identifier_removed[0]
     if expected_left_brace_token.token_type != TokenType.LEFT_CURLY_BRACE:
-        return report_error_in_parser(expected_left_brace_token.token_type)
+        return report_error_in_parser(expected_left_brace_token.token_type,
+                                      expected_left_brace_token.line_number)
 
     tokens_with_left_brace_removed: Tokens = tokens_with_identifier_removed[1:]
 
@@ -734,7 +739,8 @@ def parse_tokens_for_class_declaration(tokens: Tokens) -> NodeResult:
 
     expected_right_brace_token: Token = node_result_for_method_dec_list.tokens[0]
     if expected_right_brace_token.token_type != TokenType.RIGHT_CURLY_BRACE:
-        return report_error_in_parser(expected_right_brace_token.token_type)
+        return report_error_in_parser(expected_right_brace_token.token_type,
+                                      expected_right_brace_token.line_number)
 
     tokens_with_right_brace_removed: Tokens
     tokens_with_right_brace_removed = node_result_for_method_dec_list.tokens[1:]
@@ -830,13 +836,15 @@ def parse_tokens_for_method_declaration(tokens: Tokens) -> NodeResult:
 
     expected_identifier_token: Token = node_result_for_return_type.tokens[0]
     if expected_identifier_token.token_type != TokenType.IDENTIFIER:
-        return report_error_in_parser(expected_identifier_token.token_type)
+        return report_error_in_parser(expected_identifier_token.token_type,
+                                      expected_identifier_token.line_number)
 
     tokens_with_identifier_removed: Tokens = node_result_for_return_type.tokens[1:]
 
     expected_left_paren_token: Token = tokens_with_identifier_removed[0]
     if expected_left_paren_token.token_type != TokenType.LEFT_PARENTHESIS:
-        return report_error_in_parser(expected_left_paren_token.token_type)
+        return report_error_in_parser(expected_left_paren_token.token_type,
+                                      expected_left_paren_token.line_number)
 
     tokens_with_left_paren_removed: Tokens = tokens_with_identifier_removed[1:]
 
@@ -881,7 +889,8 @@ def parse_tokens_for_access_modifier_list(tokens: Tokens) -> NodeResult:
 
     expected_access_modifier: Token = tokens[0]
     if expected_access_modifier.token_type not in ACCESS_MODIFIER_TYPES:
-        return report_error_in_parser(expected_access_modifier.token_type)
+        return report_error_in_parser(expected_access_modifier.token_type,
+                                      expected_access_modifier.line_number)
 
     # Mutable data sucks but it's the best solution here without crazy recursion
     tokens_as_list: List[Token] = list(tokens)
@@ -916,7 +925,8 @@ def parse_tokens_for_complete_variable_type(tokens: Tokens,
 
     expected_variable_type_token: Token = tokens[0]
     if expected_variable_type_token.token_type not in variable_types:
-        return report_error_in_parser(expected_variable_type_token.token_type)
+        return report_error_in_parser(expected_variable_type_token.token_type,
+                                      expected_variable_type_token.line_number)
 
     tokens_with_variable_type_removed: Tokens = tokens[1:]
 
@@ -931,7 +941,8 @@ def parse_tokens_for_complete_variable_type(tokens: Tokens,
 
     expected_right_bracket_token: Token = tokens_with_left_bracket_removed[0]
     if expected_right_bracket_token.token_type != TokenType.RIGHT_BRACKET:
-        return report_error_in_parser(expected_right_bracket_token.token_type)
+        return report_error_in_parser(expected_right_bracket_token.token_type,
+                                      expected_right_bracket_token.line_number)
 
     tokens_with_brackets_removed: Tokens = tokens_with_left_bracket_removed[1:]
 
@@ -959,7 +970,8 @@ def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
 
     expected_identifier_token: Token = node_result_for_variable_type.tokens[0]
     if expected_identifier_token.token_type != TokenType.IDENTIFIER:
-        return report_error_in_parser(expected_identifier_token.token_type)
+        return report_error_in_parser(expected_identifier_token.token_type,
+                                      expected_identifier_token.line_number)
 
     tokens_with_identifier_removed: Tokens = node_result_for_variable_type.tokens[1:]
 
@@ -968,7 +980,8 @@ def parse_tokens_for_parameter_list(tokens: Tokens) -> NodeResult:
 
     expected_comma_or_paren_token: Token = tokens_with_identifier_removed[0]
     if expected_comma_or_paren_token.token_type not in EXPECTED_TYPES:
-        return report_error_in_parser(expected_comma_or_paren_token.token_type)
+        return report_error_in_parser(expected_comma_or_paren_token.token_type,
+                                      expected_comma_or_paren_token.line_number)
 
     if expected_comma_or_paren_token.token_type == TokenType.RIGHT_PARENTHESIS:
         parameter_list = ParameterList(expected_identifier_token.value)
@@ -1064,7 +1077,8 @@ def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
         node_result_for_while_statement = parse_tokens_for_while_statement(tokens)
 
         if isinstance(node_result_for_while_statement, NodeFailure):
-            return report_error_in_parser(initial_token.token_type)
+            return report_error_in_parser(initial_token.token_type,
+                                          initial_token.line_number)
 
         assert isinstance(node_result_for_while_statement.node, WhileStatement)
         
@@ -1076,7 +1090,8 @@ def parse_tokens_for_block_statement(tokens: Tokens) -> NodeResult:
         node_result_for_if_statement = parse_tokens_for_if_statement(tokens)
 
         if isinstance(node_result_for_if_statement, NodeFailure):
-            return report_error_in_parser(initial_token.token_type)
+            return report_error_in_parser(initial_token.token_type,
+                                          initial_token.line_number)
 
         assert isinstance(node_result_for_if_statement.node, IfStatement)
 
@@ -1223,7 +1238,8 @@ def parse_tokens_for_expression_in_paren(tokens: Tokens) -> NodeResult:
 
     expected_left_paren_token: Token = tokens[0]
     if expected_left_paren_token.token_type != TokenType.LEFT_PARENTHESIS:
-        return report_error_in_parser(expected_left_paren_token.token_type)
+        return report_error_in_parser(expected_left_paren_token.token_type,
+                                      expected_left_paren_token.line_number)
  
     tokens_with_left_paren_removed: Tokens = tokens[1:]
     
@@ -1239,7 +1255,8 @@ def parse_tokens_for_expression_in_paren(tokens: Tokens) -> NodeResult:
 
     expected_right_paren_token: Token = node_result_comp_expression.tokens[0]
     if expected_right_paren_token.token_type != TokenType.RIGHT_PARENTHESIS:
-        return report_error_in_parser(expected_right_paren_token.token_type)
+        return report_error_in_parser(expected_right_paren_token.token_type,
+                                      expected_right_paren_token.line_number)
 
     tokens_with_right_paren_removed: Tokens
     tokens_with_right_paren_removed = node_result_comp_expression.tokens[1:]
@@ -1257,7 +1274,8 @@ def parse_tokens_for_block_statement_body(tokens: Tokens) -> NodeResult:
 
     expected_left_braces_token: Token = tokens[0]
     if expected_left_braces_token.token_type != TokenType.LEFT_CURLY_BRACE:
-        return report_error_in_parser(expected_left_braces_token.token_type)
+        return report_error_in_parser(expected_left_braces_token.token_type,
+                                      expected_left_braces_token.line_number)
 
     tokens_with_left_braces_removed: Tokens = tokens[1:]
     node_result_for_statement_list: NodeResult = parse_tokens_for_statement_list(
@@ -1271,7 +1289,8 @@ def parse_tokens_for_block_statement_body(tokens: Tokens) -> NodeResult:
 
     expected_right_braces_token: Token = node_result_for_statement_list.tokens[0]
     if expected_right_braces_token.token_type != TokenType.RIGHT_CURLY_BRACE:
-        return report_error_in_parser(expected_right_braces_token.token_type)
+        return report_error_in_parser(expected_right_braces_token.token_type,
+                                      expected_right_braces_token.line_number)
 
     tokens_with_right_braces_removed: Tokens
     tokens_with_right_braces_removed = node_result_for_statement_list.tokens[1:]
@@ -1299,7 +1318,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
 
         expected_semicolon_token: Token = node_result_for_return_statement.tokens[0]
         if expected_semicolon_token.token_type != TokenType.SEMI_COLON:
-            return report_error_in_parser(expected_semicolon_token.token_type)
+            return report_error_in_parser(expected_semicolon_token.token_type,
+                                          expected_semicolon_token.line_number)
 
         tokens_with_semicolon_removed: Tokens
         tokens_with_semicolon_removed = node_result_for_return_statement.tokens[1:]
@@ -1347,7 +1367,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
         expected_semicolon_token: Token = node_result_for_initialization.tokens[0]
 
         if expected_semicolon_token.token_type != TokenType.SEMI_COLON:
-            return report_error_in_parser(expected_semicolon_token.token_type)
+            return report_error_in_parser(expected_semicolon_token.token_type,
+                                          expected_semicolon_token.line_number)
 
         tokens_with_semicolon_removed: Tokens
         tokens_with_semicolon_removed = node_result_for_initialization.tokens[1:]
@@ -1377,7 +1398,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
 
             expected_semicolon_token: Token = node_result_for_increment.tokens[0]
             if expected_semicolon_token.token_type != TokenType.SEMI_COLON:
-                return report_error_in_parser(expected_semicolon_token.token_type)
+                return report_error_in_parser(expected_semicolon_token.token_type,
+                                              expected_semicolon_token.line_number)
 
             tokens_with_semicolon_removed: Tokens
             tokens_with_semicolon_removed = node_result_for_increment.tokens[1:]
@@ -1399,7 +1421,8 @@ def parse_tokens_for_inline_statement(tokens: Tokens) -> NodeResult:
     expected_semicolon_token: Token = node_result_for_comp_expression.tokens[0]
     
     if expected_semicolon_token.token_type != TokenType.SEMI_COLON:
-        return report_error_in_parser(expected_semicolon_token.token_type)
+        return report_error_in_parser(expected_semicolon_token.token_type,
+                                      expected_semicolon_token.line_number)
 
     tokens_with_semicolon_removed: Tokens
     tokens_with_semicolon_removed = node_result_for_comp_expression.tokens[1:]
@@ -1498,7 +1521,8 @@ def parse_tokens_for_variable_initialization(tokens: Tokens) -> NodeResult:
 
     current_token: Token = tokens_with_identifier_removed[0]
     if current_token.token_type != TokenType.EQUALS:
-        return report_error_in_parser(current_token.token_type)
+        return report_error_in_parser(current_token.token_type,
+                                      current_token.line_number)
 
     tokens_with_equals_removed: Tokens = tokens_with_identifier_removed[1:]
 
@@ -1543,7 +1567,8 @@ def parse_tokens_for_comparison_expression(tokens: Tokens) -> NodeResult:
         return NodeSuccess(node_result_for_expression.tokens, comparison_expression)
 
     if current_token.token_type not in COMPARISON_OPERATOR_TOKEN_TYPES:
-        return report_error_in_parser(current_token.token_type)
+        return report_error_in_parser(current_token.token_type,
+                                      current_token.line_number)
 
     next_token: Token = node_result_for_expression.tokens[1]
     token_types: Tuple[TokenType, TokenType] = (current_token.token_type,
@@ -1667,8 +1692,7 @@ def parse_tokens_for_term(tokens: Tokens) -> NodeResult:
     assert isinstance(factor_node_result.node, FactorNode)
     term_node = TermNode(factor_node_result.node)
 
-    node_success_for_simple_term = \
-            NodeSuccess(factor_node_result.tokens, term_node)
+    node_success_for_simple_term = NodeSuccess(factor_node_result.tokens, term_node)
 
     current_token: Token = factor_node_result.tokens[0]
 
@@ -1719,7 +1743,8 @@ def parse_tokens_for_factor(tokens: Tokens) -> NodeResult:
     current_token: Token = tokens[0]
 
     if current_token.token_type not in FACTOR_TOKEN_TYPES:
-        return report_error_in_parser(current_token.token_type)
+        return report_error_in_parser(current_token.token_type,
+                                      current_token.line_number)
 
     next_token: Token = tokens[1]
 
@@ -1770,7 +1795,8 @@ def parse_tokens_for_method_call(tokens: Tokens) -> NodeResult:
             node_result_argument_list.tokens[1:]
 
     if current_token.token_type != TokenType.RIGHT_PARENTHESIS:
-        return report_error_in_parser(current_token.token_type)
+        return report_error_in_parser(current_token.token_type,
+                                      current_token.line_number)
 
     assert isinstance(node_result_argument_list.node, ArgumentList)
 
@@ -1788,7 +1814,8 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
     current_token: Token = tokens[0]
     
     if current_token.token_type == TokenType.END_OF_FILE:
-        return report_error_in_parser(TokenType.END_OF_FILE)
+        return report_error_in_parser(TokenType.END_OF_FILE,
+                                      current_token.line_number)
 
     # The purpose of this if statement is to account for no argument method calls 
     if current_token.token_type == TokenType.RIGHT_PARENTHESIS:
@@ -1808,7 +1835,8 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
 
     next_token: Token = node_result_comp_expression.tokens[0]
     if next_token.token_type not in NEXT_EXPECTED_TOKEN_TYPES:
-        return report_error_in_parser(next_token.token_type)
+        return report_error_in_parser(next_token.token_type,
+                                      next_token.line_number)
 
     assert isinstance(node_result_comp_expression.node, ComparisonExpression)
 

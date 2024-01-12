@@ -484,7 +484,7 @@ def test_parser_can_generate_correct_error_given_faulty_input():
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS, 1)
     expected_output = ParserFailure(error_message)
 
     parser_result: ParserResult = parse_tokens(tokens)
@@ -557,14 +557,14 @@ def test_parser_can_produce_error_for_class_dec_when_access_modifier_omitted():
     CLASS_IDENTIFIER = "myid"
 
     tokens: Tokens = (
-        class_token(),
+        class_token(1, 1),
         identifier_token(CLASS_IDENTIFIER),
         left_curly_brace_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.CLASS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.CLASS, 1)
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
@@ -581,14 +581,15 @@ def test_parser_can_produce_error_for_class_dec_when_class_keyword_omitted():
     CLASS_IDENTIFIER = "shinnei"
 
     tokens: Tokens = (
-        public_token(),
-        identifier_token(CLASS_IDENTIFIER),
+        public_token(1, 1),
+        identifier_token(CLASS_IDENTIFIER, 1, 8),
         left_curly_brace_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.IDENTIFIER)
+    # All that matters here it the line number -- the '8' is kind of irrev.
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.IDENTIFIER, 1)
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
@@ -603,14 +604,14 @@ def test_parser_can_produce_error_for_class_dec_when_identifier_omitted():
     """
 
     tokens: Tokens = (
-        public_token(),
-        class_token(),
-        left_curly_brace_token(),
+        public_token(1, 1),
+        class_token(1),
+        left_curly_brace_token(1),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.LEFT_CURLY_BRACE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.LEFT_CURLY_BRACE, 1)
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
@@ -627,14 +628,16 @@ def test_parser_can_produce_error_for_class_dec_when_left_brace_omitted():
     CLASS_IDENTIFIER = "pascal"
 
     tokens: Tokens = (
-        public_token(),
-        class_token(),
-            identifier_token(CLASS_IDENTIFIER),
-        right_curly_brace_token(),
+        public_token(1),
+        class_token(1),
+        identifier_token(CLASS_IDENTIFIER, 1),
+        right_curly_brace_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RIGHT_CURLY_BRACE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        TokenType.RIGHT_CURLY_BRACE, 1
+    )
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
@@ -651,16 +654,16 @@ def test_parser_can_produce_error_for_class_dec_when_error_occurs_method_dec_lis
     CLASS_IDENTIFIER = "shiden"
 
     tokens: Tokens = (
-        public_token(),
-        class_token(),
-        identifier_token(CLASS_IDENTIFIER),
-        left_curly_brace_token(),
-        while_token(),
-        right_curly_brace_token(),
+        public_token(1),
+        class_token(1),
+        identifier_token(CLASS_IDENTIFIER, 1),
+        left_curly_brace_token(1),
+        while_token(2),
+        right_curly_brace_token(3),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.WHILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.WHILE, 2)
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
@@ -677,14 +680,14 @@ def test_parser_can_produce_error_for_class_dec_when_right_brace_omitted():
     CLASS_IDENTIFIER = "vladilena"
 
     tokens: Tokens = (
-        public_token(),
-        class_token(),
-        identifier_token(CLASS_IDENTIFIER),
-        left_curly_brace_token(),
+        public_token(1),
+        class_token(1),
+        identifier_token(CLASS_IDENTIFIER, 1),
+        left_curly_brace_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_class_declaration(tokens)
@@ -760,9 +763,9 @@ def test_parser_can_produce_error_for_method_dec_list_that_fails_initial_method(
     """
 
     tokens: Tokens = (
-        private_token(),
-        int_token(),
-        left_parenthesis_token(),
+        private_token(1),
+        int_token(1),
+        left_parenthesis_token(1),
         right_parenthesis_token(),
         left_curly_brace_token(),
         right_curly_brace_token(),
@@ -770,7 +773,7 @@ def test_parser_can_produce_error_for_method_dec_list_that_fails_initial_method(
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.LEFT_PARENTHESIS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.LEFT_PARENTHESIS, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
@@ -865,27 +868,27 @@ def test_parser_can_produce_error_for_method_dec_list_that_fails_additional_meth
     RETURN_VALUE = "85"
 
     tokens: Tokens = (
-        static_token(),
-        short_token(),
-        identifier_token(METHOD_IDENTIFIER),
-        left_parenthesis_token(),
-        right_parenthesis_token(),
-        left_curly_brace_token(),
-        return_token(),
-        decimal_literal_token(RETURN_VALUE),
-        semi_colon_token(),
-        right_curly_brace_token(),
-        public_token(),
-        int_token(),
-        identifier_token(ADDITIONAL_METHOD_IDENTIFIER),
-        left_parenthesis_token(),
-        left_curly_brace_token(),
-        right_curly_brace_token(),
-        right_curly_brace_token(),
+        static_token(1),
+        short_token(1),
+        identifier_token(METHOD_IDENTIFIER, 1),
+        left_parenthesis_token(1),
+        right_parenthesis_token(1),
+        left_curly_brace_token(1),
+        return_token(2),
+        decimal_literal_token(RETURN_VALUE, 2),
+        semi_colon_token(2),
+        right_curly_brace_token(3),
+        public_token(4),
+        int_token(4),
+        identifier_token(ADDITIONAL_METHOD_IDENTIFIER, 4),
+        left_parenthesis_token(4),
+        left_curly_brace_token(4),
+        right_curly_brace_token(5),
+        right_curly_brace_token(6),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.LEFT_CURLY_BRACE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.LEFT_CURLY_BRACE, 4)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_method_declaration_list(tokens)
@@ -958,7 +961,7 @@ def test_parser_can_produce_error_for_no_access_modifiers_in_method_declaration(
     DECIMAL_LITERAL_VALUE = "999"
 
     tokens: Tokens = (
-        int_token(),
+        int_token(1),
         return_token(),
         identifier_token(METHOD_IDENTIFIER),
         left_parenthesis_token(),
@@ -974,7 +977,7 @@ def test_parser_can_produce_error_for_no_access_modifiers_in_method_declaration(
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.INT
+        TokenType.INT, 1
     )
     expected_output = NodeFailure(error_message)
     
@@ -1045,10 +1048,10 @@ def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
     DECIMAL_LITERAL_VALUE = "1"
 
     tokens: Tokens = (
-        public_token(),
-        static_token(),
-        identifier_token(METHOD_IDENTIFIER),
-        left_parenthesis_token(),
+        public_token(1),
+        static_token(1),
+        identifier_token(METHOD_IDENTIFIER, 1),
+        left_parenthesis_token(1),
         double_token(),
         identifier_token(PARAMETER_IDENTIFIER),
         right_parenthesis_token(),
@@ -1063,7 +1066,7 @@ def test_parser_can_produce_error_for_no_return_type_in_method_declaration():
     # Explanation: IDENTIFIER Counts as a VARIABLE TYPE so it sees that and
     # hits LEFT PARENTHESIS
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.LEFT_PARENTHESIS
+        TokenType.LEFT_PARENTHESIS, 1
     )
     expected_output = NodeFailure(error_message)
     
@@ -1083,10 +1086,10 @@ def test_parser_can_produce_error_for_no_identifier_in_method_declaration():
     DECIMAL_LITERAL_VALUE = "8686"
 
     tokens: Tokens = (
-        public_token(),
-        static_token(),
-        double_token(),
-        left_parenthesis_token(),
+        public_token(1),
+        static_token(1),
+        double_token(1),
+        left_parenthesis_token(1),
         int_token(),
         identifier_token(PARAMETER_IDENTIFIER),
         right_parenthesis_token(),
@@ -1099,7 +1102,7 @@ def test_parser_can_produce_error_for_no_identifier_in_method_declaration():
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.LEFT_PARENTHESIS
+        TokenType.LEFT_PARENTHESIS, 1
     )
     expected_output = NodeFailure(error_message)
     
@@ -1121,11 +1124,11 @@ def test_parser_can_produce_error_for_no_left_paren_in_method_declaration():
     DECIMAL_LITERAL_VALUE = "991"
 
     tokens: Tokens = (
-        public_token(),
-        static_token(),
-        int_token(),
-        identifier_token(METHOD_IDENTIFIER),
-        short_token(),
+        public_token(1),
+        static_token(1),
+        int_token(1),
+        identifier_token(METHOD_IDENTIFIER, 1),
+        short_token(1),
         identifier_token(PARAMETER_IDENTIFIER),
         right_parenthesis_token(),
         left_curly_brace_token(),
@@ -1137,7 +1140,7 @@ def test_parser_can_produce_error_for_no_left_paren_in_method_declaration():
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-            TokenType.SHORT
+            TokenType.SHORT, 1
     )
     expected_output = NodeFailure(error_message)
     
@@ -1146,7 +1149,7 @@ def test_parser_can_produce_error_for_no_left_paren_in_method_declaration():
     assert expected_output == node_result
 
 
-def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaration():
+def test_parser_can_produce_error_for_invalid_parameter_input_in_method_declaration():
     """
     This test checks if the function `parse_tokens_for_method_declaration`
     can generate the correct error when parameter list fails.
@@ -1157,12 +1160,12 @@ def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaratio
     DECIMAL_LITERAL_VALUE = "90"
 
     tokens: Tokens = (
-        public_token(),
-        static_token(),
-        double_token(),
-        identifier_token(METHOD_IDENTIFIER),
-        left_parenthesis_token(),
-        identifier_token(PARAMETER_IDENTIFIER),
+        public_token(1),
+        static_token(1),
+        double_token(1),
+        identifier_token(METHOD_IDENTIFIER, 1),
+        left_parenthesis_token(1),
+        identifier_token(PARAMETER_IDENTIFIER, 1),
         right_parenthesis_token(),
         left_curly_brace_token(),
         return_token(),
@@ -1175,7 +1178,7 @@ def test_parser_can_produce_error_for_valid_parameter_input_in_method_declaratio
     # Explanation: IDENTIFIER counts as a VARIABLE TYPE so it sees that but not
     # a second identifier for actual name of the parameter; instead its RPAREN
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.RIGHT_PARENTHESIS
+        TokenType.RIGHT_PARENTHESIS, 1
     )
     expected_output = NodeFailure(error_message)
     
@@ -1197,22 +1200,22 @@ def test_parser_can_produce_error_for_no_block_statement_body_in_method_declarat
     DECIMAL_LITERAL_VALUE = "101"
 
     tokens: Tokens = (
-        public_token(),
-        static_token(),
-        double_token(),
-        identifier_token(METHOD_IDENTIFIER),
-        left_parenthesis_token(),
-        double_token(),
-        identifier_token(PARAMETER_IDENTIFIER),
-        right_parenthesis_token(),
-        left_curly_brace_token(),
-        return_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        semi_colon_token(),
+        public_token(1),
+        static_token(1),
+        double_token(1),
+        identifier_token(METHOD_IDENTIFIER, 1),
+        left_parenthesis_token(1),
+        double_token(1),
+        identifier_token(PARAMETER_IDENTIFIER, 1),
+        right_parenthesis_token(1),
+        left_curly_brace_token(1),
+        return_token(1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        semi_colon_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
     
     node_result: NodeResult = parse_tokens_for_method_declaration(tokens)
@@ -1230,12 +1233,12 @@ def test_parser_can_produce_error_for_no_access_modifiers_given():
     IDENTIFIER = "turing"
 
     tokens: Tokens = (
-        int_token(),
-        identifier_token(IDENTIFIER),
+        int_token(1),
+        identifier_token(IDENTIFIER, 1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.INT)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.INT, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_access_modifier_list(tokens)
@@ -1328,12 +1331,12 @@ def test_parser_can_produce_correct_error_for_variable_type_that_omits_right_bra
     """
 
     tokens: Tokens = (
-        int_token(),
-        left_bracket_token(),
+        int_token(1),
+        left_bracket_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_complete_variable_type(
@@ -1428,14 +1431,14 @@ def test_parser_can_produce_error_when_parameter_without_type():
 
     IDENTIFIER = "apl"
     tokens: Tokens = (
-        identifier_token(IDENTIFIER),
-        right_parenthesis_token(),
+        identifier_token(IDENTIFIER, 1),
+        right_parenthesis_token(1),
         end_of_file_token
     )
     
     # Explanation: IDENTIFIER counts as a VARIABLE_TYPE so.........
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.RIGHT_PARENTHESIS
+        TokenType.RIGHT_PARENTHESIS, 1
     )
     expected_output = NodeFailure(error_message)
 
@@ -1488,12 +1491,12 @@ def test_parser_can_generate_correct_error_when_parameter_list_expects_parenthes
     IDENTIFIER = "cabal"
 
     tokens: Tokens = (
-        char_token(),
-        identifier_token(IDENTIFIER),
+        char_token(1),
+        identifier_token(IDENTIFIER, 1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_parameter_list(tokens)
@@ -1558,12 +1561,12 @@ def test_parser_can_produce_error_for_statement_list_that_fails_initial_statemen
     """
 
     tokens: Tokens = (
-        return_token(),
-        return_token(),
+        return_token(1),
+        return_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RETURN)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RETURN, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_statement_list(tokens)
@@ -1633,18 +1636,18 @@ def test_parser_can_produce_error_for_statement_list_that_fails_additional_state
     DECIMAL_LITERAL_VALUE = "40"
 
     tokens: Tokens = (
-        char_token(),
-        identifier_token(IDENTIFIER),
-        equals_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        semi_colon_token(),
-        return_token(),
-        equals_token(),
-        semi_colon_token(),
+        char_token(1),
+        identifier_token(IDENTIFIER, 1),
+        equals_token(1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        semi_colon_token(1),
+        return_token(2),
+        equals_token(2),
+        semi_colon_token(2),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.EQUALS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.EQUALS, 2)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_statement_list(tokens)
@@ -1744,16 +1747,16 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_condi
     """
 
     tokens: Tokens = (
-        while_token(),
-        left_parenthesis_token(),
-        minus_token(),
+        while_token(1),
+        left_parenthesis_token(1),
+        minus_token(1),
         right_parenthesis_token(),
         left_curly_brace_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.MINUS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.MINUS, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_while_statement(tokens)
@@ -1804,20 +1807,20 @@ def test_parser_can_generate_correct_error_for_while_statement_with_faulty_body(
     IDENTIFIER = "variable"
 
     tokens: Tokens = (
-        while_token(),
-        left_parenthesis_token(),
-        true_token(),
-        right_parenthesis_token(),
-        left_curly_brace_token(),
-        identifier_token(IDENTIFIER),
-        minus_token(),
-        divide_token(),
+        while_token(1),
+        left_parenthesis_token(1),
+        true_token(1),
+        right_parenthesis_token(1),
+        left_curly_brace_token(1),
+        identifier_token(IDENTIFIER, 2),
+        minus_token(2),
+        divide_token(2),
         semi_colon_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DIVIDE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DIVIDE, 2)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_while_statement(tokens)
@@ -1864,16 +1867,16 @@ def test_parser_can_generate_error_for_if_statement_with_faulty_condition():
     """
 
     tokens: Tokens = (
-        if_token(),
-        left_parenthesis_token(),
-        minus_token(),
+        if_token(1),
+        left_parenthesis_token(1),
+        minus_token(1),
         right_parenthesis_token(),
         left_curly_brace_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.MINUS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.MINUS, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_if_statement(tokens)
@@ -1925,20 +1928,20 @@ def test_parser_can_generate_correct_error_for_if_statement_with_faulty_body():
     IDENTIFIER = "variable"
 
     tokens: Tokens = (
-        if_token(),
-        left_parenthesis_token(),
-        true_token(),
-        right_parenthesis_token(),
-        left_curly_brace_token(),
-        identifier_token(IDENTIFIER),
-        minus_token(),
-        divide_token(),
+        if_token(1),
+        left_parenthesis_token(1),
+        true_token(1),
+        right_parenthesis_token(1),
+        left_curly_brace_token(1),
+        identifier_token(IDENTIFIER, 2),
+        minus_token(2),
+        divide_token(2),
         semi_colon_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DIVIDE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DIVIDE, 2)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_if_statement(tokens)
@@ -2032,23 +2035,23 @@ def test_parser_can_produce_correct_error_for_faulty_if_else_if_statement():
     """
 
     tokens: Tokens = (
-        if_token(),
-        left_parenthesis_token(),
-        false_token(),
-        right_parenthesis_token(),
-        left_curly_brace_token(),
-        right_curly_brace_token(),
-        else_token(),
-        if_token(),
-        left_parenthesis_token(),
-        right_parenthesis_token(),
+        if_token(1),
+        left_parenthesis_token(1),
+        false_token(1),
+        right_parenthesis_token(1),
+        left_curly_brace_token(1),
+        right_curly_brace_token(2),
+        else_token(3),
+        if_token(3),
+        left_parenthesis_token(3),
+        right_parenthesis_token(3),
         left_curly_brace_token(),
         right_curly_brace_token(),
         end_of_file_token
     )
 
     error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
-        TokenType.RIGHT_PARENTHESIS
+        TokenType.RIGHT_PARENTHESIS, 3
     )
     expected_output = NodeFailure(error_message)
 
@@ -2110,20 +2113,20 @@ def test_parser_can_produce_correct_error_for_fauly_if_else_statement():
     """
 
     tokens: Tokens = (
-        if_token(),
-        left_parenthesis_token(),
-        false_token(),
-        right_parenthesis_token(),
-        left_curly_brace_token(),
-        right_curly_brace_token(),
-        else_token(),
-        left_curly_brace_token(),
-        semi_colon_token(),
-        right_curly_brace_token(),
+        if_token(1),
+        left_parenthesis_token(1),
+        false_token(1),
+        right_parenthesis_token(1),
+        left_curly_brace_token(1),
+        right_curly_brace_token(2),
+        else_token(3),
+        left_curly_brace_token(3),
+        semi_colon_token(4),
+        right_curly_brace_token(5),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.SEMI_COLON)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.SEMI_COLON, 4)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_if_statement(tokens)
@@ -2267,7 +2270,7 @@ def test_parser_can_produce_error_for_block_statement_without_left_brace():
     DECIMAL_LITERAL_VALUE = "699"
 
     tokens: Tokens = (
-        int_token(),
+        int_token(1),
         identifier_token(IDENTIFIER),
         equals_token(),
         decimal_literal_token(DECIMAL_LITERAL_VALUE),
@@ -2276,7 +2279,7 @@ def test_parser_can_produce_error_for_block_statement_without_left_brace():
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.INT)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.INT, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
@@ -2295,16 +2298,16 @@ def test_parser_can_produce_error_for_block_statement_without_right_brace():
     DECIMAL_LITERAL_VALUE = "88"
 
     tokens: Tokens = (
-        left_curly_brace_token(),
-        double_token(),
-        identifier_token(IDENTIFIER),
-        equals_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        semi_colon_token(),
+        left_curly_brace_token(1),
+        double_token(2),
+        identifier_token(IDENTIFIER, 2),
+        equals_token(2),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 2),
+        semi_colon_token(2),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_block_statement_body(tokens)
@@ -2386,16 +2389,16 @@ def test_parser_can_generate_correct_error_for_statement_that_expects_semicolon(
     DECIMAL_LITERAL_VALUE = "66"
 
     tokens: Tokens = (
-        int_token(),
-        identifier_token(IDENTIFIER),
-        equals_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        divide_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
+        int_token(1),
+        identifier_token(IDENTIFIER, 1),
+        equals_token(1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        divide_token(1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_inline_statement(tokens)
@@ -2486,15 +2489,15 @@ def test_parser_can_generate_correct_error_given_bad_expression_to_increment():
     DECIMAL_LITERAL_VALUE = "74"
 
     tokens: Tokens = (
-        identifier_token(IDENTIFIER),
-        plus_token(),
-        equals_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        plus_token(),
+        identifier_token(IDENTIFIER, 1),
+        plus_token(1),
+        equals_token(1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        plus_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_variable_increment(tokens)
@@ -2570,12 +2573,12 @@ def test_parse_can_generate_correct_error_given_invalid_expression_to_return():
     """
     
     tokens: Tuple[Token, Token, Token] = (
-        return_token(),
-        return_token(),
+        return_token(1),
+        return_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RETURN)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.RETURN, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_return_statement(tokens)
@@ -2632,12 +2635,12 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_equals(
     IDENTIFIER = "errorprone"
 
     tokens: Tuple[Token, Token, Token] = (
-        char_token(),
-        identifier_token(IDENTIFIER),
+        char_token(1),
+        identifier_token(IDENTIFIER, 1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
@@ -2655,13 +2658,13 @@ def test_parser_can_return_correct_error_for_initialization_when_expects_express
     IDENTIFIER = "anju"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        char_token(),
-        identifier_token(IDENTIFIER),
-        equals_token(),
+        char_token(1),
+        identifier_token(IDENTIFIER, 1),
+        equals_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_variable_initialization(tokens)
@@ -2782,13 +2785,13 @@ def test_parser_can_generate_correct_error_for_complex_comparison_expression():
     DECIMAL_LITERAL_VALUE = "31"
 
     tokens: Tokens = (
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        less_than_token(),
-        plus_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        less_than_token(1),
+        plus_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_comparison_expression(tokens)
@@ -2804,12 +2807,12 @@ def test_parser_can_produce_error_for_comp_expression_with_no_left_paren():
     """
 
     tokens: Tokens = (
-        true_token(),
-        right_parenthesis_token(),
+        true_token(1),
+        right_parenthesis_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.TRUE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.TRUE, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
@@ -2825,12 +2828,12 @@ def test_parser_can_produce_error_for_comp_expression_with_no_right_paren():
     """
 
     tokens: Tokens = (
-        left_parenthesis_token(),
-        false_token(),
+        left_parenthesis_token(1),
+        false_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression_in_paren(tokens)
@@ -2934,13 +2937,13 @@ def test_parser_can_generate_correct_error_for_complex_expression():
     DECIMAL_LITERAL_VALUE = "5"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        plus_token(),
-        minus_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        plus_token(1),
+        minus_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.MINUS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.MINUS, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_expression(tokens)
@@ -3048,13 +3051,13 @@ def test_parser_can_generate_correct_error_for_complex_term():
     DECIMAL_LITERAL_VALUE = "3"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        divide_token(),
-        divide_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        divide_token(1),
+        divide_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DIVIDE)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DIVIDE, 1)
     expected_output = NodeFailure(error_message)
 
     node_output: NodeResult = parse_tokens_for_term(tokens)
@@ -3211,13 +3214,13 @@ def test_parser_can_generate_correct_error_for_factor():
     correct NodeFailure object.
     """
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS)
-    expected_output = NodeFailure(error_message)
-
     tokens: Tuple[Token, Token] = (
-        plus_token(),
+        plus_token(1),
         end_of_file_token
     )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS, 1)
+    expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_factor(tokens)
 
@@ -3259,13 +3262,13 @@ def test_parser_can_generate_correct_error_for_method_call_when_expecting_parent
     IDENTIFIER = "heELLO"
 
     tokens: Tuple[Token, Token, Token, Token] = (
-        identifier_token(IDENTIFIER),
-        left_parenthesis_token(),
-        plus_token(),
+        identifier_token(IDENTIFIER, 1),
+        left_parenthesis_token(1),
+        plus_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.PLUS, 1)
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_method_call(tokens)
@@ -3436,15 +3439,17 @@ def test_parser_can_generate_correct_error_when_argument_list_expects_parenthesi
     DECIMAL_LITERAL_VALUE = "3435"
 
     tokens: Tokens = (
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        comma_token(),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        decimal_literal_token(DECIMAL_LITERAL_VALUE),
-        right_parenthesis_token(),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        comma_token(1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        decimal_literal_token(DECIMAL_LITERAL_VALUE, 1),
+        right_parenthesis_token(1),
         end_of_file_token
     )
 
-    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.DECIMAL_LITERAL)
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(
+        TokenType.DECIMAL_LITERAL, 1
+    )
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_argument_list(tokens)
