@@ -4272,6 +4272,33 @@ def test_emitter_can_produce_correct_output_for_method_call():
     assert expected_output == emitter_result
 
 
+def test_emitter_can_produce_correct_output_for_method_call_with_println():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a MethodCall object, and then translate that input from 'System.out.println'
+    to 'print' (since that is the name of the function in Python).
+    """
+
+    PRINTLN_IDENTIFIER = "println"
+    println_qualified_identifier = QualifiedIdentifier(PRINTLN_IDENTIFIER)
+
+    OUT_IDENTIFIER = "out"
+    out_qualified_identifier = QualifiedIdentifier(OUT_IDENTIFIER,
+                                                   println_qualified_identifier)
+
+    IDENTIFIER = "System"
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER,
+                                               out_qualified_identifier)
+    argument_list = ArgumentList()
+    emitter_input = MethodCall(qualified_identifier, argument_list)
+
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"print()"
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_argument_list_with_no_arguments():
     """
     This test checks that the emitter can produce the correct output when given

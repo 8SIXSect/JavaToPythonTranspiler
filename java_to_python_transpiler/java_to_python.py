@@ -2224,8 +2224,18 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
             result_for_argument_list: str = emit_ast_into_output(argument_list,
                                                                  indent_level)
 
+            output_qualified_identifier: str
+
+            match result_for_qualified_identifier:
+                case "System.out.println":
+                    output_qualified_identifier = "print"
+                
+                case _:
+                    output_qualified_identifier = result_for_qualified_identifier
+
+
             return (
-                result_for_qualified_identifier + OPENED_PARENTHESIS +
+                output_qualified_identifier + OPENED_PARENTHESIS +
                 result_for_argument_list + CLOSED_PARENTHESIS
             )
 
