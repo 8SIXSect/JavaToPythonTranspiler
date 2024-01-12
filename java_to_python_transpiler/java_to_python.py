@@ -1942,7 +1942,7 @@ def parse_tokens_for_argument_list(tokens: Tokens) -> NodeResult:
 
 Node = Union[
     ComparisonExpression, ExpressionNode, TermNode, FactorNode,
-    MethodCall, ArgumentList,
+    MethodCall, ArgumentList, QualifiedIdentifier,
     VariableInitialization, ReturnStatement, VariableIncrement,
     InlineStatement,
     WhileStatement, IfStatement,
@@ -1967,6 +1967,7 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
     OPENED_PARENTHESIS = "("
     CLOSED_PARENTHESIS = ")"
     COLON = ":"
+    PERIOD = "."
     COMMA = ","
     SPACE = " "
     NEW_LINE = "\n"
@@ -1984,6 +1985,7 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
     def with_indent(output: str) -> str:
         return indent_level * "    " + output
 
+    #breakpoint()
 
     match node:
         case ClassDeclaration(identifier, method_declaration_list):
@@ -2204,15 +2206,26 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
                 result_for_additional_term
             )
         
-        case FactorNode(number_or_ident_or_string, None, None):
-            return number_or_ident_or_string
+        case FactorNode(number_or_string, None, None):
+            return number_or_string
 
-        case FactorNode(number_or_ident_or_string, qualified_identifier, None):
+        case FactorNode("", qualified_identifier, None):
             assert qualified_identifier is not None
             return emit_ast_into_output(qualified_identifier, indent_level)
 
         case FactorNode("", None, method_call) if method_call is not None:
             return emit_ast_into_output(method_call, indent_level)
+
+        case QualifiedIdentifier(identifier, None):
+            return identifier
+        
+        case QualifiedIdentifier(identifier, additional_identifier):
+            assert additional_identifier is not None
+
+            return (
+                identifier + PERIOD +
+                emit_ast_into_output(additional_identifier)
+            )
 
         case MethodCall(identifier, argument_list):
             result_for_argument_list: str = emit_ast_into_output(argument_list,
