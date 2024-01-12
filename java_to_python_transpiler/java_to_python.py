@@ -2208,7 +2208,6 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
         case FactorNode("", None, method_call) if method_call is not None:
             return emit_ast_into_output(method_call, indent_level)
 
-        # Add emitter tests 4 these
         case QualifiedIdentifier(identifier, None):
             return identifier
         

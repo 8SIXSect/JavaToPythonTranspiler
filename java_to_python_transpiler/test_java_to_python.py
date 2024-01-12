@@ -4163,11 +4163,11 @@ def test_emitter_can_produce_correct_output_for_complex_term_node():
     assert expected_output == emitter_result
 
 
-def test_emitter_can_produce_correct_output_for_factor_node_with_no_method_call():
+def test_emitter_can_produce_correct_output_for_factor_with_no_call_or_ident():
     """
     This test checks that the emitter can produce the correct output when given
-    a FactorNode object with a number_or_identifier field and NOT a method_call
-    field.
+    a FactorNode object with a number_or_string field and NOT a method_call
+    field OR a qualified_identifier field.
     """
 
     NUMBER = "86"
@@ -4179,10 +4179,30 @@ def test_emitter_can_produce_correct_output_for_factor_node_with_no_method_call(
     assert expected_output == emitter_result
 
 
+def test_emitter_can_produce_correct_output_for_factor_with_only_qual_identifier():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a FactorNode object with a `qualified_identifier` field and NOT a `method_call`
+    field or a `number_or_string` field
+    """
+
+    ADDITIONAL_IDENTIFIER = "lena"
+    additional_identifier = QualifiedIdentifier(ADDITIONAL_IDENTIFIER)
+
+    IDENTIFIER = "shin"
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER, additional_identifier)
+    emitter_input = FactorNode(qualified_identifier=qualified_identifier)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"{IDENTIFIER}.{ADDITIONAL_IDENTIFIER}"
+
+    assert expected_output == emitter_result
+
+
 def test_emitter_can_produce_correct_output_for_factor_node_with_a_method_call():
     """
     This test checks that the emitter can produce the correct output when given
-    a FactorNode object with a method_call field and NOT a number_or_identifier
+    a FactorNode object with a method_call field and NOT a number_or_string
     field.
     """
 
@@ -4201,6 +4221,41 @@ def test_emitter_can_produce_correct_output_for_factor_node_with_a_method_call()
     expected_output = f"{IDENTIFIER}({NUMBER})"
 
     assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_simple_qualified_identifier():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a QualifiedIdentifier object with only the `identifier` field given a value.
+    """
+
+    IDENTIFIER = "shin"
+    emitter_input = QualifiedIdentifier(IDENTIFIER)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = IDENTIFIER
+
+    assert expected_output == emitter_result
+
+
+def test_emitter_can_produce_correct_output_for_complex_qualified_identifier():
+    """
+    This test checks that the emitter can produce the correct output when given
+    a QualifiedIdentifier object with the `identifier` field given a value and
+    the `additional_identifier` field given a value.
+    """
+
+    ADDITIONAL_IDENTIFIER = "lena"
+    additional_identifier = QualifiedIdentifier(ADDITIONAL_IDENTIFIER)
+
+    IDENTIFIER = "shin"
+    emitter_input = QualifiedIdentifier(IDENTIFIER, additional_identifier)
+    emitter_result: str = emit_ast_into_output(emitter_input)
+
+    expected_output = f"{IDENTIFIER}.{ADDITIONAL_IDENTIFIER}"
+
+    assert expected_output == emitter_result
+
 
 
 def test_emitter_can_produce_correct_output_for_method_call():
