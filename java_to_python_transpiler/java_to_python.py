@@ -1780,6 +1780,25 @@ def parse_tokens_for_factor(tokens: Tokens) -> NodeResult:
 
         return NodeSuccess(node_result_for_method_call.tokens, factor_node)
 
+    # The stmt verifies this is not a Method call
+    if current_token.token_type == TokenType.IDENTIFIER:
+        node_result_for_qual_identifier: NodeResult
+        node_result_for_qual_identifier = parse_tokens_for_qualified_identifier(
+            tokens
+        )
+
+        if isinstance(node_result_for_qual_identifier, NodeFailure):
+            return node_result_for_qual_identifier
+
+        assert isinstance(node_result_for_qual_identifier.node,
+                          QualifiedIdentifier)
+
+        factor_node = FactorNode(
+            qualified_identifier=node_result_for_qual_identifier.node
+        )
+
+        return NodeSuccess(node_result_for_qual_identifier.tokens, factor_node)
+    
     tokens_after_deleting_current_token: Tokens = tokens[1:]
 
     # You may need to add a check for END_OF_FILE but idk yet

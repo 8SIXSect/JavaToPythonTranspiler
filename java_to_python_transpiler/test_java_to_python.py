@@ -1603,9 +1603,12 @@ def test_parser_can_produce_ast_for_statement_list_with_multiple_statements():
     variable_initialization = VariableInitialization(IDENTIFIER,
                                                      comparison_expression)
 
-    return_comp_expression: ComparisonExpression = generate_single_comp_expression(
-        ADDITIONAL_IDENTIFIER
-    )
+    qualified_identifier = QualifiedIdentifier(ADDITIONAL_IDENTIFIER)
+    factor = FactorNode(qualified_identifier=qualified_identifier)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    return_comp_expression = ComparisonExpression(expression)
+
     return_statement = ReturnStatement(return_comp_expression)
 
     initial_inline_statement = InlineStatement(variable_initialization)
@@ -1681,10 +1684,11 @@ def test_parser_can_generate_correct_ast_for_block_statement():
         end_of_file_token
     )
 
-    while_condition_comp_expression: ComparisonExpression
-    while_condition_comp_expression = generate_single_comp_expression(
-        IDENTIFIER
-    )
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
+    factor = FactorNode(qualified_identifier=qualified_identifier)
+    term = TermNode(factor)
+    expression = ExpressionNode(term)
+    while_condition_comp_expression = ComparisonExpression(expression)
 
     increment_comp_expression: ComparisonExpression
     increment_comp_expression = generate_single_comp_expression(
@@ -2716,7 +2720,8 @@ def test_parser_can_generate_correct_ast_for_comparison_with_one_expression():
         end_of_file_token
     )
 
-    factor = FactorNode(IDENTIFIER)
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
+    factor = FactorNode(qualified_identifier=qualified_identifier)
 
     factor_for_additional_term = FactorNode(DECIMAL_LITERAL_VALUE)
     additional_term = TermNode(factor_for_additional_term)
@@ -3177,7 +3182,8 @@ def test_parser_can_generate_correct_ast_for_single_factor_with_identifier():
         end_of_file_token
     )
 
-    factor_node = FactorNode(IDENTIFIER)
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
+    factor_node = FactorNode(qualified_identifier=qualified_identifier)
     expected_output_tokens: Tuple[Token] = (end_of_file_token,)
     expected_output = NodeSuccess(expected_output_tokens, factor_node)
 
