@@ -281,7 +281,7 @@ class NodeSuccess:
         NoNode,
 
         ComparisonExpression, ExpressionNode, TermNode, FactorNode,
-        MethodCall, ArgumentList,
+        MethodCall, ArgumentList, QualifiedIdentifier,
         VariableInitialization, ReturnStatement, VariableIncrement,
         InlineStatement,
         WhileStatement, IfStatement,
@@ -1793,7 +1793,42 @@ def parse_tokens_for_qualified_identifier(tokens: Tokens) -> NodeResult:
     QualifiedIdentifier object.
     """
 
-    raise NotImplementedError
+    # The purpose of having this function check is NOT for when factor calls it
+    # Factor will check that there is an identifier.
+    # The purpose is when chaining the function for getting additional qual idents,
+    # You'll need to check for that CASE
+    expected_identifier_token: Token = tokens[0]
+    if expected_identifier_token.token_type != TokenType.IDENTIFIER:
+        return report_error_in_parser(expected_identifier_token.token_type,
+                                      expected_identifier_token.line_number)
+
+    tokens_with_identifier_removed: Tokens = tokens[1:]
+
+    possible_period_token: Token = tokens_with_identifier_removed[0]
+    if possible_period_token.token_type != TokenType.PERIOD:
+        qualified_identifier = QualifiedIdentifier(expected_identifier_token.value)
+        return NodeSuccess(tokens_with_identifier_removed, qualified_identifier)
+
+    tokens_with_period_removed: Tokens = tokens_with_identifier_removed[1:]
+
+    node_result_for_additional_identifier: NodeResult
+    node_result_for_additional_identifier = parse_tokens_for_qualified_identifier(
+        tokens_with_period_removed
+    )
+
+    if isinstance(node_result_for_additional_identifier, NodeFailure):
+        return node_result_for_additional_identifier
+
+    assert isinstance(node_result_for_additional_identifier.node,
+                      QualifiedIdentifier)
+
+    qualified_identifier = QualifiedIdentifier(
+        expected_identifier_token.value,
+        node_result_for_additional_identifier.node
+    )
+
+    return NodeSuccess(node_result_for_additional_identifier.tokens,
+                       qualified_identifier)
 
 
 def parse_tokens_for_method_call(tokens: Tokens) -> NodeResult:

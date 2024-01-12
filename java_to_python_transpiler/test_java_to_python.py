@@ -5,7 +5,7 @@ from java_to_python_transpiler.java_to_python import (
     VARIABLE_TYPES, ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration,
     ComparisonExpression, ComparisonOperator, ExpressionNode, FactorNode,
     IfStatement, InlineStatement, MethodDeclaration, MethodDeclarationList,
-    NoNode, ParameterList, StatementList, LexerFailure, MethodCall, NodeFailure,
+    NoNode, ParameterList, QualifiedIdentifier, StatementList, LexerFailure, MethodCall, NodeFailure,
     NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
     LexerResult, Tokens, VariableIncrement, VariableInitialization,
     WhileStatement, TokenType, emit_ast_into_output,
@@ -16,7 +16,7 @@ from java_to_python_transpiler.java_to_python import (
     parse_tokens_for_expression, parse_tokens_for_expression_in_paren,
     parse_tokens_for_factor, parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
     parse_tokens_for_method_declaration, parse_tokens_for_method_declaration_list,
-    parse_tokens_for_parameter_list, parse_tokens_for_statement_list,
+    parse_tokens_for_parameter_list, parse_tokens_for_qualified_identifier, parse_tokens_for_statement_list,
     parse_tokens_for_method_call, parse_tokens_for_return_statement,
     parse_tokens_for_term, parse_tokens_for_variable_increment,
     parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
@@ -3223,6 +3223,82 @@ def test_parser_can_generate_correct_error_for_factor():
     expected_output = NodeFailure(error_message)
 
     node_result: NodeResult = parse_tokens_for_factor(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_single_identifier():
+    """
+    This test checks that the parser can correctly generate a QualifiedIdentifier
+    object using the `parse_tokens_for_qualified_identifier` function when given
+    a single identifier.
+    """
+
+    IDENTIFIER = "hlelo"
+
+    tokens: Tokens = (
+        identifier_token(IDENTIFIER),
+        end_of_file_token
+    )
+
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER)
+    expected_output = NodeSuccess(tokens[1:], qualified_identifier)
+
+    node_result: NodeResult = parse_tokens_for_qualified_identifier(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_error_for_omitted_additional_identifier():
+    """
+    This test checks that the parser can correctly generate an error using the
+    `parse_tokens_for_qualified_identifier` function when omitting the
+    additional identifier.
+    
+    Ex: myident.
+    ^^^^^^^^^^^ <-- there's only a dot; not additional identifier
+    """
+
+    IDENTIFIER = "errORRRRR"
+    
+    tokens: Tokens = (
+        identifier_token(IDENTIFIER, 1),
+        period_token(1),
+        end_of_file_token
+    )
+
+    error_message: str = ERROR_MESSAGE_FOR_PARSER.format(TokenType.END_OF_FILE, -1)
+    expected_output = NodeFailure(error_message)
+
+    node_result: NodeResult = parse_tokens_for_qualified_identifier(tokens)
+
+    assert expected_output == node_result
+
+
+def test_parser_can_generate_correct_ast_for_qualified_identifier():
+    """
+    This test checks that the parser can correctly generate a QualifiedIdentifier
+    object using the `parse_tokens_for_qualified_identifier` function when given
+    a QUALIFIED identifier.
+    """
+
+    IDENTIFIER = "System"
+    ADDITIONAL_IDENTIFER = "out"
+
+    tokens: Tokens = (
+        identifier_token(IDENTIFIER, 1),
+        period_token(1),
+        identifier_token(ADDITIONAL_IDENTIFER, 1),
+        end_of_file_token
+    )
+
+    additional_identifier = QualifiedIdentifier(ADDITIONAL_IDENTIFER)
+    qualified_identifier = QualifiedIdentifier(IDENTIFIER, additional_identifier)
+
+    expected_output_tokens: Tokens = (end_of_file_token,)
+    expected_output = NodeSuccess(expected_output_tokens, qualified_identifier)
+
+    node_result: NodeResult = parse_tokens_for_qualified_identifier(tokens)
 
     assert expected_output == node_result
 
