@@ -436,7 +436,21 @@ class FactorNode:
     """
 
     number_or_ident_or_string: str = ""
+    qualified_identifier: Optional[QualifiedIdentifier] = None
     method_call: Optional[MethodCall] = None
+
+
+@dataclass
+class QualifiedIdentifier:
+    """
+    Qualified or chained identifier
+
+    `identifier` represents the current part of the identifier
+    `additional_identifier` (optional) allows one to chain more clauses
+    """
+
+    identifier: str
+    additional_identifier: Optional[QualifiedIdentifier] = None
 
 
 @dataclass
@@ -1773,6 +1787,15 @@ def parse_tokens_for_factor(tokens: Tokens) -> NodeResult:
     return NodeSuccess(tokens_after_deleting_current_token, factor_node)
 
 
+def parse_tokens_for_qualified_identifier(tokens: Tokens) -> NodeResult:
+    """
+    This function parses a tuple of tokens in order to turn them into a
+    QualifiedIdentifier object.
+    """
+
+    raise NotImplementedError
+
+
 def parse_tokens_for_method_call(tokens: Tokens) -> NodeResult:
     """
     This function parses a list of tokens in order to turn them into a MethodCall
@@ -2127,10 +2150,14 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
                 result_for_additional_term
             )
         
-        case FactorNode(number_or_ident_or_string, None):
-            return number_or_ident_or_string            
+        case FactorNode(number_or_ident_or_string, None, None):
+            return number_or_ident_or_string
 
-        case FactorNode("", method_call) if method_call is not None:
+        case FactorNode(number_or_ident_or_string, qualified_identifier, None):
+            assert qualified_identifier is not None
+            return emit_ast_into_output(qualified_identifier, indent_level)
+
+        case FactorNode("", None, method_call) if method_call is not None:
             return emit_ast_into_output(method_call, indent_level)
 
         case MethodCall(identifier, argument_list):
