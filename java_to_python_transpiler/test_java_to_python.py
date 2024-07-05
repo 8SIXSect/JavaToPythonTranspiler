@@ -1,27 +1,6 @@
 from typing import Tuple
 
-from java_to_python_transpiler.java_to_python import (
-    VARIABLE_TYPES, ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration,
-    ComparisonExpression, ComparisonOperator, ExpressionNode, FactorNode,
-    IfStatement, InlineStatement, MethodDeclaration, MethodDeclarationList,
-    NoNode, ParameterList, QualifiedIdentifier, StatementList, LexerFailure, MethodCall, NodeFailure,
-    NodeResult, NodeSuccess, ParserFailure, ReturnStatement, TermNode, Token,
-    LexerResult, Tokens, VariableIncrement, VariableInitialization,
-    WhileStatement, TokenType, emit_ast_into_output,
-    parse_tokens, parse_tokens_for_access_modifier_list,
-    parse_tokens_for_argument_list, parse_tokens_for_block_statement,
-    parse_tokens_for_block_statement_body, parse_tokens_for_class_declaration,
-    parse_tokens_for_comparison_expression, parse_tokens_for_complete_variable_type,
-    parse_tokens_for_expression, parse_tokens_for_expression_in_paren,
-    parse_tokens_for_factor, parse_tokens_for_if_statement, parse_tokens_for_inline_statement,
-    parse_tokens_for_method_declaration, parse_tokens_for_method_declaration_list,
-    parse_tokens_for_parameter_list, parse_tokens_for_qualified_identifier, parse_tokens_for_statement_list,
-    parse_tokens_for_method_call, parse_tokens_for_return_statement,
-    parse_tokens_for_term, parse_tokens_for_variable_increment,
-    parse_tokens_for_variable_initialization, parse_tokens_for_while_statement,
-    report_error_for_lexer, scan_and_tokenize_input, ParserResult,
-    ERROR_MESSAGE_FOR_LEXER, ERROR_MESSAGE_FOR_PARSER
-)
+from java_to_python_transpiler.java_to_python import *
 
 
 # These tokens may be reused throughout the tests in this file
@@ -3578,7 +3557,7 @@ def test_emitter_can_produce_correct_output_for_class_declaration():
     expected_output = (
         f"class {CLASS_IDENTIFEIR}:\n" +
         f"    def {METHOD_IDENTIFIER}():\n" +
-        "        return 86\n"
+        "        return 86\n\n"
     )
 
     assert expected_output == emitter_result
@@ -3608,9 +3587,9 @@ def test_emitter_can_produce_correct_output_for_method_declaration_list_multiple
     emitter_result: str = emit_ast_into_output(emitter_input)
     expected_output = (
         f"def {METHOD_IDENTIFIER}(num):\n" +
-        "    return 0\n" +
+        "    return 0\n\n" +
         f"def {METHOD_IDENTIFIER}(num):\n" +
-        "    return 0\n"
+        "    return 0\n\n"
     )
     
     assert expected_output == emitter_result
@@ -3640,7 +3619,7 @@ def test_emitter_can_produce_correct_output_for_one_method_method_declaration_li
     emitter_result: str = emit_ast_into_output(emitter_input)
     expected_output = (
         f"def {METHOD_IDENTIFIER}(num):\n" +
-        "    return 0\n"
+        "    return 0\n\n"
     )
     
     assert expected_output == emitter_result
@@ -3680,7 +3659,7 @@ def test_emitter_can_produce_correct_output_for_method_declaration():
 
     expected_output = (
         f"def {METHOD_IDENTIFIER}():\n" +
-        "    return 0\n"
+        "    return 0\n\n"
     )
 
     assert expected_output == emitter_result
@@ -3795,7 +3774,7 @@ def test_emitter_can_produce_correct_output_for_empty_statement_list():
 
     emitter_input = StatementList()
     emitter_result: str = emit_ast_into_output(emitter_input)
-    expected_output = ""
+    expected_output = "pass"
 
     assert expected_output == emitter_result
 

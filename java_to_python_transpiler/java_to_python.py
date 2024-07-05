@@ -1966,6 +1966,7 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
     EQUALS = "="
     PLUS = "+"
    
+    PASS_KEYWORD = "pass"
     WHILE_KEYWORD = "while"
     RETURN_KEYWORD = "return"
     IF_KEYWORD = "if"
@@ -2020,7 +2021,7 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
             return with_indent(
                 DEF_KEYWORD + SPACE + identifier + OPENED_PARENTHESIS
                 + result_for_parameter_list + CLOSED_PARENTHESIS + COLON +
-                NEW_LINE + result_for_statement_list
+                NEW_LINE + result_for_statement_list + NEW_LINE
             )
         
         case ParameterList(None, None):
@@ -2044,7 +2045,7 @@ def emit_ast_into_output(node: Node, indent_level: int = 0) -> str:
             )
 
         case StatementList(None, None):
-            return ""
+            return with_indent(PASS_KEYWORD)
 
         case StatementList(statement, None):
             assert statement is not None
