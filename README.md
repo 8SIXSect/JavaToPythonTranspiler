@@ -2,7 +2,9 @@
 Transpiles Java source code into Python source code
 
 ## Installation
-`NotImplemented`
+```
+pip install java-to-python-transpiler
+```
 
 ## Functions
 
