@@ -5,6 +5,7 @@ This module contains methods for transpiling source (Java) to source (Python).
 from dataclasses import dataclass
 from io import TextIOWrapper
 from typing import Optional
+import autopep8
 from java_to_python_transpiler.java_to_python import (
     ArgumentList, ArithmeticOperator, BlockStatement, ClassDeclaration,
     ComparisonExpression, ComparisonOperator, ExpressionNode, FactorNode,
@@ -54,7 +55,9 @@ def java_to_python_from_string(user_input: str) -> str | TranspilerFailure:
     if isinstance(parser_result, ParserFailure):
         return TranspilerFailure(parser_result.error_messasge)
 
-    return emit_ast_into_output(parser_result)
+    transpiler_result: str = emit_ast_into_output(parser_result)
+
+    return autopep8.fix_code(transpiler_result, options={})
 
 
 def java_to_python_from_file(file_path: Optional[str] = None,
