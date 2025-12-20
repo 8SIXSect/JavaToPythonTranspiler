@@ -1,10 +1,10 @@
 # JavaToPythonTranspiler
-Transpiles Java source code into Python source code
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
 ![PyPI](https://img.shields.io/pypi/v/java-to-python-transpiler.svg)
 
+Transpiles Java source code into Python source code
 
 ## Installation
 ```
