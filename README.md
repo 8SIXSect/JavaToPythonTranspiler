@@ -8,9 +8,9 @@ pip install java-to-python-transpiler
 
 ## Example Usage
 ```python
-import java_to_python_transpiler as jtp
+from java_to_python_transpiler.transpile_methods import java_to_python_from_string, TranspilerFailure
 
-python_code: str = jtp.transpile_methods.java_to_python_from_string("""
+python_code: str | TranspilerFailure  = jtp.transpile_methods.java_to_python_from_string("""
 public class Main {
     public static void main(String[] args) {
         System.out.println("Merry Christmas");
