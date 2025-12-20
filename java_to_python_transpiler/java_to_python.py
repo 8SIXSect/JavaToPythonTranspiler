@@ -10,7 +10,6 @@ import re
 from enum import Enum
 from typing import Dict, List, Optional, Union, Tuple
 
-
 class TokenType(Enum):
     SINGLE_LINE_COMMENT = "SINGLE_LINE_COMMENT"
     LEFT_PARENTHESIS = "LEFT_PARENTHESIS"
